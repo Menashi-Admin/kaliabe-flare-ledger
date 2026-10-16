@@ -10,6 +10,7 @@ decision layer for the Niger Delta.
 **Live:** [kaliabe-flare-web.pages.dev](https://kaliabe-flare-web.pages.dev)
 **API:** [kaliabe-flare.menashiconsulting.workers.dev](https://kaliabe-flare.menashiconsulting.workers.dev)
 **CSV digest:** [kaliabe-flare-web.pages.dev/api/digest.csv](https://kaliabe-flare-web.pages.dev/api/digest.csv)
+**Decision brief (national):** [kaliabe-flare-web.pages.dev/api/brief?scope=national](https://kaliabe-flare-web.pages.dev/api/brief?scope=national)
 
 ---
 
@@ -45,15 +46,26 @@ the EU Methane Regulation), lenders/insurers (financed emissions and asset risk)
   - **computed in the browser**: the containing state and LGA, and the nearest pipeline with its
     commodity and distance
   - shareable per-site links (`#site=<id>`); table rows open the map
+- **Decision layer (Wave 1)**:
+  - a **year player** (2012→2025) under the map, with year totals;
+  - national and per-operator **trend lines** with 3-yr and 5-yr change and a labelled
+    projection;
+  - **peer percentiles**, a sortable **league table**, and **penalty exposure** (current,
+    cumulative, projected);
+  - a **scenario slider** ("reduce flaring by X%");
+  - a **watchlist** of rising, newly detected and top-decile sites;
+  - an exportable **decision brief** (print-to-PDF HTML + CSV) for any site, operator or the
+    nation.
 - **Operator compliance cards** and a **site-verdict table**
 - **Weekly CSV digest** of every site-year (6,664 rows)
 - **Methodology and data** pages carrying the caveats and the licences
 
 ## Where it's going
 
-A **decision layer**: trend overlays, peer benchmarking, penalty-exposure forecasts, abatement
-economics, EU-threshold compliance checks, and exportable decision briefs. The full spec,
-sequenced by value per unit of effort, is in [`docs/FEATURE-SET.md`](docs/FEATURE-SET.md).
+Wave 1 of the decision layer is live (above). Next come Wave 2's commercial hooks: normalised
+intensity, abatement economics, the EU methane-threshold check, supplier scorecards and a
+site risk score. The full spec, sequenced by value per unit of effort, is in
+[`docs/FEATURE-SET.md`](docs/FEATURE-SET.md).
 
 ## Architecture
 

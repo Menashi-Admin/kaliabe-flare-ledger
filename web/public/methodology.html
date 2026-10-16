@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Methodology &amp; Confidence — Kaliabe Flare Ledger</title>
 <meta name="description" content="How the Kaliabe Flare Ledger verifies flares, estimates volumes, and publishes confidence and uncertainty on every verdict." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23b5761e%22/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="./css/base.css" />
 </head>
 <body>
@@ -121,12 +122,26 @@
       nobody detects or quantifies every release.
     </p>
 
-    <h2>7. Limitations</h2>
+    <h2>7. Decision-layer derivations <span style="font-weight:400;font-size:.9rem;color:var(--ink-soft)">method KFL-M 1.1 · 2026-10-16</span></h2>
+    <p>These are Kaliabe derivations from the GFMR series. They add framing, not data.</p>
+    <ul>
+      <li><strong>3-yr and 5-yr change</strong> — the latest-year volume against the volume three (five) years earlier. Undefined (n/a) when the base year had no detection: a percentage on a zero base is meaningless.</li>
+      <li><strong>Peer percentile</strong> — the share of the <em>other</em> members of the peer set (all 476 sites, or all 40 operators including “Unattributed”) with a strictly smaller latest-year volume (“larger than N%”). <em>Improving faster than N%</em> ranks the 3-yr change, lower being better, among peers whose change is defined.</li>
+      <li><strong>Cumulative penalty</strong> — every year 2012–2025 at the US$2.00 / 1,000 scf rate. This is <em>notional</em>: the 2022 rate did not apply before 2022.</li>
+      <li><strong>Projection</strong> — a least-squares line through the last three years (2023–2025), extended three years and clamped at zero. Operator and national projections are fitted to the aggregate series. It is a projection, not a forecast of what any operator will do.</li>
+      <li><strong>Scenario</strong> — “reduce flaring by X%” scales the latest-year volume by (1 − X/100). Penalty, CO₂e and methane-equivalent are linear in volume, so they scale identically. A scenario, not a forecast.</li>
+      <li><strong>Watchlist</strong> — <em>rising</em>: 3-yr change above the chosen threshold, ranked by absolute volume added; <em>newly detected</em>: first positive volume in the last two years; <em>top decile</em>: 90th percentile or above on latest-year volume.</li>
+      <li><strong>Year player</strong> — each year shows that year's GFMR volume; “detected” means a positive volume in that year.</li>
+    </ul>
+    <p>The full method, with every constant and its source, is kept in the repository at <code>docs/METHODOLOGY.md</code>. Every decision brief is stamped with this method version and the data vintage.</p>
+
+    <h2>8. Limitations</h2>
     <ul>
       <li>Only offshore/onshore sites in GFMR's Nigeria set are shown; the dataset is a subset of total Nigerian flaring.</li>
       <li>Cloud cover materially under-samples the Niger Delta.</li>
       <li>Volume↔radiance calibration uncertainty is not fully removable from satellite data alone.</li>
       <li>Operator composition changes over time; attribution reflects the most recent record.</li>
+      <li>The “Niger Delta” flag is a study rectangle (4.5–8.5° E, 4.5–7.0° N), not the statutory Niger Delta region. Far-offshore fields such as Oso fall outside it.</li>
     </ul>
 
     <p style="margin-top:36px"><a href="./" class="link">← Back to the ledger</a></p>

@@ -27,7 +27,9 @@
    │  Cloudflare Worker  "kaliabe-flare"                              │
    │  verdict engine · penalty + CO₂e math · REST API                 │
    │  /api/summary /api/sites /api/sites/trend /api/operators         │
-   │  /api/digest.csv /api/health                                     │
+   │  /api/national /api/brief (HTML/CSV) /api/digest.csv /api/health │
+   │  decision fields in one pass: change, percentile, cumulative,    │
+   │  projection — maths shared with web via js/ledger-core.js        │
    └──────────────────────────────────────────────────────────────────┘
                         │
                         ▼
@@ -38,6 +40,9 @@
    │    · layer panel (flare / pipelines / states / LGAs)             │
    │    · per-flare detail drawer (series, verdict, confidence)       │
    │    · in-browser nearest-pipeline + point-in-polygon context      │
+   │  js/ledger-core.js — shared maths + SVG trend chart (Worker too) │
+   │  js/decision.js — scenario, exposure, percentile, brief links    │
+   │  year player · national exposure · league table · watchlist      │
    │  functions/api/[[path]].js — same-origin proxy to the Worker     │
    └──────────────────────────────────────────────────────────────────┘
 ```
@@ -47,8 +52,10 @@
 - **Zero-recurring-cost spine.** Cloudflare Pages + Worker + D1 free tier, plus static GeoJSON.
   Recurring run cost is effectively $0–3/month. A public good should not carry a bill.
 - **Separation of verdict from presentation.** All derivation (penalty, CO₂e, confidence,
-  detection floor) happens in the Worker, so every surface — site, CSV, API consumer — returns
-  the same numbers with the same caveats.
+  detection floor, change, percentile, cumulative, projection) happens in the Worker, so every
+  surface — site, CSV, decision brief, API consumer — returns the same numbers with the same
+  caveats. The only browser-side maths (scenario, year totals) runs through `ledger-core.js`, the
+  same file the Worker bundles, using constants the Worker publishes in `meta.constants`.
 - **Neutral by construction.** Only open, revocable-by-nobody sources. No scraping of
   proprietary monitoring (Kayrros / GHGSat / Enverus are studied, never ingested).
 - **Same-origin API.** The Pages Function proxies `/api/*` to the Worker so the site has one
@@ -80,7 +87,9 @@ kaliabe-flare-ledger/
 │   │   ├── methodology.html  method + confidence
 │   │   ├── data.html         sources + licences
 │   │   ├── css/base.css
-│   │   ├── js/app.js         page wiring
+│   │   ├── js/app.js         page wiring, year player, league, watchlist
+│   │   ├── js/ledger-core.js shared maths + SVG trend chart (Worker bundles it)
+│   │   ├── js/decision.js    scenario slider, exposure, percentile, brief links
 │   │   ├── js/atlas.js       our overlay engine
 │   │   └── layers/*.geojson  states · LGAs · pipelines
 │   └── functions/api/[[path]].js

@@ -7,6 +7,7 @@
 <meta name="description" content="An open-data flare verification and verdict ledger for Nigeria's Niger Delta. Sites from World Bank GFMR / NOAA VIIRS Nightfire; penalties on the NUPRC 2022 Gazette basis." />
 <link rel="preconnect" href="https://unpkg.com" crossorigin />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23b5761e%22/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="./css/base.css" />
 </head>
 <body>
@@ -20,7 +21,9 @@
     </div>
     <nav class="nav" aria-label="Primary">
       <a href="#map" class="nav__link">Map</a>
+      <a href="#exposure" class="nav__link">Exposure</a>
       <a href="#operators" class="nav__link">Operators</a>
+      <a href="#watchlist" class="nav__link">Watchlist</a>
       <a href="methodology.html" class="nav__link">Methodology</a>
       <a href="data.html" class="nav__link">Data</a>
     </nav>
@@ -53,11 +56,33 @@
     <div class="wrap">
       <div class="sectionhead">
         <h2>Flare sites, <span id="mapYear">2025</span></h2>
-        <p class="sectionhead__aside">Select any flare to open its full record.</p>
+        <p class="sectionhead__aside">Select any flare to open its full record. Scrub the years below.</p>
       </div>
       <div id="atlas" class="atlas"></div>
-      <p class="map__cite">Flare sites: World Bank GFMR individual flare locations (NOAA VIIRS Nightfire, Payne Institute); circle area ∝ latest-year volume.
+      <div class="player" id="player" aria-label="Year player">
+        <button class="player__btn" id="playBtn" type="button" aria-pressed="false" aria-label="Play years 2012 to 2025">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path class="i-play" d="M3 1.5v9l7.5-4.5z"/><path class="i-pause" d="M2.5 1.5h2.6v9H2.5zM6.9 1.5h2.6v9H6.9z"/></svg>
+        </button>
+        <div class="player__track">
+          <label class="visually-hidden" for="yearRange">Map year</label>
+          <input type="range" id="yearRange" min="2012" max="2025" step="1" value="2025" aria-valuetext="2025" disabled />
+          <div class="player__ticks" id="yearTicks" aria-hidden="true"></div>
+        </div>
+        <output class="player__year" id="yearOut" for="yearRange">2025</output>
+      </div>
+      <dl class="ytotals" id="yearTotals" aria-live="polite"></dl>
+      <p class="map__cite">Flare sites: World Bank GFMR individual flare locations (NOAA VIIRS Nightfire, Payne Institute); circle area ∝ the shown year's volume (latest record by default).
         Boundaries: geoBoundaries / GRID3 (CC BY 4.0). Pipelines: USGS (public domain). Basemap © OpenStreetMap contributors.</p>
+    </div>
+  </section>
+
+  <section class="natsec" id="exposure">
+    <div class="wrap">
+      <div class="sectionhead">
+        <h2>National exposure</h2>
+        <p class="sectionhead__aside">Every GFMR flare site in Nigeria, summed. Figures are derived estimates.</p>
+      </div>
+      <div class="nat" id="national"><p class="ops__note">Loading…</p></div>
     </div>
   </section>
 
@@ -66,15 +91,43 @@
       <div class="sectionhead">
         <h2>Operator compliance</h2>
         <div class="filter">
+          <div class="seg" role="group" aria-label="Operator view">
+            <button type="button" class="seg__opt" data-view="cards" aria-pressed="true">Cards</button>
+            <button type="button" class="seg__opt" data-view="table" aria-pressed="false">League table</button>
+          </div>
           <input id="opFilter" class="filter__input" type="search" placeholder="Filter operators…" aria-label="Filter operators" />
           <label class="filter__toggle"><input type="checkbox" id="ndOnly" /> Niger Delta only</label>
         </div>
       </div>
+      <div id="opFocus" class="focus" hidden tabindex="-1" aria-labelledby="opFocusTitle"></div>
       <div id="opCards" class="cards"></div>
+      <div id="opLeague" class="tablewrap" hidden>
+        <table class="table league" id="leagueTable">
+          <caption class="visually-hidden">Operator league table, sortable by any numeric column</caption>
+          <thead><tr id="leagueHead"></tr></thead>
+          <tbody id="leagueBody"></tbody>
+        </table>
+      </div>
       <p class="ops__note">
         Penalty basis: <strong>US$2.00 / 1,000 scf</strong> (NUPRC 2022 Flare Gas Regulations Gazette; 1,000 scf = 28.317 m³).
         ₦ figures are indicative at one FX snapshot and are never official NUPRC assessments.
       </p>
+    </div>
+  </section>
+
+  <section class="watchsec" id="watchlist">
+    <div class="wrap">
+      <div class="sectionhead">
+        <h2>Watchlist</h2>
+        <div class="filter">
+          <label class="filter__toggle" for="riseThr">Rising if 3-yr change above</label>
+          <select id="riseThr" class="filter__input">
+            <option value="25">+25%</option><option value="50" selected>+50%</option><option value="100">+100%</option>
+          </select>
+        </div>
+      </div>
+      <p class="ops__note watch__lede" id="watchLede">Derived from the site record in your browser. Select a site to open it on the map.</p>
+      <div class="watch" id="watch"></div>
     </div>
   </section>
 
@@ -108,6 +161,8 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./js/ledger-core.js"></script>
+<script src="./js/decision.js"></script>
 <script src="./js/atlas.js"></script>
 <script src="./js/app.js"></script>
 </body>

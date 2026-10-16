@@ -69,3 +69,41 @@ What was done:
   - 500 responses leaked stack traces.
 - **Overlay.** Our own layer panel (flares / pipelines / states / LGAs) with legends, counts and sources, plus a basemap switch (OSM / Paper / None). The per-flare drawer shows a hand-rolled SVG series chart with trend windows, verdict, confidence, detection floor, penalty (US$/₦), CO₂e, CH₄, site facts, state and LGA by point-in-polygon, nearest pipeline with distance, and numbered sources. Sites are deep-linkable (`#site=<id>`), table rows open sites on the map, and the drawer becomes a bottom sheet on mobile.
 - **Not done (blocked by the Prismor policy hook):** a remote D1 `UPDATE` to correct the stored `flare_annual.bcm` column. The Worker no longer reads that column, and `seed.sql` is regenerated with correct values for the next reseed.
+
+---
+
+### Pass 3 (2026-10-16): Decision Layer Wave 1
+| Channel | Role | Effort |
+|---|---|---|
+| **Claude Code (Opus, subscription)** | Led the whole pass: design, Worker decision fields + brief renderer, shared core module, front-end (year player, trends, league table, watchlist, scenario slider), METHODOLOGY.md, deploy, live HTTP + headless-browser verification, commit | All codegen this pass |
+| **OpenRouter** | Orchestrator only: wrote the brief (`docs/BUILD-BRIEF-WAVE1.md`) | Brief only |
+| **Codex (subscription)** | Not used | 0 |
+
+No per-token API spend for codegen; all of it was absorbed by the flat-rate Claude Code session.
+**Run cost unchanged** (free-tier Worker + Pages + D1). No new runtime dependencies, no chart
+library: charts are hand-rolled SVG. The brief is server-rendered HTML that prints to PDF, so no
+PDF service is needed.
+
+What shipped:
+- **Worker (single pass).** `loadLedger()` makes one D1 batch.
+  - It estimates the 476 sites and ranks them (percentiles).
+  - It rolls up 40 operators and the national total, and memoises the result for 5 minutes per
+    isolate.
+  - New per-site/operator/national fields: 3-yr and 5-yr change, cumulative volume, penalty and
+    CO₂e, a 3-yr projection, volume and improvement percentiles, and the first detected year.
+  - `meta` now carries the method version, the data vintage and full-precision constants.
+  - New routes: `/api/national` and `/api/brief`.
+  - `/api/sites` grew from 558 KB to 774 KB raw; that is **68 KB** gzipped on the wire. Latency
+    via Pages is 0.05–0.4 s (it was about 0.5 s).
+- **Shared core.** `web/public/js/ledger-core.js` holds the conversion and scenario maths and the
+  SVG trend chart. The browser loads it, and the Worker bundles the same file for the brief, so the
+  site and the brief cannot disagree.
+- **Front end.** Wave-1 items A1, A2, B1, B2, C1, C5, E2 and F1; see `docs/FEATURE-SET.md`.
+- **Docs.** `docs/METHODOLOGY.md` (new), a decision-layer section on the methodology page, and the
+  Niger Delta rectangle caveat.
+- **Verification.**
+  - 41/41 live HTTP checks pass: every new field is present and finite on all 476 sites, null only
+    where undefined; there is no NaN in any payload; briefs render; all layers return 200.
+  - A headless Chrome pass on production covered the year player, a real flare click, the
+    scenario, brief export and print-to-PDF, the operator panel, the league-table sort, the
+    watchlist and mobile. It logged 0 console errors and 0 failed requests.

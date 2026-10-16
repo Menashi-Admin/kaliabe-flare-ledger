@@ -221,6 +221,7 @@
     const lgaRenderer = L.canvas({ pane: 'lgas', padding: 0.4 });
     const state = {
       sites: [], byId: new Map(), meta: {}, selected: null,
+      year: null, years: [], vols: new Map(),   // year player: per-site volume by year index
       verdictOn: { verified_flare: true, unverified: true },
       idx: { states: null, lgas: null, pipes: null }, failed: {},
       geo: { states: null, lgas: null, pipes: null },
@@ -323,43 +324,65 @@
     Object.keys(layers).forEach((id) => { if (layers[id].on) layers[id].group.addTo(map); else row(id).classList.add('is-off'); });
 
     // ---- flares
+    // Markers are built once per data load; the year player and the verdict
+    // filter only restyle / show / hide them, so scrubbing never rebuilds.
     const markers = new Map();
+    const volAt = (s) => {
+      if (state.year == null) return s.latest_year_vol_million_m3 || 0;
+      const v = state.vols.get(s.site_id);
+      return v ? v[state.year - state.years[0]] || 0 : 0;
+    };
+    const yearLbl = () => (state.year == null ? null : state.year);
     function drawFlares() {
       const g = layers.flares.group;
       g.clearLayers(); markers.clear();
       // Largest first so small flares stay on top and clickable.
       const sorted = [...state.sites].sort((a, b) => (b.latest_year_vol_million_m3 || 0) - (a.latest_year_vol_million_m3 || 0));
       for (const s of sorted) {
-        if (!state.verdictOn[s.verdict]) continue;
-        const v = s.latest_year_vol_million_m3 || 0, on = s.verdict === 'verified_flare';
-        const m = L.circleMarker([s.lat, s.lon], {
-          renderer: flareRenderer, radius: radius(v), bubblingMouseEvents: false,
-          color: on ? C.paper : C.off, weight: on ? 0.8 : 1.2, opacity: 1,
-          fillColor: on ? C.accent : C.paper, fillOpacity: on ? 0.82 : 0.9,
-        });
-        m.bindTooltip(`<b>${esc(s.field_name || s.site_id)}</b> · ${esc(s.operator)}<br>${s.latest_year}: ${on ? num(v, 1) + ' million m³' : 'below detection floor'}`, { className: 'kfl-tip', direction: 'top', offset: [0, -radius(v)] });
+        const m = L.circleMarker([s.lat, s.lon], { renderer: flareRenderer, bubblingMouseEvents: false, opacity: 1 });
+        m.bindTooltip(() => {
+          const v = volAt(s), y = yearLbl() || s.latest_year;
+          return `<b>${esc(s.field_name || s.site_id)}</b> · ${esc(s.operator)}<br>${y}: ${v > 0 ? num(v, 1) + ' million m³' : 'below detection floor'}`;
+        }, { className: 'kfl-tip', direction: 'top' });
         m.on('click', () => select(s.site_id));
-        m.addTo(g);
         markers.set(s.site_id, m);
       }
+      styleFlares();
+    }
+    function styleFlares() {
+      const g = layers.flares.group;
+      let nOn = 0;
+      for (const s of state.sites) {
+        const m = markers.get(s.site_id);
+        const v = volAt(s), on = v > 0;
+        if (on) nOn++;
+        const show = state.verdictOn[on ? 'verified_flare' : 'unverified'];
+        if (!show) { if (g.hasLayer(m)) g.removeLayer(m); continue; }
+        m.setRadius(radius(v));
+        m.setStyle({ color: on ? C.paper : C.off, weight: on ? 0.8 : 1.2, fillColor: on ? C.accent : C.paper, fillOpacity: on ? 0.82 : 0.9 });
+        if (m.getTooltip()) m.getTooltip().options.offset = [0, -radius(v)];
+        if (!g.hasLayer(m)) m.addTo(g);
+      }
+      const lg = row('flares').querySelector('[data-legend]');
+      const ems = lg.querySelectorAll('.lg--btn em');
+      if (ems.length === 2) { ems[0].textContent = nOn; ems[1].textContent = state.sites.length - nOn; }
+      if (state.selected) haloAt(state.byId.get(state.selected));
     }
     function flareLegend() {
-      const nOn = state.sites.filter((s) => s.verdict === 'verified_flare').length;
-      const nOff = state.sites.length - nOn;
       const sizes = [10, 100, 400];
       const lg = row('flares').querySelector('[data-legend]');
       lg.innerHTML = `
         <button type="button" class="lg lg--btn" data-v="verified_flare" aria-pressed="${state.verdictOn.verified_flare}">
-          <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="${C.accent}"/></svg>Verified flare<em>${nOn}</em></button>
+          <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="${C.accent}"/></svg>Detected<em></em></button>
         <button type="button" class="lg lg--btn" data-v="unverified" aria-pressed="${state.verdictOn.unverified}">
-          <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3.2" fill="${C.paper}" stroke="${C.off}" stroke-width="1.2"/></svg>Below floor<em>${nOff}</em></button>
-        <span class="lg lg--size" title="Circle area is proportional to latest-year flared volume">
+          <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="3.2" fill="${C.paper}" stroke="${C.off}" stroke-width="1.2"/></svg>Below floor<em></em></button>
+        <span class="lg lg--size" title="Circle area is proportional to the shown year's flared volume">
           ${sizes.map((v) => { const r = radius(v); return `<svg viewBox="0 0 ${2 * r + 2} ${2 * r + 2}" width="${2 * r + 2}" height="${2 * r + 2}"><circle cx="${r + 1}" cy="${r + 1}" r="${r}" fill="none" stroke="${C.ink}" stroke-opacity=".55"/></svg>`; }).join('')}
           <span>${sizes.join(' · ')} million m³</span></span>`;
       lg.querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => {
         state.verdictOn[b.dataset.v] = !state.verdictOn[b.dataset.v];
         b.setAttribute('aria-pressed', String(state.verdictOn[b.dataset.v]));
-        drawFlares();
+        styleFlares();
       }));
       setCount('flares', num(state.sites.length, 0));
     }
@@ -450,6 +473,7 @@
           <div><dt>Methane-equiv.<sup>4</sup></dt><dd>${num(s.methane_tonnes_equivalent_latest, 0)} t</dd><dd class="kv__sub">CH₄, ${s.latest_year}</dd></div>
         </dl>
         <p class="drawer__floor"><b>Detection floor<sup>5</sup></b>${esc(s.detection_floor)}</p>
+        ${opts.drawerExtra ? opts.drawerExtra(s, m) : ''}
 
         <h4 class="drawer__h">Site</h4>
         <dl class="kv">
@@ -479,12 +503,21 @@
           <li>USGS Africa oil &amp; gas infrastructure (attributes: Cross-border Information / African Energy), public domain. Nearest-line distance computed in your browser.</li>
         </ol>`;
       drawer.querySelector('.drawer__close').addEventListener('click', close);
+      if (opts.onDrawer) opts.onDrawer(drawer, s, m);
 
       // Selection context on the map.
       ctx.clearLayers();
       if (c.pipe) L.geoJSON(c.pipe.f, { pane: 'context', interactive: false, style: { color: C.accent, weight: 3.2, opacity: 0.95, lineCap: 'round' } }).addTo(ctx);
       const admin = c.lga || c.state;
       if (admin) L.geoJSON(admin, { pane: 'context', interactive: false, style: { color: C.ink, weight: 1.4, opacity: 0.7, fillColor: C.accent, fillOpacity: 0.05 } }).addTo(ctx);
+    }
+
+    function haloAt(s) {
+      halo.clearLayers();
+      if (!s) return;
+      const r = radius(volAt(s));
+      L.circleMarker([s.lat, s.lon], { pane: 'halo', interactive: false, radius: r + 5, color: C.ink, weight: 1.4, fill: false }).addTo(halo);
+      L.circleMarker([s.lat, s.lon], { pane: 'halo', interactive: false, radius: r + 9, color: C.ink, weight: 0.6, opacity: 0.5, fill: false }).addTo(halo);
     }
 
     function select(id, { pan = true } = {}) {
@@ -495,10 +528,7 @@
       root.classList.add('is-open');
       drawer.setAttribute('aria-hidden', 'false');
       drawer.scrollTop = 0;
-      halo.clearLayers();
-      const r = radius(s.latest_year_vol_million_m3 || 0);
-      L.circleMarker([s.lat, s.lon], { pane: 'halo', interactive: false, radius: r + 5, color: C.ink, weight: 1.4, fill: false }).addTo(halo);
-      L.circleMarker([s.lat, s.lon], { pane: 'halo', interactive: false, radius: r + 9, color: C.ink, weight: 0.6, opacity: 0.5, fill: false }).addTo(halo);
+      haloAt(s);
       if (pan) {
         // Keep the site inside the map area left uncovered by panel + drawer;
         // if it falls outside, centre it there.
@@ -532,7 +562,16 @@
     function setSites(sites, meta) {
       state.sites = sites; state.meta = meta || {};
       state.byId = new Map(sites.map((s) => [s.site_id, s]));
-      drawFlares(); flareLegend();
+      // Index volumes by year once (dense arrays) so setYear is O(sites), no fetch.
+      const ys = new Set();
+      sites.forEach((s) => (s.year_series || []).forEach((p) => ys.add(p.year)));
+      state.years = [...ys].sort((a, b) => a - b);
+      state.vols = new Map(sites.map((s) => {
+        const a = new Float64Array(state.years.length);
+        (s.year_series || []).forEach((p) => { a[p.year - state.years[0]] = p.million_m3 || 0; });
+        return [s.site_id, a];
+      }));
+      flareLegend(); drawFlares();
       // Frame the Delta and its offshore fields; the lone inland site (Obi Ayima,
       // ~10°N) stays on the map but would otherwise halve the opening zoom.
       const framed = sites.filter((s) => s.lat < 8);
@@ -544,7 +583,14 @@
     ensure('states'); ensure('pipes');
     (global.requestIdleCallback || ((f) => setTimeout(f, 1200)))(() => ensure('lgas'));
 
-    return { map, setSites, select, close, get selected() { return state.selected; } };
+    // Year player hook: null = latest record (the default view).
+    function setYear(y) {
+      state.year = y == null || !state.years.length ? null : Math.max(state.years[0], Math.min(state.years[state.years.length - 1], y));
+      root.dataset.year = state.year == null ? '' : state.year;
+      styleFlares();
+    }
+
+    return { map, setSites, setYear, select, close, get selected() { return state.selected; }, get years() { return state.years; }, volumes: (id) => state.vols.get(id) };
   }
 
   global.KaliabeAtlas = { create, sparkline, util: { num, money, pct, esc } };
