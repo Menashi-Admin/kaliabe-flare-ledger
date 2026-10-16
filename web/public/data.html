@@ -55,13 +55,27 @@
       </tbody>
     </table>
 
+    <h2>Map overlay layers</h2>
+    <table class="conf-table">
+      <thead><tr><th>Layer</th><th>Source</th><th>Licence</th><th>File</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Nigeria states</strong> (37)</td><td>geoBoundaries gbOpen NGA ADM1 (GRID3)</td><td>CC BY 4.0</td><td><a class="link" href="layers/nga-states.geojson">nga-states.geojson</a></td></tr>
+        <tr><td><strong>Local Government Areas</strong> (774)</td><td>geoBoundaries gbOpen NGA ADM2 (GRID3)</td><td>CC BY 4.0</td><td><a class="link" href="layers/nga-lgas.geojson">nga-lgas.geojson</a></td></tr>
+        <tr><td><strong>Oil &amp; gas pipelines</strong> (154)</td><td>USGS Africa oil &amp; gas infrastructure; attributes from Cross-border Information (London) Ltd. / African Energy Live Data</td><td>Public domain (USGS)</td><td><a class="link" href="layers/nga-pipelines.geojson">nga-pipelines.geojson</a></td></tr>
+      </tbody>
+    </table>
+    <p>Coordinates are rounded to 5 decimal places (~1 m) for the web; geometry is otherwise unchanged.
+      State, LGA and nearest-pipeline context for each flare is computed in the browser (point-in-polygon and nearest line segment).</p>
+
     <h2>Seed data</h2>
     <p>
       The current snapshot is derived from the World Bank GFMR individual-flare-site
       dataset (Nigeria subset), committed to this repository as
       <code>data/gfmr_nigeria_sites_seed.json</code> (476 unique sites, 2012–2025).
-      The digest is also available from the API at
-      <a href="/api/digest.csv" class="link">/api/digest.csv</a>.
+      The live digest (one row per site-year; volumes in million m³, with bcm and
+      MMscfd) downloads from <a href="/api/digest.csv" class="link" download>/api/digest.csv</a>;
+      a static snapshot built from the committed seed is at
+      <a href="kaliabe-flare-digest.csv" class="link" download>kaliabe-flare-digest.csv</a>.
     </p>
 
     <h2>Live ingestion (stub)</h2>

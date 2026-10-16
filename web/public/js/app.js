@@ -1,67 +1,93 @@
 // Kaliabe Flare Ledger — frontend
-// API base: worker URL (override with ?api=... for local/dev)
-const API = new URLSearchParams(location.search).get('api') ||
-  'https://kaliabe-flare.menashiconsulting.workers.dev';
+// API is same-origin: Pages Function /api/* proxies to the Worker (web/functions/api).
+// Override with ?api=https://… for local/dev.
+const API = new URLSearchParams(location.search).get('api') || '';
 
 const $ = (id) => document.getElementById(id);
-const CSV_LINK = `${API}/api/digest.csv`;
-const fmtM = (v) => (v == null ? '—' : Number(v).toLocaleString('en-US', { maximumFractionDigits: 1 }));
-const fmtUsd = (v) => (v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 }));
+const { num, money, pct, esc } = KaliabeAtlas.util;
+const fmtM = (v) => num(v, 1);
+const fmtUsd = (v) => (v == null ? '—' : '$' + num(v, 0));
 const fmtBcm = (v) => (v == null ? '—' : Number(v).toFixed(3) + ' bcm');
 
-function esc(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+async function getJSON(path) {
+  const r = await fetch(`${API}${path}`);
+  if (!r.ok) throw new Error(`${path} → ${r.status}`);
+  return r.json();
 }
 
 async function loadSummary() {
-  const r = await fetch(`${API}/api/summary`);
-  const d = await r.json();
+  const d = await getJSON('/api/summary');
   $('statSites').textContent = fmtM(d.sites);
   $('statND').textContent = fmtM(d.niger_delta_sites);
   $('statVol').textContent = d.latest_total_bcm ? fmtBcm(d.latest_total_bcm) : (fmtM(d.latest_total_vol_million_m3) + ' mill. m³');
   $('statYear').textContent = d.latest_year || '—';
+  $('statActive').textContent = d.active_sites_latest != null ? `${fmtM(d.active_sites_latest)} with a ${d.latest_year} detection` : '';
 }
 
-let map, markers = [];
-function initMap() {
-  map = L.map('mapEl', { scrollWheelZoom: false }).setView([6.0, 6.5], 8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map);
+// ---- Map overlay (js/atlas.js)
+const atlas = KaliabeAtlas.create($('atlas'), {
+  layerBase: './layers/',
+  onSelect: (s) => history.replaceState(null, '', `#site=${encodeURIComponent(s.site_id)}`),
+  onClose: () => { if (location.hash.startsWith('#site=')) history.replaceState(null, '', location.pathname + location.search); },
+});
+
+function siteFromHash() {
+  const m = location.hash.match(/^#site=(.+)$/);
+  return m ? decodeURIComponent(m[1]) : null;
 }
 
-function circleColor(v) { return v > 0 ? '#2e5d34' : '#9a927d'; }
-
-async function loadMarkers() {
-  const r = await fetch(`${API}/api/sites/trend`);
-  const d = await r.json();
-  const groups = { on: L.featureGroup().addTo(map), off: L.featureGroup().addTo(map) };
-  for (const m of d.markers) {
-    const vol = m.million_m3 || 0;
-    const on = vol > 0;
-    const radius = Math.min(22, 4 + Math.log1p(vol) * 2.2);
-    const c = L.circleMarker([m.lat, m.lon], {
-      radius: Math.max(3, radius),
-      color: '#fff', weight: 1,
-      fillColor: circleColor(vol), fillOpacity: 0.85,
-    });
-    c.bindPopup(
-      `<div class="site-pop"><h4>${esc(m.operator || 'Unattributed')}</h4>` +
-      `<p>${m.year} flare volume: <b>${fmtM(vol)} mill. m³</b>${m.bcm ? ' · ' + fmtBcm(m.bcm) : ''}</p>` +
-      `<p>Status: <b>${on ? 'Active flare verified' : 'Unverified / below floor'}</b></p></div>`
-    );
-    c.addTo(groups[on ? 'on' : 'off']);
-    markers.push({ ...m, on });
-  }
-  map.fitBounds(Object.values(groups).reduce((b, g) => (g.leaflet && b.extend(g.getBounds())) || b, L.latLngBounds([])));
+// ---- Sites: fetched once, shared by map + table
+async function loadSites() {
+  const d = await getJSON('/api/sites');
+  const sites = d.sites || [];
+  atlas.setSites(sites, d.meta);
+  const yr = sites.reduce((y, s) => Math.max(y, s.latest_year || 0), 0);
+  if (yr) $('mapYear').textContent = yr;
+  renderTable(sites.slice(0, 200));
+  const id = siteFromHash();
+  if (id) { $('map').scrollIntoView(); atlas.select(id); }
 }
 
-async function loadOperators(ndOnly) {
-  const r = await fetch(`${API}/api/operators`);
-  const d = await r.json();
-  const ops = (d.operators || []).filter((o) => !ndOnly || o.niger_delta_sites > 0);
-  $('opCards').innerHTML = ops.map((o) => `
+function renderTable(rows) {
+  $('siteBody').innerHTML = rows.map((s) => {
+    const on = s.verdict === 'verified_flare';
+    const t = s.trend_label || 'stable';
+    const cls = t === 'rising' || t === 'new' ? 'trend-up' : t === 'falling' ? 'trend-down' : '';
+    const arrow = { rising: '↑', falling: '↓', new: '↑', inactive: '·', stable: '→' }[t] || '→';
+    const sub = [s.field_type && s.field_type !== 'NA' ? s.field_type : null, s.location ? s.location.toLowerCase() : null].filter(Boolean).join(' · ');
+    return `<tr>
+      <td><button class="sitebtn" type="button" data-site="${esc(s.site_id)}">${esc(s.field_name || s.site_id)}</button><br><span class="site-sub">${esc(sub)}</span></td>
+      <td>${esc(s.operator)}</td>
+      <td><span class="verdict ${on ? 'verdict--on' : 'verdict--off'}">${on ? 'Verified flare' : 'Unverified'}</span></td>
+      <td class="num">${fmtM(s.latest_year_vol_million_m3)}</td>
+      <td class="${cls}" title="${esc(s.trend_basis || '')}">${arrow} ${t}${s.trend_pct != null && t !== 'inactive' ? ` <span class="site-sub">${pct(s.trend_pct)}</span>` : ''}</td>
+      <td class="num">${s.confidence ? Math.round(s.confidence * 100) + '%' : '—'}</td>
+      <td class="num">${fmtUsd(s.penalty_usd_latest)}</td>
+    </tr>`;
+  }).join('');
+}
+
+$('siteBody').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-site]');
+  if (!b) return;
+  $('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  atlas.select(b.dataset.site);
+});
+
+// ---- Operators
+let operators = [];
+async function loadOperators() {
+  const d = await getJSON('/api/operators');
+  operators = d.operators || [];
+  renderOperators();
+}
+function renderOperators() {
+  const q = $('opFilter').value.trim().toLowerCase();
+  const nd = $('ndOnly').checked;
+  const ops = operators.filter((o) => (!nd || o.niger_delta_sites > 0) && o.operator.toLowerCase().includes(q));
+  $('opCards').innerHTML = ops.map((o) => {
+    const idle = 1 - o.active_sites / Math.max(1, o.sites);
+    return `
     <article class="card">
       <div class="card__head">
         <h3 class="card__name">${esc(o.operator)}</h3>
@@ -70,48 +96,17 @@ async function loadOperators(ndOnly) {
       <div class="card__rows">
         <span><b>Flare sites</b><b>${o.sites}</b></span>
         <span><b>Niger Delta</b><b>${o.niger_delta_sites}</b></span>
-        <span><b>Latest vol.</b><b>${fmtM(o.total_vol_m3_latest)} mill. m³</b></span>
-        <span><b>≈ ${fmtBcm(o.total_vol_bcm_latest)}</b><b></b></span>
-        <span><b>Penalty (est. US$)</b><b>${fmtUsd(o.penalty_usd_latest)}</b></span>
-        <span><b>Compliance</b><b class="${o.active_sites / Math.max(1, o.sites) < 0.5 ? 'trend-up' : 'trend-down'}">${Math.round(100 * (1 - o.active_sites / Math.max(1, o.sites)))}% idle</b></span>
+        <span><b>Latest vol.</b><b>${fmtM(o.total_vol_million_m3_latest)} mill. m³</b><i>${fmtBcm(o.total_vol_bcm_latest)}</i></span>
+        <span><b>Penalty (est.)</b><b>${money(o.penalty_usd_latest, 'US$')}</b></span>
+        <span><b>Idle sites</b><b>${Math.round(100 * idle)}%</b><i>no latest-year detection</i></span>
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('') || '<p class="ops__note">No operators match.</p>';
 }
+$('opFilter').addEventListener('input', renderOperators);
+$('ndOnly').addEventListener('change', renderOperators);
 
-async function loadSites() {
-  const r = await fetch(`${API}/api/sites`);
-  const d = await r.json();
-  const rows = (d.sites || []).slice(0, 200);
-  $('siteBody').innerHTML = rows.map((s) => {
-    const on = s.verdict === 'verified_flare';
-    const tUp = s.trend_pct > 5, tDown = s.trend_pct < -5;
-    return `<tr>
-      <td><b>${esc(s.field_name || s.site_id)}</b><br><span class="site-sub">${esc(s.operator)}</span></td>
-      <td>${esc(s.operator)}</td>
-      <td><span class="verdict ${on ? 'verdict--on' : 'verdict--off'}">${on ? 'Verified flare' : 'Unverified'}</span></td>
-      <td>${fmtM(s.latest_year_vol_million_m3)}</td>
-      <td class="${tUp ? 'trend-up' : tDown ? 'trend-down' : ''}">${tUp ? '↑' : tDown ? '↓' : '—'} ${s.trend_label || ''}</td>
-      <td>${s.confidence ? Math.round(s.confidence * 100) + '%' : '—'}</td>
-      <td>${fmtUsd(s.penalty_usd_latest)}</td>
-    </tr>`;
-  }).join('');
-}
-
-function bindFilters() {
-  const dl = document.querySelector('a[download]');
-  if (dl) dl.href = CSV_LINK;
-  $('opFilter').addEventListener('input', (e) => {
-    const q = e.target.value.trim().toLowerCase();
-    document.querySelectorAll('#opCards .card').forEach((card) => {
-      card.style.display = card.querySelector('.card__name').textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-  });
-  $('ndOnly').addEventListener('change', (e) => loadOperators(e.target.checked));
-}
-
-initMap();
-loadSummary();
-loadMarkers();
-loadOperators(false);
-loadSites();
-bindFilters();
+const fail = (where, html) => (err) => { console.error(err); $(where).innerHTML = html; };
+loadSummary().catch((e) => console.error(e));
+loadSites().catch(fail('siteBody', '<tr><td colspan="7">Site data temporarily unavailable.</td></tr>'));
+loadOperators().catch(fail('opCards', '<p class="ops__note">Operator data temporarily unavailable.</p>'));

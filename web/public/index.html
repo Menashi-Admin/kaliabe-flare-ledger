@@ -34,8 +34,8 @@
       <h1 class="hero__title">Nigeria's first transparent flare ledger.</h1>
       <p class="hero__lede">
         Every flare site on this map is attributed to an operator and given a
-        verdict — verified, unverified, megawatt-hours lost — with the
-        detection floor and uncertainty stated on each record. Built on cited
+        verdict — verified or unverified, penalty due, methane-equivalent
+        lost, trend — with the detection floor and uncertainty stated on each record. Built on cited
         open data: World Bank GFMR / NOAA VIIRS Nightfire, and the
         NUPRC 2022 Flare Gas Regulations penalty basis. Not affiliated with or
         endorsed by NUPRC.
@@ -43,7 +43,7 @@
       <dl class="hero__stats" id="heroStats">
         <div class="stat"><dt>Sites tracked</dt><dd id="statSites">…</dd></div>
         <div class="stat"><dt>Niger Delta sites</dt><dd id="statND">…</dd></div>
-        <div class="stat"><dt>Latest total flare vol.</dt><dd id="statVol">…</dd></div>
+        <div class="stat"><dt>Latest total flare vol.</dt><dd id="statVol">…</dd><dd class="stat__sub" id="statActive"></dd></div>
         <div class="stat"><dt>Latest year</dt><dd id="statYear">…</dd></div>
       </dl>
     </div>
@@ -52,14 +52,12 @@
   <section class="mapsec" id="map">
     <div class="wrap">
       <div class="sectionhead">
-        <h2>Flare sites, 2025</h2>
-        <div class="legend">
-          <span class="legend__item"><i class="dot dot--on"></i>Active flare</span>
-          <span class="legend__item"><i class="dot dot--off"></i>Unverified / below floor</span>
-        </div>
+        <h2>Flare sites, <span id="mapYear">2025</span></h2>
+        <p class="sectionhead__aside">Select any flare to open its full record.</p>
       </div>
-      <div id="mapEl" class="map" role="application" aria-label="Niger Delta flare site map"></div>
-      <p class="map__cite">Site geometry from World Bank GFMR individual flare locations (NOAA VIIRS Nightfire, Payne Institute). Marker size ≈ latest-year flare volume.</p>
+      <div id="atlas" class="atlas"></div>
+      <p class="map__cite">Flare sites: World Bank GFMR individual flare locations (NOAA VIIRS Nightfire, Payne Institute); circle area ∝ latest-year volume.
+        Boundaries: geoBoundaries / GRID3 (CC BY 4.0). Pipelines: USGS (public domain). Basemap © OpenStreetMap contributors.</p>
     </div>
   </section>
 
@@ -84,15 +82,15 @@
     <div class="wrap">
       <div class="sectionhead">
         <h2>Site verdicts</h2>
-        <a class="link" href="/api/digest.csv" download>Download weekly CSV digest ↓</a>
+        <a class="link" href="/api/digest.csv" download="kaliabe-flare-digest.csv">Download CSV digest ↓</a>
       </div>
       <div class="tablewrap">
         <table class="table" id="siteTable">
           <thead>
             <tr>
               <th>Site / field</th><th>Operator</th><th>Verdict</th>
-              <th>Latest vol (mill. m³)</th><th>Trend</th><th>Confidence</th>
-              <th>Penalty (US$)</th>
+              <th class="num">Latest vol (mill. m³)</th><th>Trend</th><th class="num">Confidence</th>
+              <th class="num">Penalty (US$)</th>
             </tr>
           </thead>
           <tbody id="siteBody"></tbody>
@@ -110,6 +108,7 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./js/atlas.js"></script>
 <script src="./js/app.js"></script>
 </body>
 </html>

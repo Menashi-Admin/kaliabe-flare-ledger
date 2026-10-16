@@ -38,3 +38,34 @@ cd worker && npx wrangler d1 execute kaliabe-flare --remote --file=../worker/see
 cd worker && npx wrangler deploy
 cd web && npx wrangler pages deploy public --project-name=kaliabe-flare-web --branch=production
 ```
+---
+
+### Pass 2 (2026-10-16): bug fixes + proprietary map overlay
+| Channel | Role | Effort |
+|---|---|---|
+| **Claude Code (Opus, subscription)** | Led the whole pass end-to-end: repo audit, Worker fixes, Pages Function proxy, the Kaliabe Atlas overlay (`web/public/js/atlas.js`), CSS, docs, deploy, live verification, commit | All codegen this pass |
+| **OpenRouter** | Orchestrator only: wrote the build brief (`docs/BUILD-BRIEF.md`) and delegated | Brief only, no codegen |
+| **Codex (subscription)** | Not used | 0 |
+
+**Subscription absorbed the codegen.** Per D O's directive (subscriptions drive
+heavy builds; OpenRouter orchestrates and delegates), all code in this pass was
+generated in the flat-rate Claude Code session. This pass added no per-token API
+or OpenRouter spend for codegen. Cloudflare run cost is unchanged (free-tier
+Worker + Pages + D1; the Pages Function adds one invocation per `/api/*` call).
+
+What was done:
+- **Trend fixed.** `computeTrend` read `s.m3` (undefined), so every site came out NaN and "stable". It now reads `millionM3`, compares the last 3 years with up to 5 preceding years, handles records under 4 points, guards division by zero (`new`/`inactive`), and returns a real %. Live: 313 falling / 98 rising / 34 new / 21 inactive / 10 stable; 0 NaN.
+- **CSV link fixed.** The Pages Function `web/functions/api/[[path]].js` proxies `/api/*` to the Worker on the same origin. `/api/digest.csv` on Pages now returns `text/csv` with 6,664 rows (it used to return the SPA HTML).
+- **Other fixes found in the audit:**
+  - `/api/sites` ran N+1 queries (477 D1 queries, ~18.5 s). It's now one batch (~0.2–0.5 s).
+  - The CSV `bcm` column was 1000× too small; the header now says `flaring_vol_million_m3`.
+  - `active_sites_latest` counted zero-volume sites (476 → 249).
+  - Confidence "coverage" counted non-detection years.
+  - The operator field was misnamed `total_vol_m3_latest`.
+  - Map `fitBounds` reduced over the wrong property.
+  - The hero said "megawatt-hours".
+  - The operator filter was lost when the Niger Delta toggle changed.
+  - Operator-card values were styled as labels.
+  - 500 responses leaked stack traces.
+- **Overlay.** Our own layer panel (flares / pipelines / states / LGAs) with legends, counts and sources, plus a basemap switch (OSM / Paper / None). The per-flare drawer shows a hand-rolled SVG series chart with trend windows, verdict, confidence, detection floor, penalty (US$/₦), CO₂e, CH₄, site facts, state and LGA by point-in-polygon, nearest pipeline with distance, and numbered sources. Sites are deep-linkable (`#site=<id>`), table rows open sites on the map, and the drawer becomes a bottom sheet on mobile.
+- **Not done (blocked by the Prismor policy hook):** a remote D1 `UPDATE` to correct the stored `flare_annual.bcm` column. The Worker no longer reads that column, and `seed.sql` is regenerated with correct values for the next reseed.

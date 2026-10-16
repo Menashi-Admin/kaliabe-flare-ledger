@@ -83,11 +83,22 @@
       </tbody>
     </table>
     <p>
-      Confidence is raised by years of continuous record (data coverage) and by a
+      Confidence is raised by data coverage — the share of years in the record with a
+      positive detection (zero-volume years count as non-detections, not coverage) — and by a
       named operator for the site; it is capped at 0.98 because VIIRS volume↔radiance
       calibration carries intrinsic uncertainty from gas composition and combustion
       efficiency. Correlation is not perfect; treat every verdict as a direction,
       not an exact quantity.
+    </p>
+
+    <h3>Trend</h3>
+    <p>
+      Each site's trend compares the mean flared volume of its most recent three years
+      with the mean of up to five years before them (with fewer than four years of record,
+      the last year is compared with the first). Changes within ±5% are <em>stable</em>;
+      beyond that, <em>rising</em> or <em>falling</em>. A site with no baseline volume but
+      recent detections is <em>new</em> (no percentage is defined); a site with no detections
+      in either window is <em>inactive</em>.
     </p>
 
     <h2>5. Penalty basis — NUPRC 2022 Gazette</h2>

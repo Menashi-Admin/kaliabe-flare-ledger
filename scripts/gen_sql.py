@@ -51,7 +51,7 @@ for s in sites:
            f"VALUES ('{s['site_id']}',{s['lat']},{s['lon']},'{operator}','{field_name}','{field_type}','{loc}',{nd},'GFMR/WorldBank',{s['first_year']},{s['last_year']});")
     lines.append(sql)
     for yr, vol in s['annual_vol_m3'].items():
-        bcm = vol / 1e6  # million m3 -> bcm
+        bcm = vol / 1e3  # million m3 -> bcm (1 bcm = 1,000 million m3)
         # mmscfd: vol (million m3/yr) -> scfd. 1 m3 = 35.3147 scf. million m3/yr -> scf/yr -> /365
         mmscfd = vol * 1e6 * 35.3147 / 365 / 1e6 if vol else 0
         lines.append(f"INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('{s['site_id']}',{yr},{vol},{round(bcm,8)},{round(mmscfd,4)});")

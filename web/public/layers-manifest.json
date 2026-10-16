@@ -1,7 +1,7 @@
 [
   {
     "file": "nga-states.geojson",
-    "bytes": 787046,
+    "bytes": 360714,
     "features_or_bytes": 37,
     "source": "geoBoundaries gbOpen NGA ADM1 (GRID3)",
     "license": "CC BY 4.0",
@@ -9,15 +9,15 @@
   },
   {
     "file": "nga-pipelines.geojson",
-    "bytes": 94145,
+    "bytes": 45135,
     "features_or_bytes": 154,
     "source": "USGS AFR_Infra_OG_Pipelines (Cross-border Information)",
     "license": "USGS public domain",
-    "note": "clipped to Nigeria bbox"
+    "note": "clipped to Nigeria bbox; attribute source: Cross-border Information (London) Ltd. / African Energy Live Data, via USGS"
   },
   {
     "file": "nga-lgas.geojson",
-    "bytes": 3534724,
+    "bytes": 1619514,
     "features_or_bytes": 774,
     "source": "geoBoundaries gbOpen NGA ADM2 (GRID3)",
     "license": "CC BY 4.0",
