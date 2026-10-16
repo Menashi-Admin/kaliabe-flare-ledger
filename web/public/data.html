@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Data Sources &amp; Licences — Kaliabe Flare Ledger</title>
+<meta name="description" content="Data sources, licences, and download access for the Kaliabe Flare Ledger." />
+<link rel="stylesheet" href="./css/base.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand"><span class="brand__mark" aria-hidden="true"></span><span class="brand__name"><a href="./" style="color:inherit;text-decoration:none">Kaliabe Flare Ledger</a></span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="./index.html#map" class="nav__link">Map</a>
+      <a href="./index.html#operators" class="nav__link">Operators</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <div class="wrap">
+    <h1>Data sources &amp; licences</h1>
+    <p class="lede">
+      Every figure in the ledger traces to a cited, license-clean open dataset.
+      Nothing is scraped from proprietary services; nothing is fabricated.
+      Live per-night VIIRS Nightfire ingest is a stub pending an EOG account.
+    </p>
+
+    <h2>Primary datasets</h2>
+    <table class="conf-table">
+      <thead><tr><th>Dataset</th><th>Contents</th><th>Licence</th><th>Access</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>NOAA VIIRS Nightfire (VNF)</strong></td>
+          <td>Nighttime flare heat signatures — location, temperature, radiance, timing.</td>
+          <td>Open (NASA/NOAA); EOG Colorado School of Mines.</td>
+          <td>eogdata.mines.edu / products/vnf</td>
+        </tr>
+        <tr>
+          <td><strong>World Bank GFMR — Individual Flare Sites</strong></td>
+          <td>Per-site, per-year flare volumes (2012–2025), operator &amp; field attribution.</td>
+          <td>Free with attribution.</td>
+          <td>worldbank.org gas flaring data page</td>
+        </tr>
+        <tr>
+          <td><strong>NUPRC Flare Gas Regulations Gazette (2022)</strong></td>
+          <td>Penalty basis: US$2.00 per 1,000 scf (28.317 m³).</td>
+          <td>Public government gazette.</td>
+          <td>ngfcp.nuprc.gov.ng</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Seed data</h2>
+    <p>
+      The current snapshot is derived from the World Bank GFMR individual-flare-site
+      dataset (Nigeria subset), committed to this repository as
+      <code>data/gfmr_nigeria_sites_seed.json</code> (476 unique sites, 2012–2025).
+      The digest is also available from the API at
+      <a href="/api/digest.csv" class="link">/api/digest.csv</a>.
+    </p>
+
+    <h2>Live ingestion (stub)</h2>
+    <div class="notice">
+      Raw per-night VIIRS Nightfire (VNF) files at eogdata.mines.edu require an
+      Earth Observation Group account login. Until that credential exists, the
+      ledger is fed by the published GFMR per-site dataset (which is itself VIIRS
+      Nightfire–derived and license-clean). This is noted honestly rather than
+      faked: nightly ingest is the documented next slice.
+    </div>
+
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li>World Bank GFMR — Global Gas Flaring Data &amp; Tracker: <a href="https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data" target="_blank" rel="noopener">worldbank.org/en/programs/gasflaringreduction/global-flaring-data</a></li>
+      <li>VIIRS Nightfire (NOAA EOG / Payne Institute): <a href="https://eogdata.mines.edu/products/vnf/" target="_blank" rel="noopener">eogdata.mines.edu/products/vnf/</a></li>
+      <li>NUPRC Flare Gas Regulations Gazette: <a href="https://ngfcp.nuprc.gov.ng/wp-content/uploads/2022/09/FGN-Official-Gazette-on-Flare-Gas-v2.0-002.pdf" target="_blank" rel="noopener">ngfcp.nuprc.gov.ng</a></li>
+      <li>Schuit et al. 2023 (methane hot-spot detection method, CAMS): <a href="https://confluence.ecmwf.int/spaces/CKB/pages/505389789/Methane+Hotspot+Explorer+documentation" target="_blank" rel="noopener">atmosphere.copernicus.eu / CAMS documentation</a></li>
+      <li>World Bank, <em>Gas Flaring Estimates: Methodology for determining flare gas volumes from satellite data</em>: <a href="https://pubdocs.worldbank.org/en/853661587048977000/Estimation-of-flare-gas-volumes-from-satellite-data-002.pdf" target="_blank" rel="noopener">pubdocs.worldbank.org</a></li>
+    </ul>
+
+    <p style="margin-top:36px"><a href="./" class="link">← Back to the ledger</a></p>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap foot__inner">
+  <p>Built by Kaliabe · open data · honest uncertainty.</p>
+  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a></p>
+</div></footer>
+</body>
+</html>

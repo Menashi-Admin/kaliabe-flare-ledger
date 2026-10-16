@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kaliabe Flare Ledger — Nigeria</title>
+<meta name="description" content="An open-data flare verification and verdict ledger for Nigeria's Niger Delta. Sites from World Bank GFMR / NOAA VIIRS Nightfire; penalties on the NUPRC 2022 Gazette basis." />
+<link rel="preconnect" href="https://unpkg.com" crossorigin />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="./css/base.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">Kaliabe Flare Ledger</span>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="#map" class="nav__link">Map</a>
+      <a href="#operators" class="nav__link">Operators</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="wrap">
+      <p class="hero__kicker">Open-data flare verification · Niger Delta</p>
+      <h1 class="hero__title">Nigeria's first transparent flare ledger.</h1>
+      <p class="hero__lede">
+        Every flare site on this map is attributed to an operator and given a
+        verdict — verified, unverified, megawatt-hours lost — with the
+        detection floor and uncertainty stated on each record. Built on cited
+        open data: World Bank GFMR / NOAA VIIRS Nightfire, and the
+        NUPRC 2022 Flare Gas Regulations penalty basis. Not affiliated with or
+        endorsed by NUPRC.
+      </p>
+      <dl class="hero__stats" id="heroStats">
+        <div class="stat"><dt>Sites tracked</dt><dd id="statSites">…</dd></div>
+        <div class="stat"><dt>Niger Delta sites</dt><dd id="statND">…</dd></div>
+        <div class="stat"><dt>Latest total flare vol.</dt><dd id="statVol">…</dd></div>
+        <div class="stat"><dt>Latest year</dt><dd id="statYear">…</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="mapsec" id="map">
+    <div class="wrap">
+      <div class="sectionhead">
+        <h2>Flare sites, 2025</h2>
+        <div class="legend">
+          <span class="legend__item"><i class="dot dot--on"></i>Active flare</span>
+          <span class="legend__item"><i class="dot dot--off"></i>Unverified / below floor</span>
+        </div>
+      </div>
+      <div id="mapEl" class="map" role="application" aria-label="Niger Delta flare site map"></div>
+      <p class="map__cite">Site geometry from World Bank GFMR individual flare locations (NOAA VIIRS Nightfire, Payne Institute). Marker size ≈ latest-year flare volume.</p>
+    </div>
+  </section>
+
+  <section class="opssec" id="operators">
+    <div class="wrap">
+      <div class="sectionhead">
+        <h2>Operator compliance</h2>
+        <div class="filter">
+          <input id="opFilter" class="filter__input" type="search" placeholder="Filter operators…" aria-label="Filter operators" />
+          <label class="filter__toggle"><input type="checkbox" id="ndOnly" /> Niger Delta only</label>
+        </div>
+      </div>
+      <div id="opCards" class="cards"></div>
+      <p class="ops__note">
+        Penalty basis: <strong>US$2.00 / 1,000 scf</strong> (NUPRC 2022 Flare Gas Regulations Gazette; 1,000 scf = 28.317 m³).
+        ₦ figures are indicative at one FX snapshot and are never official NUPRC assessments.
+      </p>
+    </div>
+  </section>
+
+  <section class="sitessec" id="sites">
+    <div class="wrap">
+      <div class="sectionhead">
+        <h2>Site verdicts</h2>
+        <a class="link" href="/api/digest.csv" download>Download weekly CSV digest ↓</a>
+      </div>
+      <div class="tablewrap">
+        <table class="table" id="siteTable">
+          <thead>
+            <tr>
+              <th>Site / field</th><th>Operator</th><th>Verdict</th>
+              <th>Latest vol (mill. m³)</th><th>Trend</th><th>Confidence</th>
+              <th>Penalty (US$)</th>
+            </tr>
+          </thead>
+          <tbody id="siteBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <p>Built by Kaliabe · open data · honest uncertainty. Verdicts are derived estimates, not regulatory determinations.</p>
+    <p class="foot__links"><a href="methodology.html">Methodology &amp; confidence</a> · <a href="data.html">Data &amp; licences</a></p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>

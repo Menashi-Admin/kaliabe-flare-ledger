@@ -1,0 +1,16 @@
+{
+  "name": "kaliabe-flare-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kaliabe Flare Ledger — ingestion, verdict engine, and API worker",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute kaliabe-flare --local --file=./schema.sql",
+    "db:seed": "wrangler d1 execute kaliabe-flare --local --file=./seed.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

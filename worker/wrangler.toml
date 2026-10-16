@@ -1,0 +1,9 @@
+name = "kaliabe-flare"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "kaliabe-flare"
+database_id = "3fb2bfee-90b9-4a6d-8c1a-3ab6fdf87f16"

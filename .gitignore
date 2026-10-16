@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.wrangler/
+.wds-cache/
+*~
+*.log
+.DS_Store
+.wrangler/state/

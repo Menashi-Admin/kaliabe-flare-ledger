@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Methodology &amp; Confidence — Kaliabe Flare Ledger</title>
+<meta name="description" content="How the Kaliabe Flare Ledger verifies flares, estimates volumes, and publishes confidence and uncertainty on every verdict." />
+<link rel="stylesheet" href="./css/base.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand"><span class="brand__mark" aria-hidden="true"></span><span class="brand__name"><a href="./" style="color:inherit;text-decoration:none">Kaliabe Flare Ledger</a></span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="./index.html#map" class="nav__link">Map</a>
+      <a href="./index.html#operators" class="nav__link">Operators</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <div class="wrap">
+    <h1>Methodology &amp; confidence</h1>
+    <p class="lede">
+      The Flare Ledger is built on the principle that honest uncertainty is a
+      feature, not a weakness. Every verdict states what was detected, the floor
+      below which this satellite can no longer resolve a flare, and a confidence
+      score. We never present a derived estimate as a regulatory finding.
+    </p>
+
+    <div class="notice">
+      <strong>Independence note.</strong> The Kaliabe Flare Ledger is an
+      independent, open-data project. It is not affiliated with, endorsed by,
+      or reporting for the Nigerian Upstream Petroleum Regulatory Commission
+      (NUPRC), NNPC, or any operator. Penalty figures are <em>derived estimates</em>
+      from the published NUPRC basis and are not official assessments.
+    </div>
+
+    <h2>1. Detection layer — NOAA VIIRS Nightfire</h2>
+    <p>
+      Flares are detected by <strong>NOAA VIIRS Nightfire (VNF)</strong>, run by the
+      Earth Observation Group at the Colorado School of Mines / Payne Institute.
+      VIIRS sees infrared heat at night and is sensitive only to hot emitters. Gas
+      flares burn hotter than almost any other terrestrial source, so readings with
+      temperatures above ~1,400 K are treated as flare candidates (biomass burning
+      and power plants burn cooler).
+    </p>
+    <p>
+      <strong>Detection floor.</strong> VIIRS resolves flare <em>heat</em>, not gas
+      molecules directly. Small or intermittent flares fall below the instrument's
+      resolution or are obscured by cloud — the Niger Delta is cloudy for much of the
+      year. A site with no detection in a given year is therefore labelled
+      <em>unverified / below floor</em>, not "not flaring".
+    </p>
+
+    <h2>2. Volume estimation — World Bank GFMR calibration</h2>
+    <p>
+      Radiant heat is converted to a gas-flow volume using the calibration published
+      by the World Bank's Global Flaring and Methane Reduction (GFMR) partnership,
+      which anchors satellite radiance to country-level gas-flaring statistics.
+      The volumes on these pages are GFMR's per-flare-site estimates; the underlying
+      method is documented by the World Bank (and builds on the VIIRS Nightfire
+      product and Schuit et al. 2023 for methane hot-spot detection principles).
+    </p>
+
+    <h2>3. Attribution to operators</h2>
+    <p>
+      Each flare site is assigned to a presumed operating company by geometric /
+      radiative association with field boundaries and operator records in the GFMR
+      metadata. Where no reliable operator is available a site is marked
+      <em>Unattributed</em>. Attribution is indicative, not a legal determination.
+    </p>
+
+    <h2>4. Verdicts and confidence</h2>
+    <table class="conf-table">
+      <thead><tr><th>Verdict</th><th>Meaning</th><th>Base confidence</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Verified flare</strong></td><td>A positive flare volume was detected in the latest VIIRS/GFMR record.</td><td>0.55–0.98</td></tr>
+        <tr><td><strong>Unverified</strong></td><td>No volume in the latest record — below detection floor or cloud-obscured.</td><td>0.4</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Confidence is raised by years of continuous record (data coverage) and by a
+      named operator for the site; it is capped at 0.98 because VIIRS volume↔radiance
+      calibration carries intrinsic uncertainty from gas composition and combustion
+      efficiency. Correlation is not perfect; treat every verdict as a direction,
+      not an exact quantity.
+    </p>
+
+    <h2>5. Penalty basis — NUPRC 2022 Gazette</h2>
+    <p>
+      The penalty shown is a <strong>derived estimate</strong> on the basis set by the
+      <em>Flare Gas (Prevention of Waste and Pollution) Regulations</em> (2022): a
+      charge of <strong>US$2.00 per 1,000 scf (28.317 m³)</strong> of associated gas
+      flared. The ledger converts each site's latest-year volume to US$ and, at an
+      indicative FX snapshot, to ₦. The ₦ figures are display conveniences; actual
+      assessments are made by NUPRC and are not reproduced here.
+    </p>
+
+    <h2>6. Methane-equivalent loss &amp; CO₂e</h2>
+    <p>
+      Flaring converts gas to CO₂ but also vents some unburnt methane, which is far
+      stronger as a greenhouse gas. We apply the GFMR global calibration ratios
+      (151 bcm flared ≈ 389 Mt CO₂e incl. 46 Mt methane) to each site's volume to
+      estimate CO₂e and methane-equivalent loss. These are order-of-magnitude,
+      perfect-combustion-adjusted estimates — the field's single-blind tests show
+      nobody detects or quantifies every release.
+    </p>
+
+    <h2>7. Limitations</h2>
+    <ul>
+      <li>Only offshore/onshore sites in GFMR's Nigeria set are shown; the dataset is a subset of total Nigerian flaring.</li>
+      <li>Cloud cover materially under-samples the Niger Delta.</li>
+      <li>Volume↔radiance calibration uncertainty is not fully removable from satellite data alone.</li>
+      <li>Operator composition changes over time; attribution reflects the most recent record.</li>
+    </ul>
+
+    <p style="margin-top:36px"><a href="./" class="link">← Back to the ledger</a></p>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap foot__inner">
+  <p>Built by Kaliabe · open data · honest uncertainty.</p>
+  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a></p>
+</div></footer>
+</body>
+</html>
