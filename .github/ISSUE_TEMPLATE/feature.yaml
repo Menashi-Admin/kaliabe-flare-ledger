@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a decision-layer feature or new data layer
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The roadmap lives in `docs/FEATURE-SET.md` and is sequenced by value per unit of effort.
+        If your idea maps to a listed feature, say which one. New ideas are welcome and will be
+        slotted or turned down on fit.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The decision it enables
+      description: Every feature must end in a decision. What will someone be able to decide, that they can't today?
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Audience
+      description: Operators, regulators, EU buyers, financiers, citizens, media — who benefits?
+  - type: textarea
+    id: data
+    attributes:
+      label: Data requirement
+      description: Open data only. What source, and is it license-clean? No proprietary feeds.
+  - type: textarea
+    id: notes
+    attributes:
+      label: Honesty constraints
+      description: How will estimates be labelled? What floor/confidence applies?

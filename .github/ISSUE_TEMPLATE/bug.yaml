@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a bug, a wrong number, or a misattributed site
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The Ledger runs on honesty — thank you for checking a number. If this is a *data* issue
+        rather than a code bug, say which site/operator/field around the number is wrong and
+        (ideally) link a source.
+  - type: textarea
+    id: what
+    attributes:
+      label: What's wrong
+      description: Expected vs actual. For a data issue name the site/field and the wrong figure.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction (for code bugs)
+      description: Steps, URL, endpoint. A failing test helps a lot.
+  - type: checkboxes
+    id: type
+    attributes:
+      label: Type
+      options:
+        - label: Code bug
+        - label: Data / number is wrong
+        - label: Method / citation issue
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Impact
+      options: ["Minor", "Moderate", "Major", "Critical"]

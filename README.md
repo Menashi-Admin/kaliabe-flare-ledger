@@ -10,6 +10,18 @@ decision layer for the Niger Delta.
 **Live:** [kaliabe-flare-web.pages.dev](https://kaliabe-flare-web.pages.dev)
 **API:** [kaliabe-flare.menashiconsulting.workers.dev](https://kaliabe-flare.menashiconsulting.workers.dev)
 **CSV digest:** [kaliabe-flare-web.pages.dev/api/digest.csv](https://kaliabe-flare-web.pages.dev/api/digest.csv)
+**Why it exists:** [blog/why-this-page-exists](https://kaliabe-flare-web.pages.dev/blog/why-this-page-exists/)
+
+---
+
+### Work with this project
+
+- **Read & advertise:** `README.md` (this) · `ARCHITECTURE.md` · `INTEGRATIONS.md` ·
+  `blog/why-this-page-exists.md`
+- **Extend or fix:** `CONTRIBUTING.md` · `docs/DEVELOPMENT.md` · `docs/FEATURE-SET.md`
+- **Method & data:** `docs/METHODOLOGY.md` · `docs/DATA-LICENCES.md` ·
+  `docs/DATA-SOURCES-REGISTRY.md`
+- **Licence:** MIT (`LICENSE`)
 **Decision brief (national):** [kaliabe-flare-web.pages.dev/api/brief?scope=national](https://kaliabe-flare-web.pages.dev/api/brief?scope=national)
 
 ---

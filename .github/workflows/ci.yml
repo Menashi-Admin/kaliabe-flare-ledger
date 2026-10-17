@@ -1,0 +1,27 @@
+name: CI — validate data sources
+on:
+  push:
+    paths: ['scripts/**', 'docs/DATA-SOURCES-REGISTRY.md', 'data/**']
+  pull_request:
+    paths: ['scripts/**', 'docs/DATA-SOURCES-REGISTRY.md', 'data/**']
+  workflow_dispatch:
+
+jobs:
+  validate-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate data sources
+        run: |
+          python3 scripts/validate_sources.py || {
+            echo "::error::One or more data sources are unreachable or checksums changed."
+            echo "See docs/DATA-SOURCES-REGISTRY.md. Do not merge a stale source silently."
+            exit 1
+          }
+      - name: Confirm seed JSON is valid
+        run: |
+          python3 -c \
+            "import json; seed=json.load(open('data/gfmr_nigeria_sites_seed.json')); print(f'OK: {len(seed)} sites in seed')"
