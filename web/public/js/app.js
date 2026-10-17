@@ -1,4 +1,4 @@
-// Kaliabe Flare Ledger — frontend
+// Kaliabe Flare Tracker — frontend
 // API is same-origin: Pages Function /api/* proxies to the Worker (web/functions/api).
 // Override with ?api=https://… for local/dev.
 const API = new URLSearchParams(location.search).get('api') || '';
