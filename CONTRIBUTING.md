@@ -31,13 +31,18 @@ back on the data, the method and the code.
 
 ## Development workflow
 
-1. Fork and clone; or work from a branch off `main`.
+1. **Work on a branch off `main`. Never do a change you are still testing directly on `main`.**
+   `main` is the production branch (Pages `production_branch = main`) — anything merged to
+   `main` is a release candidate. Feature branches are where testing happens.
 2. Services: Cloudflare Worker + D1 (`worker/`), Cloudflare Pages (`web/`). Local dev via
    `npx wrangler dev --local` in `worker/` (seed from `worker/seed.sql`).
 3. Reproduce data locally first — the data flow is in `ARCHITECTURE.md` and the commands are in
    the README's "Reproduce it" section.
-4. Deploy previews to Cloudflare Pages preview before touching production.
-5. Open a PR. Link the issue it closes and, for data-affecting changes, the sources you used.
+4. Verify in a **preview** deploy first (deploy from your feature branch). A Pages deploy only
+   reaches production when made explicitly with `--branch=main` from a clean `main` checkout.
+   See `docs/DEVELOPMENT.md → Branching & deployment`.
+5. Open a PR against `main`. Link the issue it closes and, for data-affecting changes, the
+   sources you used. After merge to `main`, deploy production explicitly.
 
 ## Verification expectations for a PR
 

@@ -72,11 +72,30 @@ cd worker && npx wrangler d1 execute kaliabe-flare --remote --file=../worker/sch
 cd worker && npx wrangler d1 execute kaliabe-flare --remote --file=../worker/seed.sql
 cd worker && npx wrangler deploy
 
-# web
-cd web && npx wrangler pages deploy public --project-name=kaliabe-flare-web --branch=production
+# web — a `main`-branch deploy IS production (Pages project production_branch = main)
+cd web && npx wrangler pages deploy public --project-name=kaliabe-flare-web --branch=main
 ```
 
-Prefer `--local` D1 and a preview Pages deploy first, then production.
+Prefer `--local` D1 and a preview Pages deploy first, then production. When about to put
+something live, confirm you are actually on `main` and at the commit you intend to ship:
+`git branch --show-current` must read `main` and `git status` must be clean.
+
+## Branching & deployment (the rule that keeps testing off production)
+
+- `<Pages project>.pages.dev` has **`production_branch = main`**. It is NOT connected to a Git
+  remote, so the GitHub Action pushing to `main` never auto-deploys — production changes only
+  happen through an **explicit** `wrangler pages deploy --branch=main` or with the modern
+  flagless form from a `main` checkout.
+- **All work happens on a branch off `main`.** Never edit on `main` for a change you are still
+  testing. Branch, verify in `--local` / a Pages *preview* deploy, then merge to `main` and
+  deploy `--branch=main` when it is actually ready to ship.
+- A `wrangler pages deploy` without `--branch` while `HEAD` is *not* `main` publishes a
+  **preview** deployment and cannot touch the `main` production route — that is the safety
+  rail that keeps a testing push from going live.
+- The scheduled `live-thermal` GitHub Action writes to `main` (data files only, via its own bot
+  commit). It runs `validate_sources.py` in CI on push and never deploys Pages; it is the one
+  write-to-`main` exception and is intentional.
+- Rule in one line: **feature branch to work, merge to main to release, deploy is explicit.**
 
 ## Gotchas
 
