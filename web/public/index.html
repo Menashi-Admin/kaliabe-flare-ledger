@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Kaliabe Flare Ledger — Nigeria</title>
-<meta name="description" content="An open-data flare verification and verdict ledger for Nigeria's Niger Delta. Sites from World Bank GFMR / NOAA VIIRS Nightfire; penalties on the NUPRC 2022 Gazette basis." />
+<meta name="description" content="An open-data flare verification and verdict ledger for Nigeria's Niger Delta. Sites from World Bank GFMR / NOAA VIIRS Nightfire; penalties at both tiers of the Flare Gas Regulations 2018 (S.I. No. 9 of 2018)." />
 <link rel="preconnect" href="https://unpkg.com" crossorigin />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23b5761e%22/%3E%3C/svg%3E" />
@@ -26,6 +26,7 @@
       <a href="#watchlist" class="nav__link">Watchlist</a>
       <a href="methodology.html" class="nav__link">Methodology</a>
       <a href="data.html" class="nav__link">Data</a>
+      <a href="blog/" class="nav__link">Writing</a>
     </nav>
   </div>
 </header>
@@ -39,13 +40,14 @@
         Every flare site on this map is attributed to an operator and given a
         verdict — verified or unverified, penalty due, methane-equivalent
         lost, trend — with the detection floor and uncertainty stated on each record. Built on cited
-        open data: World Bank GFMR / NOAA VIIRS Nightfire, and the
-        NUPRC 2022 Flare Gas Regulations penalty basis. Not affiliated with or
-        endorsed by NUPRC.
+        open data: World Bank GFMR / NOAA VIIRS Nightfire (June 2026 release), and the
+        Flare Gas (Prevention of Waste and Pollution) Regulations, 2018 — penalties shown at
+        both the $2.00 and $0.50 tiers, because we do not hold production rates. Not affiliated
+        with or endorsed by NUPRC.
       </p>
       <dl class="hero__stats" id="heroStats">
         <div class="stat"><dt>Sites tracked</dt><dd id="statSites">…</dd></div>
-        <div class="stat"><dt>Niger Delta sites</dt><dd id="statND">…</dd></div>
+        <div class="stat"><dt>Niger Delta sites</dt><dd id="statND">…</dd><dd class="stat__sub" id="statNDsub"></dd></div>
         <div class="stat"><dt>Latest total flare vol.</dt><dd id="statVol">…</dd><dd class="stat__sub" id="statActive"></dd></div>
         <div class="stat"><dt>Latest year</dt><dd id="statYear">…</dd></div>
       </dl>
@@ -109,8 +111,10 @@
         </table>
       </div>
       <p class="ops__note">
-        Penalty basis: <strong>US$2.00 / 1,000 scf</strong> (NUPRC 2022 Flare Gas Regulations Gazette; 1,000 scf = 28.317 m³).
-        ₦ figures are indicative at one FX snapshot and are never official NUPRC assessments.
+        Penalty basis: <strong>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018</strong> (S.I. No. 9 of 2018), Reg. 13:
+        <strong>US$2.00</strong> per 1,000 scf (28.317 m³) where 10,000 bbl of oil per day or more is produced, <strong>US$0.50</strong> where less.
+        We do not hold production rates, so every penalty is shown at both tiers (upper / lower bound); no midpoint is used.
+        ₦ figures are indicative at one FX snapshot and are never official NUPRC assessments. <a class="link" href="methodology.html#penalty">Method</a>
       </p>
     </div>
   </section>
@@ -122,11 +126,11 @@
         <div class="filter">
           <label class="filter__toggle" for="riseThr">Rising if 3-yr change above</label>
           <select id="riseThr" class="filter__input">
-            <option value="25">+25%</option><option value="50" selected>+50%</option><option value="100">+100%</option>
+            <option value="25" selected>+25%</option><option value="50">+50%</option><option value="100">+100%</option>
           </select>
         </div>
       </div>
-      <p class="ops__note watch__lede" id="watchLede">Derived from the site record in your browser. Select a site to open it on the map.</p>
+      <p class="ops__note watch__lede" id="watchLede">Derived from the site record in your browser. “Rising” needs both the chosen percentage and at least 0.5 million m³ added, so a big percentage on a tiny base doesn't qualify. Select a site to open it on the map. <a class="link" href="methodology.html#thresholds">Thresholds</a></p>
       <div class="watch" id="watch"></div>
     </div>
   </section>
@@ -143,7 +147,7 @@
             <tr>
               <th>Site / field</th><th>Operator</th><th>Verdict</th>
               <th class="num">Latest vol (mill. m³)</th><th>Trend</th><th class="num">Confidence</th>
-              <th class="num">Penalty (US$)</th>
+              <th class="num">Penalty (US$)<br><span class="site-sub">$2.00 / $0.50 tier</span></th>
             </tr>
           </thead>
           <tbody id="siteBody"></tbody>
@@ -156,7 +160,7 @@
 <footer class="foot">
   <div class="wrap foot__inner">
     <p>Built by Kaliabe · open data · honest uncertainty. Verdicts are derived estimates, not regulatory determinations.</p>
-    <p class="foot__links"><a href="methodology.html">Methodology &amp; confidence</a> · <a href="data.html">Data &amp; licences</a></p>
+    <p class="foot__links"><a href="methodology.html">Methodology &amp; confidence</a> · <a href="data.html">Data &amp; licences</a> · <a href="blog/">Writing</a></p>
   </div>
 </footer>
 

@@ -5,7 +5,9 @@
  * to render the decision brief server-side. No dependencies, no DOM access.
  *
  * Every conversion takes the constants `k` from the API (`meta.constants`) —
- * the Worker is the only place the constants are defined.
+ * the Worker is the only place the constants are defined. Every *threshold*
+ * (what counts as rising, significant, top decile …) lives here, in THRESHOLDS,
+ * so the Worker, the browser and the methodology page read the same numbers.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -13,18 +15,73 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  // million m³ → every derived unit. k: { m3_per_1000scf, penalty_usd_per_1000scf,
-  // co2e_mt_per_bcm, ch4_mt_per_bcm, scf_per_m3 }
+  // ------------------------------------------------------------ thresholds
+  // KFL-M 1.2. One named, documented set. `doc` is rendered verbatim on the
+  // methodology page and mirrored in docs/METHODOLOGY.md §6.
+  const THRESHOLDS = {
+    trend_stable_band_pct: 5,
+    trend_min_abs_change_million_m3: 0.5,
+    trend_min_detected_years: 2,
+    change_min_abs_million_m3: 0.5,
+    rising_pct_options: [25, 50, 100],
+    rising_pct_default: 25,
+    rising_min_added_million_m3: 0.5,
+    small_base_million_m3: 1,
+    newly_detected_years: 2,
+    top_decile_fraction: 0.1,
+    scenario_step_pct: 5,
+    scenario_sig_figs: 3,
+  };
+  const THRESHOLD_DOCS = [
+    ['trend_stable_band_pct', 'Trend: stable band', '±5%', 'A recent-vs-baseline change inside ±5% is labelled stable.'],
+    ['trend_min_abs_change_million_m3', 'Trend: minimum absolute change', '0.5 million m³/yr', 'A direction (rising/falling) also needs the window means to differ by at least this much; smaller moves are within detection noise and are labelled “not significant”.'],
+    ['trend_min_detected_years', 'Trend: detected years per window', '2 (or the whole window if shorter)', 'Both the recent (3-yr) and baseline (up to 5-yr) windows need this many years with a detection. A window made of non-detections may be cloud or below-floor flaring, so no direction is claimed.'],
+    ['change_min_abs_million_m3', '3-/5-yr change: minimum absolute change', '0.5 million m³', 'A point-to-point change is coloured as up/down only if it moves at least this much and beyond ±5%; otherwise it is shown muted and marked n.s.'],
+    ['rising_pct_default', 'Watchlist “rising”: minimum % (default)', '+25% (options 25 / 50 / 100%)', 'The 3-yr change must reach the chosen percentage …'],
+    ['rising_min_added_million_m3', 'Watchlist “rising”: minimum volume added', '0.5 million m³', '… and add at least this volume. The absolute floor exists because a percentage on a tiny base (0.01 → 0.05 is +400%) says nothing material; it applies to every % option.'],
+    ['small_base_million_m3', 'Small-base flag', '1 million m³', 'Where the base-year volume is below this, the percentage is flagged “small base” and the volume added is shown first.'],
+    ['newly_detected_years', 'Watchlist “newly detected”', 'last 2 years', 'First positive volume in the latest year or the year before.'],
+    ['top_decile_fraction', 'Top decile', 'top 10% of the full site set', 'Latest-year volume, ranked over every site in the ledger (detected or not); the cut-off volume is shown beside the list.'],
+    ['scenario_sig_figs', 'Scenario rounding', '3 significant figures', 'Scenario outputs are rounded to 3 significant figures (step 5%) so they are not read as precise; always labelled “scenario” with the assumption.'],
+  ];
+
+  // million m³ → every derived unit. k: { m3_per_1000scf, penalty_usd_per_1000scf_upper,
+  // penalty_usd_per_1000scf_lower, co2e_mt_per_bcm, ch4_mt_per_bcm, ch4_co2e_mt_per_bcm, scf_per_m3 }
+  // The penalty is ALWAYS a pair: the Reg. 13(1) $2.00 tier (≥10,000 bbl/d, upper
+  // bound) and the Reg. 13(2) $0.50 tier (<10,000 bbl/d, lower bound). We hold no
+  // production rates, so we never pick one, and never publish a midpoint.
   function convert(millionM3, k) {
     const v = Number.isFinite(millionM3) ? millionM3 : 0;
     const bcm = v / 1e3;
+    const kscf = (v * 1e6) / k.m3_per_1000scf;
     return {
       million_m3: v,
       bcm,
       mmscfd: (v * k.scf_per_m3) / 365,
-      penalty_usd: ((v * 1e6) / k.m3_per_1000scf) * k.penalty_usd_per_1000scf,
+      penalty_usd_upper: kscf * k.penalty_usd_per_1000scf_upper,
+      penalty_usd_lower: kscf * k.penalty_usd_per_1000scf_lower,
       co2e_t: bcm * k.co2e_mt_per_bcm * 1e6,
       ch4_t: bcm * k.ch4_mt_per_bcm * 1e6,
+      ch4_co2e_t: bcm * k.ch4_co2e_mt_per_bcm * 1e6,
+    };
+  }
+
+  // Point-to-point change significance (3-/5-yr change). null when undefined.
+  function changeSignificant(base, now, T = THRESHOLDS) {
+    if (!(base > 0)) return null;
+    const pctv = ((now - base) / base) * 100;
+    return Math.abs(now - base) >= T.change_min_abs_million_m3 && Math.abs(pctv) > T.trend_stable_band_pct;
+  }
+
+  // Watchlist "rising": ≥ thrPct 3-yr change AND ≥ the absolute floor added.
+  function rising(site, thrPct, T = THRESHOLDS) {
+    const ys = site.year_series || [];
+    if (ys.length < 4 || site.change_3yr_pct == null) return { qualifies: false };
+    const base = ys[ys.length - 4].million_m3 || 0, now = ys[ys.length - 1].million_m3 || 0;
+    const added = now - base;
+    return {
+      qualifies: site.change_3yr_pct >= thrPct && added >= T.rising_min_added_million_m3,
+      pct: site.change_3yr_pct, added, base, now, small_base: base < T.small_base_million_m3,
     };
   }
 
@@ -35,7 +92,7 @@
     const after = convert(millionM3 * (1 - cut / 100), k);
     const saved = {};
     for (const key of Object.keys(base)) saved[key] = base[key] - after[key];
-    return { cut_pct: cut, base, after, saved };
+    return { cut_pct: cut, base, after, saved, label: 'scenario', assumption: `a uniform ${cut}% cut to the recorded latest-year volume; every output scales linearly with volume — a scenario, not a forecast` };
   }
 
   // ---------------------------------------------------------------- formatting
@@ -49,6 +106,10 @@
     if (a >= 1e3) return `${sym}${(v / 1e3).toFixed(1)} k`;
     return `${sym}${v.toFixed(0)}`;
   }
+  // Round to n significant figures (scenario outputs).
+  const sig = (v, n = THRESHOLDS.scenario_sig_figs) => (v == null || !isFinite(v) || v === 0 ? v : Number(v.toPrecision(n)));
+  // The two-tier penalty, as text. Order is fixed: $2.00 tier first, then $0.50.
+  const penaltyPair = (upper, lower, sym = 'US$') => `${money(upper, sym)} at the $2.00 tier · ${money(lower, sym)} at the $0.50 tier`;
   const pct = (v) => (v == null || !isFinite(v) ? '' : `${v > 0 ? '+' : v < 0 ? '−' : ''}${num(Math.abs(v), Math.abs(v) >= 100 ? 0 : 1)}%`);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // Percentile phrasing, kept in one place so site, card and brief agree.
@@ -111,5 +172,5 @@
     </svg>`;
   }
 
-  return { convert, scenario, trendChart, util: { num, money, pct, esc, ordinal } };
+  return { THRESHOLDS, THRESHOLD_DOCS, convert, scenario, changeSignificant, rising, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
 });

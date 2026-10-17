@@ -422,7 +422,7 @@
       const v = s.latest_year_vol_million_m3 || 0;
       const mmscfd = (v * 35.3146667) / 365;
       const tl = s.trend_label || 'stable';
-      const arrow = { rising: '↑', falling: '↓', new: '↑', inactive: '·', stable: '→' }[tl] || '→';
+      const arrow = { rising: '↑', falling: '↓', new: '↑', inactive: '·', stable: '→', not_significant: '~' }[tl] || '→';
       const tcls = tl === 'rising' || tl === 'new' ? 'trend-up' : tl === 'falling' ? 'trend-down' : '';
       const fx = m.ngn_per_usd_indicative || 1550;
       const c = context(s);
@@ -464,13 +464,13 @@
           <p class="fig__sub">${num(s.latest_year_bcm, 3)} bcm · ${num(mmscfd, 1)} MMscfd</p>
         </div>
         ${sparkline(series)}
-        <p class="drawer__trend"><span class="${tcls}">${arrow} ${titleCase(tl)}${s.trend_pct != null ? ' ' + pct(s.trend_pct) : ''}</span><sup>2</sup>
-          <span class="kv__sub">${esc(s.trend_basis || m.trend_method || '')}</span></p>
+        <p class="drawer__trend"><span class="${tcls}">${arrow} ${titleCase(tl.replace('_', ' '))}${s.trend_pct != null ? ' ' + pct(s.trend_pct) : ''}</span><sup>2</sup>
+          <span class="kv__sub">${esc(s.trend_basis || m.trend_method || '')}${s.trend_significance && s.trend_significance !== 'significant' ? ' · ' + esc(s.trend_significance) : ''}</span></p>
 
         <dl class="facts">
-          <div><dt>Penalty estimate<sup>3</sup></dt><dd>${money(s.penalty_usd_latest, 'US$')}</dd><dd class="kv__sub">≈ ${money(s.penalty_ngn_latest, '₦')} indicative</dd></div>
-          <div><dt>CO₂e<sup>4</sup></dt><dd>${num(s.co2e_tonnes_latest, 0)} t</dd><dd class="kv__sub">${s.latest_year}</dd></div>
-          <div><dt>Methane-equiv.<sup>4</sup></dt><dd>${num(s.methane_tonnes_equivalent_latest, 0)} t</dd><dd class="kv__sub">CH₄, ${s.latest_year}</dd></div>
+          <div><dt>Penalty, $2.00 tier<sup>3</sup></dt><dd>${money(s.penalty_usd_latest_upper, 'US$')}</dd><dd class="kv__sub">≥10k bbl/d · upper · ≈ ${money(s.penalty_ngn_latest_upper, '₦')}</dd></div>
+          <div><dt>Penalty, $0.50 tier<sup>3</sup></dt><dd>${money(s.penalty_usd_latest_lower, 'US$')}</dd><dd class="kv__sub">&lt;10k bbl/d · lower · ≈ ${money(s.penalty_ngn_latest_lower, '₦')}</dd></div>
+          <div><dt>CO₂e<sup>4</sup></dt><dd>${num(s.co2e_tonnes_latest, 0)} t</dd><dd class="kv__sub">unburned CH₄ ${num(s.methane_tonnes_latest, 0)} t</dd></div>
         </dl>
         <p class="drawer__floor"><b>Detection floor<sup>5</sup></b>${esc(s.detection_floor)}</p>
         ${opts.drawerExtra ? opts.drawerExtra(s, m) : ''}
@@ -479,7 +479,7 @@
         <dl class="kv">
           <div><dt>Field type</dt><dd>${esc(s.field_type && s.field_type !== 'NA' ? s.field_type : 'Not stated')}</dd></div>
           <div><dt>Location</dt><dd>${esc(titleCase(s.location || '—'))}</dd></div>
-          <div><dt>Niger Delta</dt><dd>${s.in_niger_delta ? 'Yes' : 'No'} <span class="kv__sub">study box 4.5–8.5° E, 4.5–7.0° N</span></dd></div>
+          <div><dt>Niger Delta</dt><dd>${s.niger_delta_class === 'niger_delta' ? 'Yes' : s.niger_delta_class === 'offshore' ? 'Offshore' : 'No'} <span class="kv__sub">${esc(s.niger_delta_label || '')} · by state boundary (nine Niger Delta states)</span></dd></div>
           <div><dt>Coordinates</dt><dd class="mono">${lat}, ${lon}</dd></div>
           <div><dt>Record</dt><dd>${series.length ? `${series[0].year}–${series[series.length - 1].year}` : '—'} <span class="kv__sub">${detYears} of ${series.length} yrs detected</span></dd></div>
         </dl>
@@ -494,10 +494,10 @@
         <dl class="kv">${pipeHtml}</dl>
 
         <ol class="drawer__src">
-          <li>World Bank GFMR, flare volume estimates by individual flare location 2012–2025; NOAA VIIRS Nightfire (EOG, Payne Institute). Values in million m³; bcm = million m³ ÷ 1,000.</li>
+          <li>World Bank GFMR, flare volume estimates by individual flare location 2012–2025, June 2026 release (three-satellite method); NOAA VIIRS Nightfire (EOG, Payne Institute). Values in million m³; bcm = million m³ ÷ 1,000.</li>
           <li>Kaliabe derivation from (1): ${esc(m.trend_method || 'mean of last 3 yrs vs preceding up to 5 yrs')}.</li>
-          <li>NUPRC Flare Gas (Prevention of Waste and Pollution) Regulations 2022: US$${m.penalty_usd_per_1000scf || 2}.00 per 1,000 scf (${m.m3_per_1000scf || 28.317} m³), on the ${s.latest_year} volume. ₦ at an indicative ${num(fx, 0)}/US$. A derived estimate, not an NUPRC assessment.</li>
-          <li>GFMR 2025 global ratios: 151 bcm ≈ 389 Mt CO₂e incl. 46 Mt CH₄. Order-of-magnitude.</li>
+          <li>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018 (S.I. No. 9 of 2018), Reg. 13: US$2.00 per 1,000 scf (${m.m3_per_1000scf || 28.317} m³) where ≥10,000 bbl/d is produced, US$0.50 where less, on the ${s.latest_year} volume. We do not hold production rates, so both tiers are shown. Force-majeure and Deliver-or-Pay exemptions are not deducted. ₦ at an indicative ${num(fx, 0)}/US$. A derived estimate, not an NUPRC assessment.</li>
+          <li>World Bank Global Gas Flaring Tracker, June 2026 (data year 2025): 167 bcm ≈ 429 MtCO₂e incl. 50 MtCO₂e unburned methane (1.8 Mt CH₄). Order-of-magnitude.</li>
           <li>Kaliabe verdict method; see <a href="methodology.html">methodology</a>.</li>
           <li>geoBoundaries gbOpen NGA ADM1/ADM2 (GRID3), CC BY 4.0. Point-in-polygon computed in your browser.</li>
           <li>USGS Africa oil &amp; gas infrastructure (attributes: Cross-border Information / African Energy), public domain. Nearest-line distance computed in your browser.</li>

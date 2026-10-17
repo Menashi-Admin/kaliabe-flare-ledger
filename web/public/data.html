@@ -17,7 +17,8 @@
       <a href="./index.html#map" class="nav__link">Map</a>
       <a href="./index.html#operators" class="nav__link">Operators</a>
       <a href="methodology.html" class="nav__link">Methodology</a>
-      <a href="data.html" class="nav__link">Data</a>
+      <a href="data.html" class="nav__link" aria-current="page">Data</a>
+      <a href="blog/" class="nav__link">Writing</a>
     </nav>
   </div>
 </header>
@@ -42,16 +43,22 @@
           <td>eogdata.mines.edu / products/vnf</td>
         </tr>
         <tr>
-          <td><strong>World Bank GFMR — Individual Flare Sites</strong></td>
-          <td>Per-site, per-year flare volumes (2012–2025), operator &amp; field attribution.</td>
+          <td><strong>World Bank Global Gas Flaring Tracker, June 2026</strong></td>
+          <td>Emissions ratios: 167 bcm (2025) ≈ 429 MtCO₂e incl. 50 MtCO₂e unburned methane (1.8 Mt CH₄).</td>
           <td>Free with attribution.</td>
           <td>worldbank.org gas flaring data page</td>
         </tr>
         <tr>
-          <td><strong>NUPRC Flare Gas Regulations Gazette (2022)</strong></td>
-          <td>Penalty basis: US$2.00 per 1,000 scf (28.317 m³).</td>
+          <td><strong>World Bank GFMR — Individual Flare Sites</strong></td>
+          <td>Per-site, per-year flare volumes (2012–2025), operator &amp; field attribution. <strong>Vintage:</strong> the June 2026 release (Global Gas Flaring Tracker, 23 June 2026), on the new three-satellite methodology (Suomi NPP, NOAA-20, NOAA-21; revised calibration; series restated back to 2012).</td>
+          <td>Free with attribution.</td>
+          <td>worldbank.org gas flaring data page</td>
+        </tr>
+        <tr>
+          <td><strong>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018</strong><br>S.I. No. 9 of 2018 · Official Gazette No. 88, Vol. 105, 9 July 2018</td>
+          <td>Penalty basis, Reg. 13: US$2.00 per 1,000 scf (28.317 m³) where ≥10,000 bbl oil/day is produced; US$0.50 where less. Both tiers are shown because we do not hold production rates.</td>
           <td>Public government gazette.</td>
-          <td>ngfcp.nuprc.gov.ng</td>
+          <td>ngfcp.nuprc.gov.ng (scanned PDF)</td>
         </tr>
       </tbody>
     </table>
@@ -66,7 +73,15 @@
       </tbody>
     </table>
     <p>Coordinates are rounded to 5 decimal places (~1 m) for the web; geometry is otherwise unchanged.
-      State, LGA and nearest-pipeline context for each flare is computed in the browser (point-in-polygon and nearest line segment).</p>
+      State, LGA and nearest-pipeline context for each flare is computed in the browser (point-in-polygon and nearest line segment).
+      The Niger Delta flag uses the same ADM1 layer: the union of the nine Niger Delta states, by point-in-polygon. Offshore sites
+      beyond the state boundary are labelled separately (see <a class="link" href="methodology.html#niger-delta">methodology §8</a>).</p>
+
+    <h2>Source registry</h2>
+    <p>Every source is checked by <code>scripts/validate_sources.py</code>. It records whether the source is reachable, its
+      version or vintage, a SHA-256 checksum of the fetched bytes and its licence, and writes
+      <code>docs/DATA-SOURCES-REGISTRY.md</code>. It exits non-zero if any source is unreachable, so a stale source shows up
+      instead of failing silently.</p>
 
     <h2>Seed data</h2>
     <p>
@@ -92,7 +107,8 @@
     <ul class="sources">
       <li>World Bank GFMR — Global Gas Flaring Data &amp; Tracker: <a href="https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data" target="_blank" rel="noopener">worldbank.org/en/programs/gasflaringreduction/global-flaring-data</a></li>
       <li>VIIRS Nightfire (NOAA EOG / Payne Institute): <a href="https://eogdata.mines.edu/products/vnf/" target="_blank" rel="noopener">eogdata.mines.edu/products/vnf/</a></li>
-      <li>NUPRC Flare Gas Regulations Gazette: <a href="https://ngfcp.nuprc.gov.ng/wp-content/uploads/2022/09/FGN-Official-Gazette-on-Flare-Gas-v2.0-002.pdf" target="_blank" rel="noopener">ngfcp.nuprc.gov.ng</a></li>
+      <li>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018, S.I. No. 9 of 2018, Official Gazette No. 88 Vol. 105 (9 July 2018), as hosted by the NUPRC Nigerian Gas Flare Commercialisation Programme: <a href="https://ngfcp.nuprc.gov.ng/wp-content/uploads/2022/09/FGN-Official-Gazette-on-Flare-Gas-v2.0-002.pdf" target="_blank" rel="noopener">ngfcp.nuprc.gov.ng</a> (the 2022 in the URL is the upload date, not the instrument)</li>
+      <li>World Bank, Global Gas Flaring Tracker, June 2026: <a href="https://thedocs.worldbank.org/en/doc/b34e0c054bb3fe3695e70154c28eef3f-0400072026/original/Global-Gas-FlaringTracker-June-23-2026.pdf" target="_blank" rel="noopener">thedocs.worldbank.org</a></li>
       <li>Schuit et al. 2023 (methane hot-spot detection method, CAMS): <a href="https://confluence.ecmwf.int/spaces/CKB/pages/505389789/Methane+Hotspot+Explorer+documentation" target="_blank" rel="noopener">atmosphere.copernicus.eu / CAMS documentation</a></li>
       <li>World Bank, <em>Gas Flaring Estimates: Methodology for determining flare gas volumes from satellite data</em>: <a href="https://pubdocs.worldbank.org/en/853661587048977000/Estimation-of-flare-gas-volumes-from-satellite-data-002.pdf" target="_blank" rel="noopener">pubdocs.worldbank.org</a></li>
     </ul>
@@ -103,7 +119,7 @@
 
 <footer class="foot"><div class="wrap foot__inner">
   <p>Built by Kaliabe · open data · honest uncertainty.</p>
-  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a></p>
+  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a> · <a href="blog/">Writing</a></p>
 </div></footer>
 </body>
 </html>

@@ -150,7 +150,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_392
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3926',2023,188.69,0.18869,18.2562);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3926',2024,170.4,0.1704,16.4866);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3926',2025,134.67,0.13467,13.0297);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3913',5.55998274,5.072502919,'Chevron','Okan','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3913',5.55998274,5.072502919,'Chevron','Okan','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3913',2012,107.17,0.10717,10.369);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3913',2013,42.85,0.04285,4.1458);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3913',2014,23.74,0.02374,2.2969);
@@ -240,7 +240,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_393
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3936',2023,0.18,0.00018,0.0174);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3936',2024,3.49,0.00349,0.3377);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3936',2025,118.99,0.11899,11.5126);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('m_62',4.42038121,7.161768784,'Nigeria LNG','NLNG','LNG','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('m_62',4.42038121,7.161768784,'Nigeria LNG','NLNG','LNG','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('m_62',2012,76.43,0.07643,7.3948);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('m_62',2013,38.92,0.03892,3.7656);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('m_62',2014,37.03,0.03703,3.5827);
@@ -345,7 +345,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_394
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3948',2023,89.95,0.08995,8.7029);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3948',2024,134.09,0.13409,12.9736);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3948',2025,90.38,0.09038,8.7445);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3643',4.425126375,7.152957504,'Nigeria LNG','NLNG','LNG','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3643',4.425126375,7.152957504,'Nigeria LNG','NLNG','LNG','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3643',2012,69.04,0.06904,6.6798);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3643',2013,92.31,0.09231,8.9312);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3643',2014,63.43,0.06343,6.137);
@@ -510,7 +510,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_366
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3662',2023,29.61,0.02961,2.8648);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3662',2024,46.35,0.04635,4.4845);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3662',2025,57.75,0.05775,5.5875);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3988',4.460109903,7.468328148,'Lekoil Nigeria','Otakikpo','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3988',4.460109903,7.468328148,'Lekoil Nigeria','Otakikpo','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3988',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3988',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3988',2014,0,0.0,0);
@@ -600,7 +600,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_378
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3788',2023,76.86,0.07686,7.4364);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3788',2024,102.64,0.10264,9.9307);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3788',2025,47.32,0.04732,4.5783);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3766',4.414189893,7.140095189,'Nigeria LNG','NLNG','LNG','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3766',4.414189893,7.140095189,'Nigeria LNG','NLNG','LNG','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3766',2012,32.65,0.03265,3.159);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3766',2013,19.31,0.01931,1.8683);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3766',2014,41.05,0.04105,3.9717);
@@ -660,7 +660,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_381
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3812',2023,9.55,0.00955,0.924);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3812',2024,6.86,0.00686,0.6637);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3812',2025,43.11,0.04311,4.171);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3809',5.436832674,5.14665406,'Chevron','Meji','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3809',5.436832674,5.14665406,'Chevron','Meji','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3809',2012,18.3,0.0183,1.7706);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3809',2013,44.74,0.04474,4.3287);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3809',2014,13.09,0.01309,1.2665);
@@ -735,7 +735,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_388
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3883',2023,46.02,0.04602,4.4526);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3883',2024,76.74,0.07674,7.4248);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3883',2025,38.82,0.03882,3.7559);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3947a',5.386908886,4.589892567,'General Hydrocarbons','Oyo','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3947a',5.386908886,4.589892567,'General Hydrocarbons','Oyo','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947a',2012,137.91,0.13791,13.3432);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947a',2013,151.44,0.15144,14.6522);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947a',2014,107.26,0.10726,10.3777);
@@ -810,7 +810,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_396
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3962',2023,35.84,0.03584,3.4676);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3962',2024,39.9,0.0399,3.8604);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3962',2025,33.55,0.03355,3.246);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3846',4.453429789,6.325528671,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3846',4.453429789,6.325528671,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3846',2012,5.44,0.00544,0.5263);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3846',2013,8.21,0.00821,0.7943);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3846',2014,10.33,0.01033,0.9995);
@@ -1005,7 +1005,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_390
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3908',2023,7.19,0.00719,0.6957);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3908',2024,32.04,0.03204,3.1);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3908',2025,27.7,0.0277,2.68);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3903',4.803143925,5.311923588,'Renaissance Africa Energy','EA','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3903',4.803143925,5.311923588,'Renaissance Africa Energy','EA','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2012,9.93,0.00993,0.9608);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2013,5.27,0.00527,0.5099);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2014,18.19,0.01819,1.7599);
@@ -1020,7 +1020,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_390
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2023,34.93,0.03493,3.3796);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2024,17.27,0.01727,1.6709);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3903',2025,27.6,0.0276,2.6704);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3820',5.77525882,4.890006475,'Chevron','Meren','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3820',5.77525882,4.890006475,'Chevron','Meren','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3820',2012,24.56,0.02456,2.3762);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3820',2013,37.57,0.03757,3.635);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3820',2014,45.48,0.04548,4.4003);
@@ -1125,7 +1125,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_384
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3845',2023,24.87,0.02487,2.4062);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3845',2024,11.08,0.01108,1.072);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3845',2025,22.09,0.02209,2.1373);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3656',5.436568351,5.140480557,'Chevron','Meji','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3656',5.436568351,5.140480557,'Chevron','Meji','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3656',2012,47.66,0.04766,4.6112);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3656',2013,52.6,0.0526,5.0892);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3656',2014,42.83,0.04283,4.1439);
@@ -1365,7 +1365,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_380
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3805',2023,1.62,0.00162,0.1567);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3805',2024,2.36,0.00236,0.2283);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3805',2025,15.05,0.01505,1.4561);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3731',4.42887731,7.170755061,'Nigeria LNG','NLNG','LNG','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3731',4.42887731,7.170755061,'Nigeria LNG','NLNG','LNG','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3731',2012,11.61,0.01161,1.1233);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3731',2013,8.33,0.00833,0.8059);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3731',2014,8.46,0.00846,0.8185);
@@ -1620,7 +1620,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_362
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3624',2023,3.87,0.00387,0.3744);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3624',2024,2.91,0.00291,0.2816);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3624',2025,9.57,0.00957,0.9259);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3862',4.441669461,6.361412791,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3862',4.441669461,6.361412791,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3862',2012,3.76,0.00376,0.3638);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3862',2013,2.57,0.00257,0.2487);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3862',2014,9.78,0.00978,0.9462);
@@ -1740,7 +1740,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_382
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3828',2023,9.33,0.00933,0.9027);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3828',2024,8.32,0.00832,0.805);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3828',2025,8.2,0.0082,0.7934);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3861',4.554993337,4.615749127,'Shell','Bonga','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3861',4.554993337,4.615749127,'Shell','Bonga','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2012,59.62,0.05962,5.7684);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2013,79.68,0.07968,7.7092);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2014,27.91,0.02791,2.7004);
@@ -1755,7 +1755,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_386
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2023,4.93,0.00493,0.477);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2024,8.33,0.00833,0.8059);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3861',2025,7.82,0.00782,0.7566);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3799',4.433630568,6.324618552,'Aiteo Eastern E&P Company','Nembe Creek','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3799',4.433630568,6.324618552,'Aiteo Eastern E&P Company','Nembe Creek','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3799',2012,3.97,0.00397,0.3841);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3799',2013,3.37,0.00337,0.3261);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3799',2014,7.41,0.00741,0.7169);
@@ -1935,7 +1935,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_386
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3869',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3869',2024,4.94,0.00494,0.478);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3869',2025,6.1,0.0061,0.5902);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3947b',5.388011825,4.582294726,'General Hydrocarbons','Oyo','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3947b',5.388011825,4.582294726,'General Hydrocarbons','Oyo','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947b',2012,58.67,0.05867,5.6765);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947b',2013,47.71,0.04771,4.6161);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3947b',2014,25.92,0.02592,2.5078);
@@ -1965,7 +1965,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_387
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3875',2023,59.97,0.05997,5.8023);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3875',2024,7.61,0.00761,0.7363);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3875',2025,6.06,0.00606,0.5863);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3823',5.60074729,5.108974106,'NEPL','Delta South','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3823',5.60074729,5.108974106,'NEPL','Delta South','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3823',2012,36.2,0.0362,3.5024);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3823',2013,38.89,0.03889,3.7627);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3823',2014,30.63,0.03063,2.9635);
@@ -1995,7 +1995,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_381
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3814',2023,11.43,0.01143,1.1059);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3814',2024,12.17,0.01217,1.1775);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3814',2025,5.76,0.00576,0.5573);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3754',4.452109452,6.283374838,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3754',4.452109452,6.283374838,'Aiteo Eastern E&P Company','Nembe Creek','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3754',2012,1.85,0.00185,0.179);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3754',2013,0.53,0.00053,0.0513);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3754',2014,0.45,0.00045,0.0435);
@@ -2070,7 +2070,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_391
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3911',2023,12.8,0.0128,1.2384);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3911',2024,4.22,0.00422,0.4083);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3911',2025,4.92,0.00492,0.476);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3730',4.469261492,7.196303025,'NEPL','Bonny','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3730',4.469261492,7.196303025,'NEPL','Bonny','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3730',2012,19.21,0.01921,1.8586);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3730',2013,2.8,0.0028,0.2709);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3730',2014,2.37,0.00237,0.2293);
@@ -2370,7 +2370,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_381
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3811b',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3811b',2024,0.49,0.00049,0.0474);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3811b',2025,2.39,0.00239,0.2312);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3639',4.557817674,6.988406644,'NNPC Limited','Cawthorne Channel','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3639',4.557817674,6.988406644,'NNPC Limited','Cawthorne Channel','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3639',2012,20.76,0.02076,2.0086);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3639',2013,4.11,0.00411,0.3977);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3639',2014,3.69,0.00369,0.357);
@@ -2400,7 +2400,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_366
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3664',2023,9.73,0.00973,0.9414);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3664',2024,5.99,0.00599,0.5795);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3664',2025,2.25,0.00225,0.2177);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3758',5.331263649,5.208952133,'Brittania-U Nigeria','Ajapa','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3758',5.331263649,5.208952133,'Brittania-U Nigeria','Ajapa','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2012,6.41,0.00641,0.6202);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2013,5.22,0.00522,0.505);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2014,2.11,0.00211,0.2041);
@@ -2415,7 +2415,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_375
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2023,2.97,0.00297,0.2874);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2024,1.62,0.00162,0.1567);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3758',2025,2.21,0.00221,0.2138);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3921',5.914358212,4.879965736,'Chevron','Isan West','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3921',5.914358212,4.879965736,'Chevron','Isan West','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3921',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3921',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3921',2014,0,0.0,0);
@@ -2565,7 +2565,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_362
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3627a',2023,7.84,0.00784,0.7585);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3627a',2024,9.81,0.00981,0.9491);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3627a',2025,1.35,0.00135,0.1306);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4072a',4.413298804,6.911825742,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4072a',4.413298804,6.911825742,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072a',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072a',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072a',2014,0,0.0,0);
@@ -2805,7 +2805,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_367
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3676',2023,1.94,0.00194,0.1877);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3676',2024,1.21,0.00121,0.1171);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3676',2025,0.64,0.00064,0.0619);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3675',5.575456625,5.058194828,'Chevron','Okan','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3675',5.575456625,5.058194828,'Chevron','Okan','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3675',2012,12.91,0.01291,1.2491);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3675',2013,10.31,0.01031,0.9975);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3675',2014,5.76,0.00576,0.5573);
@@ -3015,7 +3015,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_378
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3781',2023,2.44,0.00244,0.2361);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3781',2024,1.16,0.00116,0.1122);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3781',2025,0.31,0.00031,0.03);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3688',4.577193616,8.42247541,'Moni Pulo','Abana East','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3688',4.577193616,8.42247541,'Moni Pulo','Abana East','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3688',2012,1.39,0.00139,0.1345);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3688',2013,1.24,0.00124,0.12);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3688',2014,1.62,0.00162,0.1567);
@@ -3105,7 +3105,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_366
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3666',2023,0.13,0.00013,0.0126);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3666',2024,0.11,0.00011,0.0106);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3666',2025,0.16,0.00016,0.0155);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3712',5.53767385,5.091851407,'Chevron','Okan','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3712',5.53767385,5.091851407,'Chevron','Okan','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3712',2012,10.21,0.01021,0.9878);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3712',2013,5.62,0.00562,0.5437);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3712',2014,4.67,0.00467,0.4518);
@@ -3180,7 +3180,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_418
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4181',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4181',2024,0.02,2e-05,0.0019);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4181',2025,0.13,0.00013,0.0126);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3658',5.974143099,4.84397905,'ConOil','Bella','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3658',5.974143099,4.84397905,'ConOil','Bella','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3658',2012,0.78,0.00078,0.0755);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3658',2013,0.2,0.0002,0.0194);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3658',2014,0.23,0.00023,0.0223);
@@ -3300,7 +3300,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_383
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38320',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38320',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38320',2025,0.08,8e-05,0.0077);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3677b',4.540671278,6.981751079,'NNPC Limited','Akaso','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3677b',4.540671278,6.981751079,'NNPC Limited','Akaso','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3677b',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3677b',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3677b',2014,0,0.0,0);
@@ -3420,7 +3420,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_377
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3776b',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3776b',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3776b',2025,0.04,4e-05,0.0039);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3901',5.758924634,4.923430756,'Chevron','Meren','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3901',5.758924634,4.923430756,'Chevron','Meren','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3901',2012,18.0,0.018,1.7415);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3901',2013,12.76,0.01276,1.2346);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3901',2014,18.84,0.01884,1.8228);
@@ -3645,7 +3645,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_405
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4059',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4059',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4059',2025,0.01,1e-05,0.001);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4072b',4.416014549,6.896833598,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4072b',4.416014549,6.896833598,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2014,0,0.0,0);
@@ -3660,7 +3660,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_407
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2023,0.19,0.00019,0.0184);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2024,0.11,0.00011,0.0106);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4072b',2025,0.01,1e-05,0.001);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4090',4.476911276,7.032075143,'NNPC Limited','Akaso','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4090',4.476911276,7.032075143,'NNPC Limited','Akaso','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4090',2012,1.03,0.00103,0.0997);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4090',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4090',2014,0,0.0,0);
@@ -3810,7 +3810,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_361
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3617',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3617',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3617',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3642',4.467515917,6.865771495,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3642',4.467515917,6.865771495,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3642',2012,6.5,0.0065,0.6289);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3642',2013,0.11,0.00011,0.0106);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3642',2014,0.48,0.00048,0.0464);
@@ -4170,7 +4170,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_375
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3751',2023,0.03,3e-05,0.0029);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3751',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3751',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3756',4.430312101,6.77750392,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3756',4.430312101,6.77750392,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3756',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3756',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3756',2014,0,0.0,0);
@@ -4200,7 +4200,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_376
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3768',2023,0.17,0.00017,0.0164);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3768',2024,1.23,0.00123,0.119);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3768',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3772',5.376783219,5.307837655,'Renaissance Africa Energy','Forcados Yokri','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3772',5.376783219,5.307837655,'Renaissance Africa Energy','Forcados Yokri','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3772',2012,13.91,0.01391,1.3458);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3772',2013,13.51,0.01351,1.3071);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3772',2014,9.3,0.0093,0.8998);
@@ -4455,7 +4455,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_383
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38311',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38311',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38311',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_38318',4.4078287,6.940202047,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_38318',4.4078287,6.940202047,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38318',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38318',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38318',2014,0,0.0,0);
@@ -4545,7 +4545,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_383
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38332',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38332',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_38332',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3839',4.429412195,6.804355889,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3839',4.429412195,6.804355889,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2014,0,0.0,0);
@@ -4560,7 +4560,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_383
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2023,0.08,8e-05,0.0077);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2024,0.02,2e-05,0.0019);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3839',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3840',4.468425867,6.856091026,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3840',4.468425867,6.856091026,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3840',2012,5.79,0.00579,0.5602);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3840',2013,0.81,0.00081,0.0784);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3840',2014,0.17,0.00017,0.0164);
@@ -4620,7 +4620,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_385
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3853',2023,0.53,0.00053,0.0513);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3853',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3853',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3857',5.597853957,4.988999928,'Chevron','Okan','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3857',5.597853957,4.988999928,'Chevron','Okan','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2012,26.51,0.02651,2.5649);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2013,33.15,0.03315,3.2073);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2014,29.83,0.02983,2.8861);
@@ -4635,7 +4635,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_385
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3857',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3859',4.420636469,6.517266339,'Aiteo Eastern E&P Company','Odeama Creek','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3859',4.420636469,6.517266339,'Aiteo Eastern E&P Company','Odeama Creek','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3859',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3859',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3859',2014,21.27,0.02127,2.0579);
@@ -4665,7 +4665,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_386
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3860',2023,0.04,4e-05,0.0039);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3860',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3860',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3864',5.72731535,4.83121997,'Chevron','Meren','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3864',5.72731535,4.83121997,'Chevron','Meren','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3864',2012,5.52,0.00552,0.5341);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3864',2013,3.58,0.00358,0.3464);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3864',2014,13.2,0.0132,1.2771);
@@ -4740,7 +4740,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_387
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3872',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3872',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3872',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3873a',4.45692689,6.953200903,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3873a',4.45692689,6.953200903,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2014,0,0.0,0);
@@ -4755,7 +4755,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_387
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873a',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3873b',4.456571851,6.945949576,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3873b',4.456571851,6.945949576,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873b',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873b',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3873b',2014,0,0.0,0);
@@ -4800,7 +4800,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_388
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3881',2023,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3881',2024,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3881',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3887',5.738640733,4.72570533,'Chevron','Opolo','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3887',5.738640733,4.72570533,'Chevron','Opolo','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3887',2012,36.71,0.03671,3.5518);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3887',2013,26.05,0.02605,2.5204);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3887',2014,17.06,0.01706,1.6506);
@@ -4905,7 +4905,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_390
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3906',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3906',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3906',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3915',4.40140978,6.64637814,'Renaissance Africa Energy','Belema','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3915',4.40140978,6.64637814,'Renaissance Africa Energy','Belema','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3915',2012,68.06,0.06806,6.585);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3915',2013,49.21,0.04921,4.7612);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3915',2014,54.91,0.05491,5.3127);
@@ -4995,7 +4995,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_392
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3927',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3927',2024,0.0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3927',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3942',4.435396099,7.235569954,'NEPL','Bonny','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3942',4.435396099,7.235569954,'NEPL','Bonny','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3942',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3942',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3942',2014,0,0.0,0);
@@ -5040,7 +5040,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_395
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3955',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3955',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3955',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3956',5.717736708,5.004370761,'Chevron','Tapa','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3956',5.717736708,5.004370761,'Chevron','Tapa','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3956',2012,26.07,0.02607,2.5223);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3956',2013,21.46,0.02146,2.0763);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3956',2014,20.64,0.02064,1.997);
@@ -5130,7 +5130,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_397
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3970',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3970',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3970',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3974',4.429822224,6.76676055,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3974',4.429822224,6.76676055,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3974',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3974',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3974',2014,0,0.0,0);
@@ -5190,7 +5190,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_399
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3995',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3995',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3995',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3997',5.881612391,4.833959223,'Chevron','Parabe','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_3997',5.881612391,4.833959223,'Chevron','Parabe','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3997',2012,151.76,0.15176,14.6832);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3997',2013,158.85,0.15885,15.3692);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_3997',2014,141.07,0.14107,13.6489);
@@ -5250,7 +5250,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_400
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4001',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4001',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4001',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4003',5.828339449,4.79662333,'Chevron','Malu','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4003',5.828339449,4.79662333,'Chevron','Malu','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2012,19.01,0.01901,1.8393);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2013,14.97,0.01497,1.4484);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2014,36.83,0.03683,3.5634);
@@ -5265,7 +5265,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_400
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4003',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4004a',4.422312989,6.797977334,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4004a',4.422312989,6.797977334,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2014,0,0.0,0);
@@ -5280,7 +5280,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_400
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2023,0.55,0.00055,0.0532);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2024,0.2,0.0002,0.0194);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004a',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4004b',4.42612758,6.790217861,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4004b',4.42612758,6.790217861,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004b',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004b',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4004b',2014,0,0.0,0);
@@ -5325,7 +5325,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_400
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4006',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4006',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4006',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4007',4.468523445,6.841086136,'Unattributed','','NA','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4007',4.468523445,6.841086136,'Unattributed','','NA','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4007',2012,0.59,0.00059,0.0571);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4007',2013,0.06,6e-05,0.0058);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4007',2014,0,0.0,0);
@@ -5385,7 +5385,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_400
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4009b',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4009b',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4009b',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4012',5.869887338,4.939420786,'NEPL','*','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4012',5.869887338,4.939420786,'NEPL','*','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4012',2012,58.83,0.05883,5.692);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4012',2013,35.89,0.03589,3.4725);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4012',2014,0,0.0,0);
@@ -5430,7 +5430,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_401
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4016',2023,0.06,6e-05,0.0058);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4016',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4016',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4017',5.68607205,5.052930841,'NEPL','Delta','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4017',5.68607205,5.052930841,'NEPL','Delta','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2012,129.02,0.12902,12.483);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2013,111.06,0.11106,10.7453);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2014,94.51,0.09451,9.1441);
@@ -5445,7 +5445,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_401
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2024,0.03,3e-05,0.0029);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4017',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4018a',4.45497022,6.935721034,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4018a',4.45497022,6.935721034,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2014,0,0.0,0);
@@ -5460,7 +5460,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_401
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018a',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4018b',4.442333354,6.938926463,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4018b',4.442333354,6.938926463,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018b',2012,0.4,0.0004,0.0387);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018b',2013,1.17,0.00117,0.1132);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4018b',2014,0.05,5e-05,0.0048);
@@ -5535,7 +5535,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_402
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4023',2023,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4023',2024,0.62,0.00062,0.06);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4023',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4024',4.490973647,7.079297777,'NNPC Limited','Akaso','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4024',4.490973647,7.079297777,'NNPC Limited','Akaso','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4024',2012,0.17,0.00017,0.0164);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4024',2013,0.35,0.00035,0.0339);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4024',2014,0,0.0,0);
@@ -5580,7 +5580,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_402
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4026',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4026',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4026',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4027',4.4663267,6.876260952,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4027',4.4663267,6.876260952,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4027',2012,1.46,0.00146,0.1413);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4027',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4027',2014,0.21,0.00021,0.0203);
@@ -5685,7 +5685,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_403
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4037',2023,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4037',2024,0.41,0.00041,0.0397);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4037',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4039',4.433410952,6.755932971,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4039',4.433410952,6.755932971,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4039',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4039',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4039',2014,0,0.0,0);
@@ -5835,7 +5835,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_405
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4054b',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4054b',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4054b',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4055',4.458545311,7.052625742,'ExxonMobil','Oso','GAS','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4055',4.458545311,7.052625742,'ExxonMobil','Oso','GAS','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4055',2012,0.1,0.0001,0.0097);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4055',2013,0.04,4e-05,0.0039);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4055',2014,0,0.0,0);
@@ -6030,7 +6030,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_407
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4071',2023,0.02,2e-05,0.0019);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4071',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4071',2025,0.0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4074',4.440560005,6.883522855,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4074',4.440560005,6.883522855,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4074',2012,1.33,0.00133,0.1287);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4074',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4074',2014,0.06,6e-05,0.0058);
@@ -6210,7 +6210,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_408
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4088',2023,1.84,0.00184,0.178);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4088',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4088',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4089',4.457950171,7.029964697,'NNPC Limited','Akaso','OIL','OFFSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4089',4.457950171,7.029964697,'NNPC Limited','Akaso','OIL','OFFSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4089',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4089',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4089',2014,0,0.0,0);
@@ -6285,7 +6285,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_410
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4101',2023,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4101',2024,0.01,1e-05,0.001);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4101',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4102',4.485874872,7.088894719,'ExxonMobil','Oso','GAS','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4102',4.485874872,7.088894719,'ExxonMobil','Oso','GAS','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4102',2012,0.09,9e-05,0.0087);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4102',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4102',2014,0,0.0,0);
@@ -6525,7 +6525,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_413
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4130',2023,0.12,0.00012,0.0116);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4130',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4130',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4131',4.461238482,6.970224275,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4131',4.461238482,6.970224275,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4131',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4131',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4131',2014,0,0.0,0);
@@ -6645,7 +6645,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_413
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4139',2023,0.14,0.00014,0.0135);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4139',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4139',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4147a',4.495242693,6.839441304,'Newcross EP','Awoba (OML 24)','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4147a',4.495242693,6.839441304,'Newcross EP','Awoba (OML 24)','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2012,2.83,0.00283,0.2738);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2014,0,0.0,0);
@@ -6660,7 +6660,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_414
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2023,0.0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2024,0.12,0.00012,0.0116);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147a',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4147b',4.489444734,6.844325081,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4147b',4.489444734,6.844325081,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147b',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147b',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4147b',2014,0,0.0,0);
@@ -6690,7 +6690,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_415
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4150',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4150',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4150',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4154',4.491983499,6.960014931,'NNPC Limited','Akaso','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4154',4.491983499,6.960014931,'NNPC Limited','Akaso','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4154',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4154',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4154',2014,0,0.0,0);
@@ -6750,7 +6750,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_416
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4160',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4160',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4160',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4166',4.437175423,6.948729185,'Unattributed','','NA','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4166',4.437175423,6.948729185,'Unattributed','','NA','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4166',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4166',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4166',2014,0,0.0,0);
@@ -7110,7 +7110,7 @@ INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_422
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4228',2023,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4228',2024,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4228',2025,0,0.0,0);
-INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4231',4.444150404,7.256302256,'NEPL','Bonny','OIL','ONSHORE',0,'GFMR/WorldBank',2012,2025);
+INSERT INTO flare_sites (site_id,lat,lon,operator,field_name,field_type,location,in_niger_delta,source,first_year,last_year) VALUES ('s_4231',4.444150404,7.256302256,'NEPL','Bonny','OIL','ONSHORE',1,'GFMR/WorldBank',2012,2025);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4231',2012,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4231',2013,0,0.0,0);
 INSERT INTO flare_annual (site_id,year,flaring_vol_m3,bcm,mmscfd) VALUES ('s_4231',2014,0,0.0,0);

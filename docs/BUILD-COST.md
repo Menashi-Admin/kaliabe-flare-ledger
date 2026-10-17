@@ -107,3 +107,44 @@ What shipped:
   - A headless Chrome pass on production covered the year player, a real flare click, the
     scenario, brief export and print-to-PDF, the operator panel, the league-table sort, the
     watchlist and mobile. It logged 0 console errors and 0 failed requests.
+
+---
+
+### Pass 4 (2026-10-17): data-source + threshold tuning (KFL-M 1.2) and the launch blog
+| Channel | Role | Effort |
+|---|---|---|
+| **Claude Code (Opus, subscription)** | Led the whole pass: source research, gazette OCR check, Worker + core changes, front end, blog build, source validator, docs, deploy, live HTTP + headless-browser verification, commit | All codegen this pass |
+| **OpenRouter** | Orchestrator only: wrote the brief (`docs/BUILD-BRIEF-TUNING.md`) | Brief only, no codegen |
+| **Codex (subscription)** | Not used | 0 |
+
+No per-token API spend for codegen; the flat-rate Claude Code session absorbed all of it. **Run cost is
+unchanged**: free-tier Worker + Pages + D1, and no new runtime dependency, font or analytics. The blog is
+static HTML; Python-Markdown runs only at build time. `/api/sites` grew to 1.16 MB raw, which is 90 KB
+gzipped on the wire.
+
+What shipped:
+- **Penalty basis corrected** to the *Flare Gas (Prevention of Waste and Pollution) Regulations, 2018*
+  (S.I. No. 9 of 2018, Gazette No. 88, Vol. 105).
+  - The NUPRC-hosted scanned gazette was OCR'd to confirm the citation and the Reg. 13 text.
+  - Every penalty is now shown at both tiers ($2.00 / $0.50). No midpoint is used, and the exemptions
+    are stated.
+- **GFMR vintage confirmed and labelled.** The seed is the June 2026 three-satellite release: the
+  workbook's global 2025 total is 166.6 bcm against the tracker's 167 bcm.
+- **Emissions ratios** updated to the June 2026 tracker (429/167, 50/167 MtCO₂e per bcm).
+  - Unburned methane is now reported as mass (1.8/167 Mt CH₄ per bcm).
+  - This fixed a ≤1.1 mislabel: a CO₂e figure had been shown as "t CH₄".
+- **Niger Delta by nine-state point-in-polygon**, with offshore sites labelled; 69 sites changed flag.
+- **Source registry**: `scripts/validate_sources.py` → `docs/DATA-SOURCES-REGISTRY.md`.
+- **Thresholds**: one named set in `ledger-core.js`, rendered on the methodology page.
+- **Blog**: `/blog/` and `/blog/why-this-page-exists/`, linked from the nav and footer.
+
+Verification:
+- **Live HTTP:** 39/39 checks pass.
+- **Source validator:** 12/12 sources reachable; pinned checksums match.
+- **Headless Chrome (production):** blog desktop and mobile, flare drawer, scenario slider, brief,
+  watchlist, league table and methodology thresholds. 0 console errors, 0 failed requests.
+
+Not done:
+- **Remote D1 reseed.** It is blocked by the Prismor `db-modification` policy and destructive in any
+  case. The Worker reads the Niger Delta class from the bundled `niger-delta.json`, so the stale D1
+  `in_niger_delta` column is no longer read anywhere. `seed.sql` is regenerated for the next reseed.

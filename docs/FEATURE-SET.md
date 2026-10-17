@@ -1,7 +1,7 @@
 # Feature Set — The Decision Layer
 
 **Kaliabe Flare Ledger · overlays and trends for decision-making**
-Status: **Wave 1 shipped 2026-10-16** (method KFL-M 1.1) · Waves 2–3: spec
+Status: **Wave 1 shipped 2026-10-16** (method KFL-M 1.1) · **Tuning pass shipped 2026-10-17** (KFL-M 1.2) · Waves 2–3: spec
 
 The current Ledger answers *"what is flaring?"*. The decision layer answers
 *"so what should we do?"*. Every feature below is an **overlay or trend on the same open-data
@@ -35,7 +35,7 @@ uncertainty. No feature ships that is merely decorative.
 
 | # | Feature | Decision it drives | Audience |
 |---|---|---|---|
-| C1 ✅ | **Penalty exposure** — current, cumulative, and forecast at the NUPRC rate | What is our liability if nothing changes? | Operators, regulators |
+| C1 ✅ | **Penalty exposure** — current, cumulative, and forecast at both Reg. 13 tiers (Flare Gas Regulations 2018) | What is our liability if nothing changes? | Operators, regulators |
 | C2 | **Abatement economics** — cost per tonne CO₂e abated vs carbon price (EU ETS / credit price); payback | Fix it or pay it? | Operators |
 | C3 | **"Worth fixing" ranking** — sites ranked by abatement value, not just volume | Where does the first dollar go? | Operators |
 | C4 | **Gas-monetisation value** — flared volume valued as saleable gas / power | What are we literally burning? | Operators, government |
@@ -93,6 +93,19 @@ C5 scenario slider · E2 watchlist · F1 export brief.
 - F1 is print-to-PDF from a self-contained HTML brief, not a server-generated PDF file (no PDF
   library on the Worker, by design — zero recurring cost).
 - F1 covers national, operator and site scope; *state* and *portfolio* scope follow B3 / E1.
+
+**Tuning pass (KFL-M 1.2):** ✅ shipped 2026-10-17
+
+| Item | Shipped as | Where |
+|---|---|---|
+| ✅ Penalty citation | Corrected everywhere to the *Flare Gas (Prevention of Waste and Pollution) Regulations, 2018*, S.I. No. 9 of 2018 (Gazette No. 88, Vol. 105) | Worker `PENALTY`, site, docs |
+| ✅ Two-tier penalty | Every penalty (current, cumulative, projection, scenario, year player, tables, brief, CSV) at $2.00 (≥10k bbl/d, upper) **and** $0.50 (<10k bbl/d, lower); the assumption is stated; no midpoint; force-majeure and Deliver-or-Pay exemptions shown | `ledger-core.js convert`, Worker, `decision.js exposureHtml` |
+| ✅ GFMR vintage | June 2026 release (three-satellite method) confirmed against the tracker and labelled in `meta.vintage`, the site and every brief | Worker `VINTAGE` |
+| ✅ Emissions constants | June 2026 tracker: 429/167 MtCO₂e per bcm; unburned CH₄ now reported as mass (1.8/167); old figures kept in a comment | Worker constants |
+| ✅ Niger Delta boundary | Nine-state union by point-in-polygon; offshore sites labelled with nearest state and distance | `scripts/classify_niger_delta.py` |
+| ✅ Source registry | `scripts/validate_sources.py` → `docs/DATA-SOURCES-REGISTRY.md`; exits non-zero on an unreachable source | scripts |
+| ✅ Thresholds | One named set (`THRESHOLDS`): rising % + 0.5 million m³ floor, trend/change significance, peer-set n/a rule, top-decile cut-off shown, scenario rounding; documented on the methodology page (rendered from the code) | `ledger-core.js` |
+| ✅ Writing | Launch note published at `/blog/why-this-page-exists/` with a minimal `/blog/` index; Writing link in nav + footer | `scripts/build_blog.py` |
 
 **Wave 2 — the commercial hooks:**
 A4 normalised intensity · C2/C3 abatement economics · D1 EU threshold check · D4 supplier

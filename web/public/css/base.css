@@ -333,3 +333,48 @@ section.natsec,section.watchsec{padding:64px 0;border-bottom:1px solid var(--lin
   .player{gap:10px;padding:10px 12px}
   .focus{padding:18px 16px}
 }
+
+/* ---- KFL-M 1.2: two-tier penalty table */
+.tiers{width:100%;border-collapse:collapse;margin:14px 0 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.tiers th,.tiers td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;font-size:.86rem;vertical-align:top}
+.tiers thead th{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.tiers thead th span{display:block;text-transform:none;letter-spacing:0;font-weight:400;font-size:.68rem}
+.tiers tbody th{font-weight:400;font-size:.8rem}
+.tiers td.num{font-weight:600;text-align:right}
+.tiers thead th.num{text-align:right}
+
+/* Wrapping nav on small screens (Writing link added) */
+.nav{flex-wrap:wrap;row-gap:6px}
+@media(max-width:640px){.nav{gap:14px}}
+.nav__link[aria-current="page"]{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+
+/* Threshold table on the methodology page */
+.thr-table td:nth-child(2){white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* ---- Writing (blog) — a readable measure, restraint, one accent */
+.article{padding:64px 0 72px}
+.article__inner{max-width:68ch;margin:0 auto;padding:0 24px}
+.article__kicker{color:var(--accent);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;margin:0 0 16px}
+.article h1{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;margin:0 0 18px}
+.article__byline{color:var(--ink-soft);font-size:.88rem;margin:0 0 40px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.article__body{font-family:var(--serif);font-size:1.12rem;line-height:1.72}
+.article__body p{margin:0 0 1.15em}
+.article__body h2{font-family:var(--serif);font-weight:600;font-size:1.4rem;line-height:1.25;margin:2.2em 0 .7em}
+.article__body strong{font-weight:600}
+.article__body a{color:var(--accent);text-underline-offset:3px}
+.article__body hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}
+.article__end{font-family:var(--sans);font-size:.92rem;color:var(--ink-soft)}
+.article__end p{margin:0 0 .5em}
+.article__links{list-style:none;padding:0;margin:28px 0 0;font-family:var(--sans);font-size:.95rem}
+.article__links li{padding:10px 0;border-top:1px solid var(--line)}
+.article__links li:last-child{border-bottom:1px solid var(--line)}
+.article__links a{color:var(--ink);text-decoration:none;font-weight:600}
+.article__links a:hover{color:var(--accent)}
+.article__links span{color:var(--ink-soft);font-weight:400}
+.postlist{list-style:none;padding:0;margin:32px 0 0}
+.postlist li{padding:18px 0;border-top:1px solid var(--line)}
+.postlist li:last-child{border-bottom:1px solid var(--line)}
+.postlist a{font-family:var(--serif);font-size:1.3rem;color:var(--ink);text-decoration:none}
+.postlist a:hover{color:var(--accent)}
+.postlist p{margin:4px 0 0;color:var(--ink-soft);font-size:.9rem}
+@media(max-width:640px){.article{padding:40px 0 56px}.article__body{font-size:1.05rem}}

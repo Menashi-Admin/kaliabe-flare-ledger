@@ -1,9 +1,19 @@
 # Methodology & Confidence
 
-**Kaliabe Flare Ledger · method version KFL-M 1.1 (2026-10-16)**
+**Kaliabe Flare Ledger · method version KFL-M 1.2 (2026-10-17)**
 Mirrors the site's [methodology page](https://kaliabe-flare-web.pages.dev/methodology.html). The
-code that implements each rule is named next to it; every constant below lives in one place,
-`worker/src/index.js`, and is published to clients as `meta.constants`.
+code that implements each rule is named next to it.
+
+- Every **constant** lives in `worker/src/index.js` and is published as `meta.constants`.
+- Every **threshold** lives in `THRESHOLDS` in `web/public/js/ledger-core.js`. It is published as
+  `meta.thresholds`, and the site's methodology page renders its threshold table from that object.
+
+### Change log
+
+| Version | Date | Change |
+|---|---|---|
+| **KFL-M 1.2** | 2026-10-17 | **Penalty basis corrected.** The governing instrument is the Flare Gas (Prevention of Waste and Pollution) Regulations, **2018** (S.I. No. 9 of 2018), not "NUPRC 2022 Regulations". Every penalty is now shown at **both** Reg. 13 tiers ($2.00 / $0.50) and no midpoint is used; the exemptions are stated. GFMR vintage labelled (June 2026 release, three-satellite method). Emissions ratios updated to the June 2026 tracker, and unburned methane is now reported as CH₄ mass (1.1 labelled a CO₂e quantity "t CH₄"). Niger Delta now by the nine-state boundary, with offshore sites labelled. Thresholds named and explicit: significance rules, rising floor, peer-set rules, top-decile cut-off, scenario rounding. |
+| KFL-M 1.1 | 2026-10-16 | Decision layer Wave 1. |
 
 > **Independence.** The Ledger is an independent, open-data project. It is not affiliated with,
 > endorsed by, or reporting for NUPRC, NNPC or any operator. Every figure is a **derived
@@ -28,6 +38,22 @@ Site volumes come from the **World Bank Global Flaring and Methane Reduction (GF
 *Flare Volume Estimates by Individual Flare Location, 2012–2025* [1]. GFMR converts each site's
 annual radiant heat into a gas volume using a calibration fitted against reported national flaring
 statistics [3].
+
+**Vintage.** The seed is the workbook released with the **Global Gas Flaring Tracker of 23 June 2026**
+(URL path `…-0400072026/related/Flare-Volume-Estimates-by-individual-Flare-Location-2012-2025.xlsx`;
+workbook created 2026-06-08; SHA-256 `8b6052d2…0bc40354`, which matches the live file per
+`docs/DATA-SOURCES-REGISTRY.md`).
+
+- **Method.** That release uses the new GFMR / Payne Institute methodology: three VIIRS satellites
+  (Suomi NPP, NOAA-20, NOAA-21) instead of one, multi-year flare location tracking and a revised
+  volume calibration.
+- **Restated series.** The whole 2012–2025 series was restated, so it does not match pre-2026
+  editions.
+- **How we checked.** The workbook's global 2025 total is **166.6 bcm**, matching the tracker's
+  167 bcm. Its 2024 total is 156.9 bcm, matching the tracker's restated 157 bcm; the July 2025
+  edition had said 151 bcm.
+- **Where it is shown.** The vintage is stamped in `meta.vintage`, in `meta.data_vintage` and on
+  every brief.
 
 The sources of uncertainty, none of which can be removed from satellite data alone:
 
@@ -60,88 +86,161 @@ record carries its detection floor as text (`detection_floor`).
 - `named_operator` = 1 when the site has an operator other than "Unattributed".
 - The cap at **0.98** is deliberate: the calibration uncertainty in §2 never goes away.
 
-**Trend label.** The mean of the last 3 years is compared with the mean of up to 5 years before
-them. A record shorter than 4 years compares its last year with its first.
-- Within ±5% the trend is **stable**; beyond that it is **rising** or **falling**.
+**Trend label** (`computeTrend()`). The mean of the last 3 years is compared with the mean of up to 5
+years before them. A record shorter than 4 years compares its last year with its first.
+- Within ±5% the trend is **stable**.
+- Beyond ±5%, it is **rising** or **falling** only if the change is **significant**:
+  - the two window means differ by at least **0.5 million m³/yr**, *and*
+  - each window has at least **2 detected years** (or every year, if the window is shorter).
+- Otherwise the trend is **not significant** (`not_significant`), and `trend_significance` gives the
+  reason. A window made of non-detections may be cloud or below-floor flaring, and below the floor
+  is not the same as not flaring.
 - No baseline volume but recent detections is **new** (no percentage is defined).
 - No detections in either window is **inactive**.
 
+On the live set (476 sites) this gives 72 rising, 126 falling, 10 stable, 213 not significant,
+34 new and 21 inactive. Under 1.1 it was 98 rising and 313 falling. Most of the difference is sites
+that dropped below the detection floor in the recent window: 1.1 called them "falling", and 1.2
+declines to.
+
 ## 5. Penalty basis and conversion constants
+
+**Instrument.** *Flare Gas (Prevention of Waste and Pollution) Regulations, 2018*, S.I. No. 9 of 2018 —
+Federal Republic of Nigeria Official Gazette No. 88, Vol. 105, 9 July 2018 (made 5 July 2018 under s.9
+Petroleum Act and s.5 Associated Gas Reinjection Act) [4]. KFL-M ≤1.1 cited "NUPRC 2022 Regulations",
+which was **incorrect**.
+
+**Regulation 13** sets a **tiered** flare payment on the volume of gas flared, by production rate, "irrespective of
+whether the flaring is Routine or Non-Routine":
+
+| Tier | Applies where the OML or marginal field produces | Rate | Ledger use |
+|---|---|---|---|
+| Reg. 13(1) | **10,000 bbl of oil per day or more** | **US$2.00** per 28.317 scm (1,000 scf) | upper bound |
+| Reg. 13(2) | **less than 10,000 bbl of oil per day** | **US$0.50** per 28.317 scm (1,000 scf) | lower bound |
+
+> **Assumption.** We do not hold production rates; the regulation sets $2.00 (≥10,000 bbl/d) or $0.50
+> (<10,000 bbl/d). We therefore publish every penalty at **both tiers** — current, cumulative, projected and
+> scenario — and **never a midpoint**. The tier depends on production in the whole lease or field, not on one flare.
+
+**Exemptions** (stated, not deducted, because the volumes involved cannot be seen from satellite data):
+- **Force majeure** — the provisos to Reg. 13(1)–(2): no liability where the flaring was caused by an act of
+  war, community disturbance, insurrection, storm, flood, earthquake or other natural phenomenon beyond the
+  producer's reasonable control.
+- **Deliver-or-Pay** — Reg. 13(3): no flare payment on an agreed volume of flare gas committed to a Permit
+  Holder under a Deliver or Pay Agreement, from the start of commercial operations of the flare reduction project.
+
+Not modelled: the additional US$2.50 per 1,000 scf payment for specified non-compliance (Reg. 19).
 
 | Constant | Value | Source |
 |---|---|---|
-| Penalty rate | **US$2.00 per 1,000 scf** | NUPRC Flare Gas (Prevention of Waste and Pollution) Regulations, Gazette [4] |
+| Penalty, upper tier | **US$2.00 per 1,000 scf** | Reg. 13(1) [4] |
+| Penalty, lower tier | **US$0.50 per 1,000 scf** | Reg. 13(2) [4] |
 | scf per m³ | 35.3146667 | exact unit conversion |
-| m³ per 1,000 scf | 28.3168 | derived from the above |
-| CO₂e per bcm flared | 389 ÷ 151 = **2.576 Mt** | GFMR 2025 global ratio: 151 bcm ≈ 389 Mt CO₂e [1] |
-| CH₄ per bcm flared | 46 ÷ 151 = **0.3046 Mt** | GFMR 2025 global ratio: incl. 46 Mt CH₄ [1] |
+| m³ per 1,000 scf | 28.317 | derived from the above; equals the Regulations' 28.317 scm |
+| CO₂e per bcm flared | 429 ÷ 167 = **2.569 Mt CO₂e** | GFMR tracker, June 2026 (data year 2025): 167 bcm → 429 MtCO₂e [1] |
+| Unburned CH₄ (as CO₂e) per bcm | 50 ÷ 167 = **0.2994 Mt CO₂e** | same: "including 50 MMtCO₂e in the form of unburned methane" [1] |
+| Unburned CH₄ (mass) per bcm | 1.8 ÷ 167 = **0.01078 Mt CH₄** | same: "(1.8 million tonnes)" [1] |
 | ₦ per US$ | 1,550 | indicative display snapshot only |
 
-Penalty (US$) = volume (m³) ÷ 28.3168 × 2.00. For example, Oso in 2025 flared 308.37 million m³,
-which gives **US$21.78 m**.
+*Superseded (KFL-M ≤1.1), kept for traceability:* the July 2025 tracker (data year 2024, single-satellite
+method), 151 bcm ≈ 389 MtCO₂e incl. 46 MtCO₂e methane, gave 2.576 Mt CO₂e/bcm and 0.3046/bcm. The second
+figure was labelled "t CH₄", but it is methane expressed as CO₂e, not CH₄ mass.
 
-- **Not an assessment.** These are derived estimates on the published basis, not NUPRC
-  assessments. Actual liabilities depend on facts the Ledger cannot see: reported volumes,
-  exemptions and the producer category.
-- **One rate for everyone.** The Ledger applies the US$2.00 rate to every site. The Regulations
-  differentiate charges by producer category, but production data are not in the open-data spine.
-  For smaller producers the Ledger figure should therefore be read as an upper bound. Check the
-  Gazette before citing a figure for a specific producer.
+Penalty (US$) = volume (m³) ÷ 28.317 × rate. For example, Oso flared 308.37 million m³ in 2025, which
+gives **US$21.78 m at the $2.00 tier** and **US$5.44 m at the $0.50 tier**. The national 2025 figure is
+**US$466.2 m / US$116.6 m**.
+
+- **Not an assessment.** These are derived estimates on the published basis, not NUPRC assessments.
+  Actual liabilities depend on facts the Ledger cannot see: the producer's production rate, reported
+  volumes and exempt volumes.
 - **Emissions ratios.** The CO₂e and CH₄ figures use a global average ratio. They are
   order-of-magnitude estimates, not site-level combustion modelling.
 
-## 6. Decision-layer derivations (Wave 1, `seriesStats()` / `rank()` / `aggregate()`)
+## 6. Decision-layer derivations and thresholds (`seriesStats()` / `rank()` / `topDecile()` / `THRESHOLDS`)
 
 These add framing to the GFMR series, not new data. They are computed once per request in the
 Worker and shared by the site, the API and the decision brief.
 
-- **N-yr change** (`change_3yr_pct`, `change_5yr_pct`) — the latest-year volume vs the volume N
-  years earlier (2025 vs 2022; 2025 vs 2020). It is **undefined** when the base year had no
-  detection, because a percentage on a zero base is meaningless.
-- **Peer percentile** (`percentile_volume`) — the share of the *other* members of the peer set with
-  a strictly smaller latest-year volume ("larger than N%").
-  - The peer sets are all 476 sites, or all 40 operators. "Unattributed" counts as one operator.
-  - **Improvement percentile** (`percentile_improvement`) ranks the 3-yr change, lower being
-    better ("improving faster than N%"), among peers whose change is defined.
-- **Cumulative** (`cumulative_million_m3`, `cumulative_penalty_usd`) — the sum over 2012–2025.
-  The cumulative penalty is **notional**: it applies the 2022 rate to every year, and the years
-  before 2022 fell under the previous regime.
-- **Projection** (`forecast`) — a least-squares line through the last 3 years (2023–2025),
-  extended 3 years and clamped at zero.
+### Thresholds (all in `THRESHOLDS`, `web/public/js/ledger-core.js`)
+
+| Key | Default | Rule and reason |
+|---|---|---|
+| `trend_stable_band_pct` | 5 | A recent-vs-baseline change within ±5% is *stable*. |
+| `trend_min_abs_change_million_m3` | 0.5 | A trend direction also needs the window means to differ by ≥ 0.5 million m³/yr; below that it is within detection noise ("not significant"). |
+| `trend_min_detected_years` | 2 | Both trend windows need ≥ 2 detected years (or every year, if shorter); otherwise "not significant". |
+| `change_min_abs_million_m3` | 0.5 | A 3-/5-yr change is significant only if it moves ≥ 0.5 million m³ *and* beyond ±5%. Non-significant changes are shown muted with "n.s.", and `change_Nyr_significant` is `false`. |
+| `rising_pct_options` / `rising_pct_default` | 25 / 50 / 100; default **25** | Watchlist "rising": the 3-yr change must reach the chosen % … |
+| `rising_min_added_million_m3` | **0.5** | … **and** add ≥ 0.5 million m³, for every % option. **Why the absolute floor:** a percentage on a tiny base is real but immaterial (0.01 → 0.05 million m³ is +400%). The floor keeps the list to changes that matter in volume. Rows show both the volume added and the %. |
+| `small_base_million_m3` | 1 | A base-year volume below 1 million m³ flags the percentage as "small base". For example, Egbema West (s_4041a), 0.56 → 284.87 million m³, is shown as "+284.3 M m³ · +50,770% · small base (0.56)". |
+| `newly_detected_years` | 2 | "Newly detected" = first positive volume in the latest year or the year before. |
+| `top_decile_fraction` | 0.1 | Top decile = latest-year volume ≥ the n-th largest of the **full** site set, n = ceil(10% × 476) = 48; ties included. The cut-off (**39.13 million m³** for 2025) is published in `meta.top_decile` and shown in the UI. |
+| `scenario_step_pct` / `scenario_sig_figs` | 5 / 3 | The scenario slider moves in 5% steps. Outputs are rounded to 3 significant figures and always carry the "scenario" label and their assumption. |
+
+### Derivations
+
+- **N-yr change** (`change_3yr_pct`, `change_5yr_pct`, with `change_3yr_significant`, `change_5yr_significant`)
+  — the latest-year volume vs the volume N years earlier (2025 vs 2022; 2025 vs 2020). It is **undefined**
+  when the base year had no detection, because a percentage on a zero base is meaningless.
+- **Peer percentile** (`percentile_volume`) — the share of the *other* members of the peer set with a
+  strictly smaller latest-year volume ("larger than N%").
+  - **Peer set rule:** only members **with a latest-year detection**: 249 of 476 sites, and operators with a
+    2025 detection. Members with no detection have no usable value. They are **excluded from the calculation
+    and shown as n/a**, never counted as zero.
+  - **Improvement percentile** (`percentile_improvement`) ranks the 3-yr change, lower being better, among
+    peers with a detected base year (364 of 476 sites). The others are n/a.
+  - `peer_set_size` carries `{ volume, improvement, excluded_volume, excluded_improvement }`, and the peer-set
+    size is printed wherever a percentile appears (drawer, operator card, league table, brief).
+- **Cumulative** (`cumulative_million_m3`, `cumulative_penalty_usd_upper` / `_lower`) — the sum over
+  2012–2025 at both tiers. It is **notional**: the Regulations were made in July 2018, and earlier years fell
+  under the previous regime.
+- **Projection** (`forecast`, each year carrying `penalty_usd_upper` / `_lower`) — a least-squares line
+  through the last 3 years (2023–2025), extended 3 years and clamped at zero.
   - Operator and national projections are fitted to the aggregate series, not summed from sites.
   - **It is a projection, not a fact**, and is labelled as one everywhere it appears.
-- **Scenario** — "reduce flaring by X%" multiplies the latest-year volume by (1 − X/100).
-  Penalty, CO₂e and CH₄ are linear in volume, so they scale identically.
-  - The maths is `scenario()` in `web/public/js/ledger-core.js`. The browser and the Worker
-    (which bundles the same file for the brief) share it.
-  - It is labelled a scenario everywhere.
-- **Watchlist**:
-  - *Rising*: the 3-yr change is above the chosen threshold (25 / 50 / 100%). The list is ranked
-    by absolute volume added, because a huge percentage on a tiny base is real but less
-    material.
-  - *Newly detected*: the first positive volume falls in the last 2 years.
-  - *Top decile*: `percentile_volume ≥ 90`.
-- **Year player** — each year shows that year's GFMR volume. "Detected" means a positive volume in
-  that year. Penalty figures for years before 2022 are labelled notional.
+- **Scenario** — "reduce flaring by X%" multiplies the latest-year volume by (1 − X/100). Penalty (both tiers),
+  CO₂e and CH₄ are linear in volume, so they scale identically. The maths is `scenario()` in `ledger-core.js`,
+  shared by the browser and the Worker. It returns its own `label` and `assumption`, which are always shown.
+- **Watchlist** — *rising*, *newly detected* and *top decile*, as in the threshold table.
+- **Year player** — each year shows that year's GFMR volume and the penalty at both tiers. Years before 2019
+  are labelled notional, because the Regulations date from July 2018.
 
-## 7. The Niger Delta rectangle caveat
+## 7. Niger Delta classification (`scripts/classify_niger_delta.py`)
 
-`in_niger_delta` is a **study rectangle**, 4.5–8.5° E by 4.5–7.0° N, set in the seed. It is not
-the statutory Niger Delta region (the nine NDDC states), so:
+KFL-M ≤1.1 used a study rectangle (4.5–8.5° E, 4.5–7.0° N), which misclassified offshore fields
+such as Oso. 1.2 uses a real boundary: the union of the **nine Niger Delta states** (Abia, Akwa Ibom,
+Bayelsa, Cross River, Delta, Edo, Imo, Ondo, Rivers), taken from the geoBoundaries ADM1 layer we
+already ship [5]. Each site is classified by point-in-polygon against all 37 ADM1 units:
 
-- far-offshore fields such as Oso (ExxonMobil, 4.31° N) fall **outside** it;
-- a few inland sites inside the box may sit outside the statutory region.
+| Class | Rule | Count (476) | `in_niger_delta` |
+|---|---|---|---|
+| `niger_delta` | inside one of the nine states | 405 | true |
+| `offshore` | inside no state polygon; labelled with the nearest state and the distance to it | 70 (69 nearest a Niger Delta state, 1 nearest Lagos) | false |
+| `outside` | inside a state that is not one of the nine | 1 (Kaduna) | false |
 
-The state and LGA shown in the flare drawer come from a point-in-polygon test against the
-geoBoundaries layers [5]. That is the better guide to administrative location.
+- **Offshore sites are labelled, not bucketed.** They are not counted as Niger Delta, but
+  `niger_delta_label` says so explicitly; for example, Oso is "Offshore, beyond the state boundary — nearest
+  state Rivers (Niger Delta), 18.3 km". They are counted separately as `offshore_sites`.
+- **69 sites changed flag** compared with the rectangle:
+  - 27 offshore fields that the rectangle had counted as Niger Delta are now labelled offshore (e.g. Okan,
+    Meji, Bonga, Oyo, Meren).
+  - 42 sites inside Niger Delta states that the rectangle had missed (mostly Rivers and Bayelsa sites
+    south of 4.5° N) are now included (e.g. NLNG, Bonny, Nembe Creek).
+- **Coastline caveat.** The ADM1 web layer is simplified, so sites within a few hundred metres of the
+  coastline can fall on either side. GFMR's own ONSHORE/OFFSHORE field is kept separately; 33
+  GFMR-"OFFSHORE" sites fall inside a state polygon (estuaries, near-shore).
+- **Implementation.** The classification is generated into `worker/src/niger-delta.json`, which the Worker
+  bundles; it is not read from the D1 `in_niger_delta` column, which is stale until the next reseed.
+  `seed.sql` is regenerated with the new flag.
 
 ## 8. Decision briefs
 
 `/api/brief?scope=national|operator|site&id=…&cut=0–100&format=html|csv` renders a self-contained,
 print-ready brief.
 
-- **Contents:** the headline figures, the trend with its projection, the percentile, penalty
-  exposure, the scenario (if one is set), sources, the method version and the data vintage.
+- **Contents:** the headline figures, the trend with its projection, the percentile with its peer
+  set, penalty exposure **at both tiers** (with the assumption and exemptions), the scenario (if one is
+  set, rounded, with its label and assumption), sources, the method version, the 1.2 change note, the
+  GFMR release and the data vintage.
 - **One row list:** the HTML and the CSV are built from the same rows, so they cannot disagree.
 - **Stamp:** every brief carries the method version and the data vintage.
 
@@ -158,19 +257,24 @@ print-ready brief.
 ## Sources
 
 1. World Bank, Global Flaring and Methane Reduction Partnership (GFMR). *Flare Volume Estimates by
-   Individual Flare Location, 2012–2025*, and the 2025 Global Gas Flaring Tracker.
-   https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data
+   Individual Flare Location, 2012–2025* (June 2026 release), and the *Global Gas Flaring Tracker*,
+   23 June 2026. https://www.worldbank.org/en/programs/gasflaringreduction/global-flaring-data
 2. Elvidge, C. D., Zhizhin, M., Hsu, F.-C., Baugh, K. E. (2013). VIIRS Nightfire: Satellite
    pyrometry at night. *Remote Sensing* 5(9), 4423–4449.
 3. Elvidge, C. D., Zhizhin, M., Baugh, K., Hsu, F.-C., Ghosh, T. (2016). Methods for global survey
    of natural gas flaring from Visible Infrared Imaging Radiometer Suite data. *Energies* 9(1), 14.
    Product: Earth Observation Group, VIIRS Nightfire — https://eogdata.mines.edu/products/vnf/
-4. Federal Republic of Nigeria. *Flare Gas (Prevention of Waste and Pollution) Regulations*,
-   Official Gazette. Administered by NUPRC — https://www.nuprc.gov.ng/
+4. Federal Republic of Nigeria. *Flare Gas (Prevention of Waste and Pollution) Regulations, 2018*,
+   S.I. No. 9 of 2018, Official Gazette No. 88, Vol. 105, 9 July 2018. Copy hosted by the NUPRC Nigerian
+   Gas Flare Commercialisation Programme:
+   https://ngfcp.nuprc.gov.ng/wp-content/uploads/2022/09/FGN-Official-Gazette-on-Flare-Gas-v2.0-002.pdf
+   (scanned; the text of Reg. 13 was OCR-verified on 2026-10-17, and the checksum is pinned in
+   `docs/DATA-SOURCES-REGISTRY.md`).
 5. geoBoundaries gbOpen, Nigeria ADM1/ADM2 (GRID3), CC BY 4.0 — https://www.geoboundaries.org/
 6. Schuit, B. J., et al. (2023). Automated detection and monitoring of methane super-emitters using
    satellite data. *Atmospheric Chemistry and Physics* 23, 9071–9098. See also the Stanford
    single-blind controlled-release tests of satellite methane detection (Sherwin et al., 2024,
    *Scientific Reports*).
 
-Licences for every source: [`DATA-LICENCES.md`](DATA-LICENCES.md).
+Licences for every source: [`DATA-LICENCES.md`](DATA-LICENCES.md). Reachability, vintage and
+checksums: [`DATA-SOURCES-REGISTRY.md`](DATA-SOURCES-REGISTRY.md) (`scripts/validate_sources.py`).

@@ -20,10 +20,14 @@ Methane and flare data is abundant and fragmented — satellite operators, regul
 all publish detections. Nobody publishes a **neutral, site-level verdict that a decision-maker
 can act on and cite**. The Ledger occupies that layer for Nigeria:
 
-- **476 flare sites** across **40 operators**, 2012–2025
-- **390** in the Niger Delta
-- **6.60 bcm** flared in the latest year — with a modelled penalty exposure of **US$2.00 per
-  1,000 scf** on the NUPRC 2022 Regulations basis
+- **476 flare sites** across **40 operators**, 2012–2025 (World Bank GFMR, June 2026 release,
+  three-satellite methodology)
+- **405** inside the nine Niger Delta states, **70** offshore beyond the state boundary (labelled
+  separately), **1** elsewhere
+- **6.60 bcm** flared in the latest year, with a modelled penalty of **US$466.2 m at the $2.00
+  tier / US$116.6 m at the $0.50 tier** under the *Flare Gas (Prevention of Waste and Pollution)
+  Regulations, 2018* (S.I. No. 9 of 2018), Reg. 13. We do not hold production rates, so both tiers
+  are shown and no midpoint is used.
 - Every record carries a verdict, a confidence, a detection floor, and a source line
 
 ## Who depends on it
@@ -41,8 +45,9 @@ the EU Methane Regulation), lenders/insurers (financed emissions and asset risk)
     (154), states (37), LGAs (774)
   - basemap switch (OSM / Paper / None)
   - **click any flare** → a detail drawer with the full record: volumes in million m³, bcm and
-    MMscfd; a year-by-year bar chart; trend; verdict; confidence; detection floor; penalty in
-    US$ and ₦; CO₂e and methane-equivalent loss; numbered sources
+    MMscfd; a year-by-year bar chart; trend (with a significance rule); verdict; confidence;
+    detection floor; penalty at both Reg. 13 tiers in US$ and ₦; CO₂e and unburned CH₄; numbered
+    sources
   - **computed in the browser**: the containing state and LGA, and the nearest pipeline with its
     commodity and distance
   - shareable per-site links (`#site=<id>`); table rows open the map
@@ -58,7 +63,12 @@ the EU Methane Regulation), lenders/insurers (financed emissions and asset risk)
     nation.
 - **Operator compliance cards** and a **site-verdict table**
 - **Weekly CSV digest** of every site-year (6,664 rows)
-- **Methodology and data** pages carrying the caveats and the licences
+- **Methodology and data** pages carrying the caveats, the licences and every threshold
+  (rendered from `ledger-core.js`)
+- **Writing**: the launch note, [Why this page exists](https://kaliabe-flare-web.pages.dev/blog/why-this-page-exists/)
+- **Source registry**: `scripts/validate_sources.py` → [`docs/DATA-SOURCES-REGISTRY.md`](docs/DATA-SOURCES-REGISTRY.md)
+  (reachability, vintage, checksum and licence for every source; exits non-zero if one is
+  unreachable)
 
 ## Where it's going
 
@@ -82,10 +92,11 @@ open data ─▶ scripts/ ─▶ D1 (flare_sites, flare_annual) ─▶ Worker (v
 
 | Source | Used for | Licence |
 |---|---|---|
-| World Bank GFMR — individual flare locations (NOAA VIIRS Nightfire derived) | flare sites + annual volumes | open, attribution |
+| World Bank GFMR — individual flare locations 2012–2025, June 2026 release (NOAA VIIRS Nightfire derived, three satellites) | flare sites + annual volumes | open, attribution |
+| World Bank Global Gas Flaring Tracker, June 2026 | emissions ratios (167 bcm → 429 MtCO₂e incl. 50 MtCO₂e methane) | open, attribution |
 | NOAA/VIIRS Nightfire (Payne Institute, Colorado School of Mines) | upstream of GFMR | open |
-| NUPRC 2022 Flare Gas Regulations Gazette | penalty basis (US$2.00 / 1,000 scf) | public regulation |
-| geoBoundaries gbOpen NGA (GRID3) | state + LGA boundaries | CC BY 4.0 |
+| Flare Gas (Prevention of Waste and Pollution) Regulations, 2018 — S.I. No. 9 of 2018, Gazette No. 88 Vol. 105 | penalty basis, Reg. 13: US$2.00 (≥10,000 bbl/d) / US$0.50 (<10,000 bbl/d) per 1,000 scf | public regulation |
+| geoBoundaries gbOpen NGA (GRID3) | state + LGA boundaries; Niger Delta nine-state boundary | CC BY 4.0 |
 | Natural Earth / USGS Africa O&G pipelines | pipeline overlay | public domain |
 
 Proprietary monitoring (Kayrros, GHGSat, Enverus) is **studied, never ingested**. Full detail:
@@ -98,7 +109,10 @@ python3 scripts/build_seed.py                 # GFMR workbook → Nigeria seed
 python3 scripts/fetch_layers.py               # states + pipelines
 python3 scripts/fetch_layers2.py              # LGAs
 python3 scripts/compact_layers.py             # simplify geometry
+python3 scripts/classify_niger_delta.py       # nine-state point-in-polygon → worker/src/niger-delta.json
 python3 scripts/gen_sql.py                    # seed JSON → seed.sql
+python3 scripts/build_blog.py                 # blog/*.md → web/public/blog/
+python3 scripts/validate_sources.py           # source registry; non-zero if a source is unreachable
 python3 scripts/build_digest_csv.py           # weekly CSV digest
 
 cd worker && npx wrangler d1 execute kaliabe-flare --remote --file=../worker/schema.sql

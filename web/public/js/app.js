@@ -8,7 +8,7 @@ const core = KaliabeCore;
 const D = KaliabeDecision;
 const { num, money, pct, esc } = core.util;
 const fmtM = (v) => num(v, 1);
-const fmtUsd = (v) => (v == null ? '—' : '$' + num(v, 0));
+const T = core.THRESHOLDS;
 const fmtBcm = (v) => (v == null ? '—' : Number(v).toFixed(3) + ' bcm');
 
 let META = null;        // meta from the API: constants, method version, latest year
@@ -24,6 +24,7 @@ async function loadSummary() {
   const d = await getJSON('/api/summary');
   $('statSites').textContent = fmtM(d.sites);
   $('statND').textContent = fmtM(d.niger_delta_sites);
+  $('statNDsub').textContent = d.offshore_sites != null ? `+ ${d.offshore_sites} offshore, beyond the state boundary` : '';
   $('statVol').textContent = d.latest_total_bcm ? fmtBcm(d.latest_total_bcm) : (fmtM(d.latest_total_vol_million_m3) + ' mill. m³');
   $('statYear').textContent = d.latest_year || '—';
   $('statActive').textContent = d.active_sites_latest != null ? `${fmtM(d.active_sites_latest)} with a ${d.latest_year} detection` : '';
@@ -39,7 +40,7 @@ const atlas = KaliabeAtlas.create($('atlas'), {
     ${D.changesHtml(s, m.latest_year)}
     ${D.percentileHtml(s, 'sites')}
     <h4 class="drawer__h">Penalty exposure<sup>3</sup></h4>
-    ${D.exposureHtml(s, s.penalty_usd_latest, m)}
+    ${D.exposureHtml(s, m)}
     ${D.scenarioHtml('site:' + s.site_id, "this site's")}
     ${D.briefLinksHtml('site', s.site_id)}`,
   onDrawer: (el, s, m) => D.wireScenario(el, s.latest_year_vol_million_m3 || 0, m, (cut) => D.updateBriefLinks(el, cut)),
@@ -101,8 +102,8 @@ function setYear(y) {
   $('yearTotals').innerHTML = `
     <div><dt>${y} flared volume</dt><dd>${num(t.vol, 0)} <span>million m³</span></dd><dd class="kv__sub">${num(c.bcm, 2)} bcm${dy != null ? ` · ${pct(dy)} vs ${y - 1}` : ''}</dd></div>
     <div><dt>Sites detected</dt><dd>${t.det} <span>of ${SITES.length}</span></dd><dd class="kv__sub">positive volume in ${y}</dd></div>
-    <div><dt>Penalty basis</dt><dd>${money(c.penalty_usd, 'US$')}</dd><dd class="kv__sub">${y} volume at the 2022 rate${y < 2022 ? ' (notional)' : ''}</dd></div>
-    <div><dt>CO₂e</dt><dd>${num(c.co2e_t / 1e6, 1)} <span>Mt</span></dd><dd class="kv__sub">CH₄-equiv. ${num(c.ch4_t / 1e6, 2)} Mt</dd></div>`;
+    <div><dt>Penalty, two tiers</dt><dd>${money(c.penalty_usd_upper, 'US$')} <span>/ ${money(c.penalty_usd_lower, '$')}</span></dd><dd class="kv__sub">$2.00 / $0.50 tier, 2018 Regulations${y < 2019 ? ' (notional before July 2018)' : ''}</dd></div>
+    <div><dt>CO₂e</dt><dd>${num(c.co2e_t / 1e6, 1)} <span>Mt</span></dd><dd class="kv__sub">unburned CH₄ ${num(c.ch4_t / 1e3, 1)} kt</dd></div>`;
   const ch = document.querySelector('#natChart');
   if (ch && NATIONAL) ch.innerHTML = core.trendChart(NATIONAL.year_series, { forecast: NATIONAL.forecast, mark: y });
 }
@@ -138,7 +139,7 @@ function renderNational() {
     </div>
     <div class="nat__side">
       <h3 class="drawer__h">Penalty exposure</h3>
-      ${D.exposureHtml(n, n.penalty_usd_latest, m)}
+      ${D.exposureHtml(n, m)}
       ${D.scenarioHtml('national', 'national')}
       ${D.briefLinksHtml('national')}
       <p class="exp__note">Method ${esc(m.method_version)} · ${esc(m.data_vintage)}</p>
@@ -150,32 +151,36 @@ function renderNational() {
 // ---- E2 watchlist: rising, newly detected, top decile — all from /api/sites
 function renderWatch() {
   if (!META) return;
-  const Y = META.latest_year, thr = +$('riseThr').value;
-  // Rising is ranked by absolute increase: a large % on a tiny base is real but
-  // matters less than a large volume added, so both are shown.
-  const delta = (s) => { const ys = s.year_series || []; return ys.length > 3 ? ys[ys.length - 1].million_m3 - ys[ys.length - 4].million_m3 : 0; };
-  const rising = SITES.filter((s) => s.change_3yr_pct != null && s.change_3yr_pct > thr).sort((a, b) => delta(b) - delta(a));
-  const fresh = SITES.filter((s) => s.first_detected_year != null && s.first_detected_year >= Y - 1).sort((a, b) => b.latest_year_vol_million_m3 - a.latest_year_vol_million_m3);
-  const top = SITES.filter((s) => s.percentile_volume >= 90).sort((a, b) => b.latest_year_vol_million_m3 - a.latest_year_vol_million_m3);
-  const block = (id, title, note, rows, metricHead, metric) => `
+  const Y = META.latest_year, thr = +$('riseThr').value, floor = T.rising_min_added_million_m3;
+  // Rising needs BOTH the % threshold and the absolute floor (THRESHOLDS); ranked
+  // by volume added, because a large % on a tiny base is real but immaterial.
+  const rising = SITES.map((s) => ({ s, r: core.rising(s, thr) })).filter((x) => x.r.qualifies)
+    .sort((a, b) => b.r.added - a.r.added);
+  const fresh = SITES.filter((s) => s.first_detected_year != null && s.first_detected_year > Y - T.newly_detected_years).sort((a, b) => b.latest_year_vol_million_m3 - a.latest_year_vol_million_m3);
+  const td = META.top_decile;
+  const top = SITES.filter((s) => s.top_decile).sort((a, b) => b.latest_year_vol_million_m3 - a.latest_year_vol_million_m3);
+  const block = (id, title, note, rows, metricHead, metric, siteOf = (x) => x) => `
     <div class="watch__col" id="${id}">
       <h3 class="watch__h">${title} <span class="watch__n">${rows.length}</span></h3>
       <p class="exp__note">${note}</p>
       <div class="tablewrap watch__table">
         <table class="table table--tight">
           <thead><tr><th scope="col">Site · operator</th><th scope="col" class="num">${metricHead}</th><th scope="col" class="num">${Y} M m³</th></tr></thead>
-          <tbody>${rows.map((s) => `<tr>
+          <tbody>${rows.map((x) => { const s = siteOf(x); return `<tr>
             <td><button class="sitebtn" type="button" data-site="${esc(s.site_id)}">${esc(s.field_name || s.site_id)}</button><br><span class="site-sub">${esc(s.operator)}</span></td>
-            <td class="num">${metric(s)}</td><td class="num">${fmtM(s.latest_year_vol_million_m3)}</td></tr>`).join('')
+            <td class="num">${metric(x)}</td><td class="num">${fmtM(s.latest_year_vol_million_m3)}</td></tr>`; }).join('')
             || `<tr><td colspan="3" class="site-sub">None in the current record.</td></tr>`}</tbody>
         </table>
       </div>
     </div>`;
   $('watch').innerHTML =
-    block('watchRising', 'Rising', `3-yr change above +${thr}% (${Y} vs ${Y - 3}); largest volume added first.`, rising, '3-yr change', (s) => `+${fmtM(delta(s))} M m³<br><span class="site-sub">${pct(s.change_3yr_pct)}</span>`) +
+    block('watchRising', 'Rising', `3-yr change ≥ +${thr}% <b>and</b> ≥ ${floor} million m³ added (${Y} vs ${Y - 3}); largest volume added first.`, rising, 'Added · 3-yr change',
+      ({ r }) => `+${fmtM(r.added)} M m³<br><span class="site-sub">${pct(r.pct)}${r.small_base ? ` · small base (${num(r.base, 2)})` : ''}</span>`, (x) => x.s) +
     block('watchNew', 'Newly detected', `First detection in ${Y - 1} or ${Y}; no flaring recorded before.`, fresh, 'First yr', (s) => s.first_detected_year) +
-    block('watchTop', 'Top decile by volume', `≥ 90th percentile of all ${SITES.length} sites on ${Y} volume.`, top, 'Pctile', (s) => s.percentile_volume);
+    block('watchTop', 'Top decile by volume', `Top 10% of all ${td ? td.peer_set_size : SITES.length} sites on ${Y} volume: the ${td ? td.slots : ''} largest, cut-off <b>${td ? num(td.cutoff_million_m3, 2) : '—'} million m³</b>.`, top, 'Pctile <span class="site-sub">of detected</span>', (s) => s.percentile_volume == null ? 'n/a' : s.percentile_volume);
 }
+// Threshold options come from core.THRESHOLDS, so the select can't drift from the method.
+$('riseThr').innerHTML = T.rising_pct_options.map((v) => `<option value="${v}"${v === T.rising_pct_default ? ' selected' : ''}>+${v}%</option>`).join('');
 $('riseThr').addEventListener('change', renderWatch);
 $('watch').addEventListener('click', (e) => { const b = e.target.closest('[data-site]'); if (b) openSite(b.dataset.site); });
 
@@ -184,16 +189,16 @@ function renderTable(rows) {
     const on = s.verdict === 'verified_flare';
     const t = s.trend_label || 'stable';
     const cls = t === 'rising' || t === 'new' ? 'trend-up' : t === 'falling' ? 'trend-down' : '';
-    const arrow = { rising: '↑', falling: '↓', new: '↑', inactive: '·', stable: '→' }[t] || '→';
+    const arrow = { rising: '↑', falling: '↓', new: '↑', inactive: '·', stable: '→', not_significant: '~' }[t] || '→';
     const sub = [s.field_type && s.field_type !== 'NA' ? s.field_type : null, s.location ? s.location.toLowerCase() : null].filter(Boolean).join(' · ');
     return `<tr>
       <td><button class="sitebtn" type="button" data-site="${esc(s.site_id)}">${esc(s.field_name || s.site_id)}</button><br><span class="site-sub">${esc(sub)}</span></td>
       <td>${esc(s.operator)}</td>
       <td><span class="verdict ${on ? 'verdict--on' : 'verdict--off'}">${on ? 'Verified flare' : 'Unverified'}</span></td>
       <td class="num">${fmtM(s.latest_year_vol_million_m3)}</td>
-      <td class="${cls}" title="${esc(s.trend_basis || '')}">${arrow} ${t}${s.trend_pct != null && t !== 'inactive' ? ` <span class="site-sub">${pct(s.trend_pct)}</span>` : ''}</td>
+      <td class="${cls}" title="${esc((s.trend_basis || '') + '; ' + (s.trend_significance || ''))}">${arrow} ${t === 'not_significant' ? 'not significant' : t}${s.trend_pct != null && t !== 'inactive' ? ` <span class="site-sub">${pct(s.trend_pct)}</span>` : ''}</td>
       <td class="num">${s.confidence ? Math.round(s.confidence * 100) + '%' : '—'}</td>
-      <td class="num">${fmtUsd(s.penalty_usd_latest)}</td>
+      <td class="num">${money(s.penalty_usd_latest_upper, '$')}<br><span class="site-sub">${money(s.penalty_usd_latest_lower, '$')}</span></td>
     </tr>`;
   }).join('');
 }
@@ -232,9 +237,9 @@ function renderOperators() {
         <span><b>Flare sites</b><b>${o.sites}</b></span>
         <span><b>Niger Delta</b><b>${o.niger_delta_sites}</b></span>
         <span><b>Latest vol.</b><b>${fmtM(o.total_vol_million_m3_latest)} mill. m³</b><i>${fmtBcm(o.total_vol_bcm_latest)}</i></span>
-        <span><b>Penalty (est.)</b><b>${money(o.penalty_usd_latest, 'US$')}</b><i>cum. ${money(o.cumulative_penalty_usd, 'US$')}</i></span>
-        <span><b>3-yr change</b><b>${D.chg(o.change_3yr_pct)}</b><i>${o.percentile_improvement != null ? `improving faster than ${o.percentile_improvement}%` : 'improvement rank n/a'}</i></span>
-        <span><b>Peer percentile</b><b>${o.percentile_volume}%</b><i>larger than ${o.percentile_volume}% of operators</i></span>
+        <span><b>Penalty (est.)</b><b>${money(o.penalty_usd_latest_upper, 'US$')}</b><i>$2.00 tier · ${money(o.penalty_usd_latest_lower, 'US$')} at $0.50</i></span>
+        <span><b>3-yr change</b><b>${D.chg(o.change_3yr_pct, o.change_3yr_significant)}</b><i>${o.percentile_improvement != null ? `improving faster than ${o.percentile_improvement}% of ${o.peer_set_size.improvement}` : 'improvement rank n/a'}</i></span>
+        <span><b>Peer percentile</b><b>${o.percentile_volume == null ? 'n/a' : o.percentile_volume + '%'}</b><i>${o.percentile_volume == null ? `no ${o.latest_year} detection; excluded` : `of ${o.peer_set_size.volume} operators with a detection`}</i></span>
         <span><b>Idle sites</b><b>${Math.round(100 * idle)}%</b><i>no latest-year detection</i></span>
       </div>
       <p class="card__more" aria-hidden="true">Trend &amp; exposure →</p>
@@ -252,10 +257,11 @@ const COLS = [
   { k: 'sites', label: 'Sites', f: (v) => v },
   { k: 'total_vol_million_m3_latest', label: 'Latest, M m³', f: fmtM },
   { k: 'cumulative_million_m3', label: 'Cum. 2012–25, M m³', f: (v) => num(v, 0) },
-  { k: 'change_3yr_pct', label: '3-yr change', f: (v) => D.chg(v) },
-  { k: 'penalty_usd_latest', label: 'Penalty now', f: (v) => money(v, '$') },
-  { k: 'cumulative_penalty_usd', label: 'Penalty cum.', f: (v) => money(v, '$') },
-  { k: 'percentile_volume', label: 'Pctile', f: (v) => (v == null ? '—' : v + '%') },
+  { k: 'change_3yr_pct', label: '3-yr change', f: (v, o) => D.chg(v, o.change_3yr_significant) },
+  { k: 'penalty_usd_latest_upper', label: 'Penalty now, $2.00 tier', f: (v) => money(v, '$') },
+  { k: 'penalty_usd_latest_lower', label: 'Penalty now, $0.50 tier', f: (v) => money(v, '$') },
+  { k: 'cumulative_penalty_usd_upper', label: 'Cum., $2.00 tier', f: (v) => money(v, '$') },
+  { k: 'percentile_volume', label: 'Pctile', f: (v, o) => (v == null ? 'n/a' : `${v}%<br><span class="site-sub">of ${o.peer_set_size.volume}</span>`) },
 ];
 const sort = { k: 'total_vol_million_m3_latest', dir: -1 };
 function renderLeague(ops) {
@@ -275,7 +281,7 @@ function renderLeague(ops) {
     <td class="num site-sub">${i + 1}</td>
     ${COLS.map((c) => c.text
       ? `<th scope="row"><button type="button" class="sitebtn" data-op="${esc(o.operator)}">${esc(o.operator)}</button></th>`
-      : `<td class="num">${c.f(o[c.k])}</td>`).join('')}
+      : `<td class="num">${c.f(o[c.k], o)}</td>`).join('')}
   </tr>`).join('') || `<tr><td colspan="${COLS.length + 1}">No operators match.</td></tr>`;
 }
 $('leagueHead').addEventListener('click', (e) => {
@@ -323,7 +329,7 @@ function openOperator(name) {
       </div>
       <div class="nat__side">
         <h4 class="drawer__h">Penalty exposure</h4>
-        ${D.exposureHtml(o, o.penalty_usd_latest, m)}
+        ${D.exposureHtml(o, m)}
         ${D.scenarioHtml('op:' + o.operator, `${o.operator}'s`)}
         ${D.briefLinksHtml('operator', o.operator)}
       </div>

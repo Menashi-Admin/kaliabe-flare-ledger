@@ -9,7 +9,7 @@
    ┌───────────────────────────────────────────────────────────────────────┐
    │  World Bank GFMR flare volumes   NOAA/VIIRS Nightfire (Payne Inst.)   │
    │  geoBoundaries NGA ADM1/ADM2     USGS Africa O&G pipelines            │
-   │  NUPRC 2022 Flare Gas Regulations Gazette (penalty basis)             │
+   │  Flare Gas Regulations 2018, S.I. No. 9 of 2018 (penalty, 2 tiers)    │
    └───────────────────────────────────────────────────────────────────────┘
                         │                     │                    │
                    scripts/               scripts/            docs/
@@ -35,7 +35,7 @@
                         ▼
    ┌──────────────────────────────────────────────────────────────────┐
    │  Cloudflare Pages  "kaliabe-flare-web"                           │
-   │  index.html · methodology.html · data.html                       │
+   │  index.html · methodology.html · data.html · blog/ (Writing)     │
    │  js/atlas.js  — our own overlay engine on Leaflet                │
    │    · layer panel (flare / pipelines / states / LGAs)             │
    │    · per-flare detail drawer (series, verdict, confidence)       │
@@ -55,7 +55,8 @@
   detection floor, change, percentile, cumulative, projection) happens in the Worker, so every
   surface — site, CSV, decision brief, API consumer — returns the same numbers with the same
   caveats. The only browser-side maths (scenario, year totals) runs through `ledger-core.js`, the
-  same file the Worker bundles, using constants the Worker publishes in `meta.constants`.
+  same file the Worker bundles, using constants the Worker publishes in `meta.constants`. Every
+  filter threshold lives in `THRESHOLDS` in that same file (KFL-M 1.2).
 - **Neutral by construction.** Only open, revocable-by-nobody sources. No scraping of
   proprietary monitoring (Kayrros / GHGSat / Enverus are studied, never ingested).
 - **Same-origin API.** The Pages Function proxies `/api/*` to the Worker so the site has one
@@ -78,6 +79,7 @@ kaliabe-flare-ledger/
 │   └── OPUS-BUILD-OUTPUT.md  build record
 ├── worker/                   Cloudflare Worker + D1 schema/seed
 │   ├── src/index.js          verdict engine + REST API
+│   ├── src/niger-delta.json  generated Niger Delta classification (bundled)
 │   ├── schema.sql            flare_sites, flare_annual
 │   ├── seed.sql              generated seed (Nigeria subset)
 │   └── wrangler.toml
@@ -91,6 +93,7 @@ kaliabe-flare-ledger/
 │   │   ├── js/ledger-core.js shared maths + SVG trend chart (Worker bundles it)
 │   │   ├── js/decision.js    scenario slider, exposure, percentile, brief links
 │   │   ├── js/atlas.js       our overlay engine
+│   │   ├── blog/             Writing: index + one folder per post (built)
 │   │   └── layers/*.geojson  states · LGAs · pipelines
 │   └── functions/api/[[path]].js
 ├── data/                     seed inputs (GFMR Nigeria subset)
@@ -101,6 +104,9 @@ kaliabe-flare-ledger/
     ├── fetch_layers2.py      LGAs
     ├── compact_layers.py     simplify/round layer geometry
     ├── gen_sql.py            seed JSON → seed.sql
+    ├── classify_niger_delta.py  nine-state point-in-polygon → worker/src/niger-delta.json
+    ├── build_blog.py         blog/*.md → web/public/blog/
+    ├── validate_sources.py   source registry → docs/DATA-SOURCES-REGISTRY.md
     └── build_digest_csv.py   → weekly CSV digest
 ```
 
