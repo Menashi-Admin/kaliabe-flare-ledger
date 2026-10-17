@@ -33,6 +33,7 @@ async function loadSummary() {
 // ---- Map overlay (js/atlas.js) — the drawer gains the decision view (B1, C1, C5, F1)
 const atlas = KaliabeAtlas.create($('atlas'), {
   layerBase: './layers/',
+  liveUrl: `${API}/api/live`,
   onSelect: (s) => history.replaceState(null, '', `#site=${encodeURIComponent(s.site_id)}`),
   onClose: () => { if (location.hash.startsWith('#site=')) history.replaceState(null, '', location.pathname + location.search); },
   drawerExtra: (s, m) => `

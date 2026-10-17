@@ -1,6 +1,6 @@
 # Methodology & Confidence
 
-**Kaliabe Flare Ledger · method version KFL-M 1.2 (2026-10-17)**
+**Kaliabe Flare Ledger · method version KFL-M 1.3 (2026-10-17)**
 Mirrors the site's [methodology page](https://kaliabe-flare-web.pages.dev/methodology.html). The
 code that implements each rule is named next to it.
 
@@ -12,7 +12,8 @@ code that implements each rule is named next to it.
 
 | Version | Date | Change |
 |---|---|---|
-| **KFL-M 1.2** | 2026-10-17 | **Penalty basis corrected.** The governing instrument is the Flare Gas (Prevention of Waste and Pollution) Regulations, **2018** (S.I. No. 9 of 2018), not "NUPRC 2022 Regulations". Every penalty is now shown at **both** Reg. 13 tiers ($2.00 / $0.50) and no midpoint is used; the exemptions are stated. GFMR vintage labelled (June 2026 release, three-satellite method). Emissions ratios updated to the June 2026 tracker, and unburned methane is now reported as CH₄ mass (1.1 labelled a CO₂e quantity "t CH₄"). Niger Delta now by the nine-state boundary, with offshore sites labelled. Thresholds named and explicit: significance rules, rising floor, peer-set rules, top-decile cut-off, scenario rounding. |
+| **KFL-M 1.3** | 2026-10-17 | **Enrichment — live & opportunity** (§9). Population within 5/10/25/50 km (GRID3 v3.0); power-gap estimates (`core.powerGap`); electricity-access context (WDI, NDHS 2023-24) with a derived state rural proxy; live NASA FIRMS thermal check with an under-report flag (`core.liveCheck`); ACLED LGA security context and 12-month trend (`core.secTrend`). New thresholds: `live_min_window_nights`, `live_burning_night_share_pct`, `sec_trend_band_pct`, `sec_trend_min_abs_events`. No change to verdicts, trends or penalties. |
+| KFL-M 1.2 | 2026-10-17 | **Penalty basis corrected.** The governing instrument is the Flare Gas (Prevention of Waste and Pollution) Regulations, **2018** (S.I. No. 9 of 2018), not "NUPRC 2022 Regulations". Every penalty is now shown at **both** Reg. 13 tiers ($2.00 / $0.50) and no midpoint is used; the exemptions are stated. GFMR vintage labelled (June 2026 release, three-satellite method). Emissions ratios updated to the June 2026 tracker, and unburned methane is now reported as CH₄ mass (1.1 labelled a CO₂e quantity "t CH₄"). Niger Delta now by the nine-state boundary, with offshore sites labelled. Thresholds named and explicit: significance rules, rising floor, peer-set rules, top-decile cut-off, scenario rounding. |
 | KFL-M 1.1 | 2026-10-16 | Decision layer Wave 1. |
 
 > **Independence.** The Ledger is an independent, open-data project. It is not affiliated with,
@@ -244,7 +245,116 @@ print-ready brief.
 - **One row list:** the HTML and the CSV are built from the same rows, so they cannot disagree.
 - **Stamp:** every brief carries the method version and the data vintage.
 
-## 9. Honesty constraints
+## 9. Enrichment — live & opportunity (KFL-M 1.3)
+
+These turn each site from a *record* into a *development brief*. **Every number in this section is an
+estimate** on the stated assumption, labelled `estimate` in the API (`gap_label`) and on every surface.
+
+### 9.1 Population demand (`scripts/pop_demand.py` → `web/public/data/pop_demand.json`)
+
+- **Source:** GRID3 NGA Population v3.0 — Bayesian-modelled gridded population, 100 m cells (3 arc-seconds),
+  scaled to UN-WPP 2025; CC BY 4.0. Downloaded from WorldPop (`wopr.worldpop.org/download/611`, zip SHA-256
+  `12a45438…31aee42`, GeoTIFF dated 2025-02-27). Its national sum is 237,527,782, equal to WDI's 2025
+  population.
+- **Method:** a zonal sum, raster to point. `popNkm` is the sum of the cells whose centre lies within N km
+  (great-circle distance) of the site, for N = 5, 10, 25 and 50. Sea cells are no-data and count as zero, so
+  offshore sites have small inner rings (Oso: 0 within 10 km, 939,704 within 50 km).
+- **Settlements:** GRID3 NGA Settlement Points (eHealth Africa, Proxy Logics, ORNL; released March 2021;
+  CC BY 4.0). 80,959 points were fetched (the site bounding box plus ~0.5°).
+  - `nearest_settlement` is the nearest named point. Its `nearest_settlement_pop` is the people within
+    2 km of that point, because GRID3 points carry no population.
+  - `main_centre_25km` is the named point within 25 km with the largest 2-km population.
+  - Names are GRID3's. A point may sit inside a larger town: "Ahiahu" near Egbema West lies in Omoku's core,
+    hence ~120,000 people within 2 km.
+- **State:** the containing state from §7, or the nearest state for offshore sites (labelled).
+
+### 9.2 Electricity-access context (`scripts/fetch_access_rates.py` → `web/public/data/access_rates.json`)
+
+| Figure | Value | Source |
+|---|---|---|
+| National access, % population | **62.5%** (2024); 61.2% (2023); 59.5% (2021) | World Bank WDI `EG.ELC.ACCS.ZS` (Tracking SDG7), CC BY 4.0, last updated 2026-10-08 |
+| Urban / rural | **85.5% / 23.5%** (2024); 85.0% / 32.9% (2023) | WDI `.UR.ZS` / `.RU.ZS` |
+| People without access | **≈ 87.3 million** (2024) | derived: WDI population 232.7 m × (1 − 62.5%) |
+| NDHS 2023-24 population with electricity | 50.5% total · 77.9% urban · **27.7% rural** | Nigeria DHS 2023-24 (NPC & ICF), DHS Program API `HC_ELEC_P_ELC` |
+| Oil-state access (NDHS 2023-24, state-wide) | Bayelsa 64.5 · Rivers 87.3 · Delta 76.4 · Akwa Ibom 61.2 · Edo 89.6 · Imo 62.6 · Ondo 67.5 · Cross River 39.7 · Abia 76.7 (%) | same |
+
+- **The brief's approximations.** The brief quoted "~59% national / ~89% urban / ~33% rural". Those are
+  WDI values from 2021–2023. The current WDI vintage (2024) is used instead, and the year-to-year swing in
+  the rural series (32.9% → 23.5%) is a survey effect, stated as such.
+- **No rural-by-state figure.** Neither WDI nor NDHS publishes one, so the **state rural proxy is derived**:
+  NDHS state population-with-electricity × the national rural/total ratio (27.7 ÷ 50.5 = 0.549). For
+  example, Rivers 87.3% → 47.9%, Bayelsa 64.5% → 35.4%, Cross River 39.7% → 21.8%.
+- **Fallback.** A state without an NDHS figure uses the national NDHS rural rate (27.7%). This does not
+  occur for any current site.
+- **Caveats:**
+  - "With electricity" means a reported connection or supply, not hours of supply.
+  - Applying a rural rate to an urban ring (e.g. Port Harcourt) overstates the gap there.
+
+### 9.3 Power gap (`powerGap()` in `ledger-core.js`; constants in `meta.constants.gap`)
+
+| Output | Formula | Assumption |
+|---|---|---|
+| `gas_available_GWh` | latest-year m³ × **0.0100 MWh/m³** ÷ 1,000 | thermal (higher heating value) energy of methane-rich associated gas (~36–38 MJ/m³) |
+| `electric_potential_MW` | gas MWh ÷ 8,760 × **0.40** | simple-cycle gas turbine / gas engine electrical efficiency. The size of generator the gas could fuel continuously. Under 10 MW it is rounded to 0.1 MW, above that to 1 MW |
+| `households_servable` | MW × 8,760 × **0.85** ÷ **1.2 MWh/household/yr** | capacity factor 0.85. 100 kWh/month per household, just under the ESMAP Multi-Tier Framework **Tier 4** floor (1,250 kWh/yr; Tier 3 starts at 365). Rounded to 2 s.f. *(The brief called this load "Tier 1/2"; under the MTF it is upper Tier 3.)* |
+| `people_within_10km_not_grid` | pop10km × (1 − rural access proxy) | §9.2; rounded to 2 s.f. |
+
+- **Example — Oso (2025: 308.37 million m³):** 3,084 GWh/yr → **141 MW** → **870,000 households**; 0 people
+  within 10 km (offshore).
+- **Example — Egbema West:** 2,849 GWh/yr → 130 MW → 810,000 households; **79,000** of 120,915 people within
+  10 km without access (Imo proxy 34.3%).
+- **Roll-ups** (`national.opportunity`, `operator.opportunity`) sum GWh, MW and households. **People are
+  not summed**, because the 10 km circles overlap.
+- **Not a feasibility study.** These assume that all of the latest year's flare could be captured and
+  that the flare continues. Gas quality, capture cost, uptime and offtake are not modelled.
+
+### 9.4 Live thermal check (`scripts/live_thermal.py`, daily; `liveCheck()` in `ledger-core.js`)
+
+- **Source:** NASA FIRMS (LANCE), VIIRS 375 m active fire NRT, collection 2 — Suomi NPP, NOAA-20 and NOAA-21,
+  "Northern and Central Africa" regional CSV files (no key). NASA open data, acknowledgement requested.
+- **Matching:** detections inside the Nigeria bbox (2.6–14.8° E, 2.8–14.0° N) are assigned to the nearest
+  ledger site within **1 km**. On the first snapshot, 93% of the detections within 1.5 km of a site (666 of
+  716) fell within 0.5 km.
+- **Window and counting:**
+  - The window is a rolling 30 UTC dates; the first run seeded 8 dates from the 7-day files.
+  - A night counts as detected when a night pass (`daynight = N`) hit the site.
+  - `live_nights_detected_pct` = detected nights ÷ nights in the window. FIRMS gives no per-site cloud
+    mask, so cloudy nights count as misses and the share is a **lower bound**.
+- **Rules** (`THRESHOLDS`):
+  - `live_site_burning` = detected on ≥ **50%** of nights, once the window has ≥ **3** nights.
+  - **Under-report flag:** the trend label (§4) is *falling* but the site is live-burning →
+    "under-report (live check) — investigate". This is a prompt to look, not a finding.
+- **Observed values.** Flares sit at **~310–330 K mean `bright_ti4`** in this product. A 375 m pixel
+  averages the flame with cooler surroundings, so they are not the "very high" temperatures of VIIRS
+  Nightfire's Planck fit (§1). Bush fires overlap in `bright_ti4`, so the ledger relies on the location
+  match to known GFMR sites, not on a temperature cut.
+- **First snapshot** (retrieved 2026-10-17 02:27 UTC; window 2026-10-09 … 2026-10-16): 85 sites detected,
+  24 burning, 55 detected in the last 24 h, **8 flagged** (Oso, Odidi, Oben, Erha, Cawthorne Channel,
+  Agbami-Ekoli, Jones Creek, Ekulama).
+- **Delivery:** the Worker reads the committed file from the public repository (cached 15 min) and falls
+  back to the copy bundled at deploy time; `meta.enrichment.live.origin` says which.
+
+### 9.5 Security context (`scripts/ingest_acled.py`; `secTrend()` in `ledger-core.js`)
+
+- **Source:** ACLED Nigeria monthly events and fatalities by LGA (admin-2, OCHA P-code), via HDX
+  (`nigeria-acled-conflict-data`, as of 2026-10-15): political violence (events + fatalities), civilian
+  targeting (a subset of political violence) and demonstrations (events).
+- **Licence:** ACLED Terms of Use & Attribution Policy. Used for non-commercial monitoring; confirm with
+  ACLED before any commercial reuse.
+- **Join:** ACLED P-codes ↔ OCHA COD-AB NGA admin-2 polygons (HDX `cod-ab-nga`, CC BY-IGO). The site's LGA is
+  found by point-in-polygon; offshore sites take the nearest LGA, labelled.
+- **Areas:** `sec_area25_12m` / `sec_area50_12m` sum every LGA whose polygon lies within 25 / 50 km. These
+  are **LGA aggregates, not point counts**: an LGA that only grazes the circle contributes all of its events.
+- **Trend:** political-violence events in the 25 km area, last 12 complete months (2025-10 … 2026-09) vs the
+  12 before. It is **rising** or **declining** only beyond ±25% *and* ≥ 3 events; otherwise **flat**. With
+  none in either window it is "none recorded".
+- **Point counts pending:** `sec_events_10km/25km/50km` need ACLED point events (a myACLED account) and are
+  null, with `sec_point_status` = pending. The `--api` path is built. The checked-in
+  `data/samples/acled_point_sample_SYNTHETIC.csv` is invented test data for `--self-test` only.
+- **Not a judgement.** These are reported conflict events, evidence for monitoring. They are not a risk
+  rating of a site or an operator.
+
+## 10. Honesty constraints
 
 - A **derived, open-data** record. Never an official determination, never an operator endorsement.
 - Every figure carries its source and method version. Estimates are labelled estimates,
@@ -275,6 +385,16 @@ print-ready brief.
    satellite data. *Atmospheric Chemistry and Physics* 23, 9071–9098. See also the Stanford
    single-blind controlled-release tests of satellite methane detection (Sherwin et al., 2024,
    *Scientific Reports*).
+
+7. GRID3 (2025). *Nigeria gridded population estimates, version 3.0* (CC BY 4.0), via WorldPop. GRID3 / eHealth
+   Africa, Proxy Logics, ORNL (2021). *Settlement Points in Nigeria* (CC BY 4.0).
+8. World Bank, World Development Indicators — Access to electricity (EG.ELC.ACCS.*), Tracking SDG7 (ESMAP et al.);
+   National Population Commission & ICF, *Nigeria Demographic and Health Survey 2023-24*, via The DHS Program API.
+   ESMAP (2015), *Beyond Connections: Energy Access Redefined* (Multi-Tier Framework).
+9. NASA FIRMS / LANCE, VIIRS 375 m Active Fire NRT (VNP14IMGTDL_NRT, VJ114IMGTDL_NRT, VJ214IMGTDL_NRT);
+   Schroeder, W. et al. (2014), *Remote Sensing of Environment* 143, 85–96.
+10. Raleigh, C., Linke, A., Hegre, H., Karlsen, J. (2010). Introducing ACLED. *Journal of Peace Research* 47(5);
+    ACLED, acleddata.com; OCHA COD-AB Nigeria (HDX).
 
 Licences for every source: [`DATA-LICENCES.md`](DATA-LICENCES.md). Reachability, vintage and
 checksums: [`DATA-SOURCES-REGISTRY.md`](DATA-SOURCES-REGISTRY.md) (`scripts/validate_sources.py`).

@@ -73,6 +73,18 @@ the EU Methane Regulation), lenders/insurers (financed emissions and asset risk)
   - a **watchlist** of rising, newly detected and top-decile sites;
   - an exportable **decision brief** (print-to-PDF HTML + CSV) for any site, operator or the
     nation.
+- **Live & opportunity (KFL-M 1.3)**: every site carries
+  - **population demand**: GRID3 v3.0 people within 5/10/25/50 km, the nearest named settlement and the
+    largest centre within 25 km;
+  - a **Generation opportunity** block (estimates): gas wasted (GWh/yr), the generator it could fuel
+    (MW), the households it could power, and the people within 10 km without electricity access
+    (WDI + NDHS 2023-24 state proxy);
+  - a **live thermal check**: NASA FIRMS VIIRS 375 m, pulled daily by a GitHub Action. It reports
+    nights detected, mean bright_ti4 and FRP, a "Live now" indicator, and an **under-report flag**
+    where the archive says *falling* but the flare still burns on ≥50% of nights. There is also a
+    toggleable *Live thermal (last 24h)* layer;
+  - **security context**: ACLED reported events by LGA (via HDX) with a 12-month trend and a
+    toggleable LGA layer. Point-radius counts are pending a myACLED account.
 - **Operator compliance cards** and a **site-verdict table**
 - **Weekly CSV digest** of every site-year (6,664 rows)
 - **Methodology and data** pages carrying the caveats, the licences and every threshold
@@ -84,7 +96,8 @@ the EU Methane Regulation), lenders/insurers (financed emissions and asset risk)
 
 ## Where it's going
 
-Wave 1 of the decision layer is live (above). Next come Wave 2's commercial hooks: normalised
+Wave 1 of the decision layer and the Wave 2 enrichment layers (live & opportunity, KFL-M 1.3) are
+live (above). Next come the rest of Wave 2's commercial hooks: normalised
 intensity, abatement economics, the EU methane-threshold check, supplier scorecards and a
 site risk score. The full spec, sequenced by value per unit of effort, is in
 [`docs/FEATURE-SET.md`](docs/FEATURE-SET.md).
@@ -110,6 +123,10 @@ open data ─▶ scripts/ ─▶ D1 (flare_sites, flare_annual) ─▶ Worker (v
 | Flare Gas (Prevention of Waste and Pollution) Regulations, 2018 — S.I. No. 9 of 2018, Gazette No. 88 Vol. 105 | penalty basis, Reg. 13: US$2.00 (≥10,000 bbl/d) / US$0.50 (<10,000 bbl/d) per 1,000 scf | public regulation |
 | geoBoundaries gbOpen NGA (GRID3) | state + LGA boundaries; Niger Delta nine-state boundary | CC BY 4.0 |
 | Natural Earth / USGS Africa O&G pipelines | pipeline overlay | public domain |
+| GRID3 NGA Population v3.0 (100 m) + GRID3 Settlement Points | population within 5–50 km, nearest settlement | CC BY 4.0 |
+| World Bank WDI (Tracking SDG7) + Nigeria DHS 2023-24 | electricity-access context, state rural proxy | CC BY 4.0 / DHS terms |
+| NASA FIRMS (LANCE) VIIRS 375 m NRT | live thermal check + last-24h layer (daily) | NASA open data |
+| ACLED Nigeria (LGA monthly, via HDX) + OCHA COD-AB | security context | ACLED terms (attribution; non-commercial) / CC BY-IGO |
 
 Proprietary monitoring (Kayrros, GHGSat, Enverus) is **studied, never ingested**. Full detail:
 [`docs/DATA-LICENCES.md`](docs/DATA-LICENCES.md).
@@ -124,6 +141,11 @@ python3 scripts/compact_layers.py             # simplify geometry
 python3 scripts/classify_niger_delta.py       # nine-state point-in-polygon → worker/src/niger-delta.json
 python3 scripts/gen_sql.py                    # seed JSON → seed.sql
 python3 scripts/build_blog.py                 # blog/*.md → web/public/blog/
+pip install -r scripts/requirements-enrich.txt   # numpy, rasterio, openpyxl (1.3 enrichment only)
+python3 scripts/pop_demand.py                 # GRID3 raster → web/public/data/pop_demand.json
+python3 scripts/fetch_access_rates.py         # WDI + NDHS → web/public/data/access_rates.json
+python3 scripts/ingest_acled.py               # ACLED (HDX) → security.json + layers/security-lga.geojson
+python3 scripts/live_thermal.py               # NASA FIRMS → web/public/data/live/ (daily via GitHub Action)
 python3 scripts/validate_sources.py           # source registry; non-zero if a source is unreachable
 python3 scripts/build_digest_csv.py           # weekly CSV digest
 

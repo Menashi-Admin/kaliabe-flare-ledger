@@ -112,6 +112,24 @@ overlay and trend layer that turns records into choices: peer benchmarks, penalt
 forecasts, abatement economics, compliance gaps, and watchlists — each exportable as a decision
 brief. See `docs/FEATURE-SET.md`.
 
+### 5a. Live & opportunity (KFL-M 1.3)
+
+Each flare site now reads as a **generation opportunity**, not just a record:
+
+- **Fuel:** the gas it flared last year as energy (e.g. Oso: ~3,084 GWh/yr, enough for a ~141 MW
+  simple-cycle plant, ~870,000 households at 1.2 MWh/yr). Nationally, the 476 sites flared ~66,000 GWh/yr,
+  equivalent to ~3,000 MW of generation.
+- **Demand:** GRID3 population within 5/10/25/50 km and the nearest named settlement. Combined with the
+  state electricity-access proxy, this gives the people within 10 km likely without access (e.g. Agbada:
+  ~630,000).
+- **Ground truth:** a daily NASA FIRMS check of whether the flare is burning now. Sites the annual archive
+  calls "falling" but VIIRS still sees on most nights are flagged for investigation (8 on the first snapshot).
+- **De-risking:** ACLED reported-event counts and a 12-month trend for the surrounding LGAs.
+
+Buyers: mini-grid and gas-to-power developers, DFIs and the Nigerian Gas Flare Commercialisation
+Programme's bidders (who need a ranked pipeline of sites with fuel *and* customers), and lenders
+(the security context). Every figure is a labelled estimate with its assumption. It is not a feasibility study.
+
 **Honest bounds:** the Ledger is derived, open-data, and never an official determination. It
 publishes detection floors and confidence; it must never imply NUPRC endorsement. Its power is
 neutrality and citation, not authority.

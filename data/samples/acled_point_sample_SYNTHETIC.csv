@@ -1,0 +1,7 @@
+event_id_cnty,event_date,event_type,sub_event_type,latitude,longitude,fatalities,admin1,admin2
+# SYNTHETIC TEST FIXTURE - invented rows in ACLED's export schema. Not ACLED data. Used only by scripts/ingest_acled.py --self-test; never shipped or displayed.,,,,,,,,
+SYNTH0001,2026-03-02,Violence against civilians,Attack,4.8200,7.0300,0,Rivers,Obio/Akpor
+SYNTH0002,2026-05-14,Protests,Peaceful protest,4.7800,7.0100,0,Rivers,Port Harcourt
+SYNTH0003,2026-06-20,Battles,Armed clash,5.0100,6.2700,1,Bayelsa,Yenagoa
+SYNTH0004,2026-07-09,Explosions/Remote violence,Remote explosive/landmine/IED,5.5200,5.7500,0,Delta,Ughelli North
+SYNTH0005,2026-08-30,Riots,Mob violence,5.3500,6.9900,0,Imo,Ohaji/Egbema

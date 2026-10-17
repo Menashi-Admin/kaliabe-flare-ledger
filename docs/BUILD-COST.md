@@ -148,3 +148,46 @@ Not done:
 - **Remote D1 reseed.** It is blocked by the Prismor `db-modification` policy and destructive in any
   case. The Worker reads the Niger Delta class from the bundled `niger-delta.json`, so the stale D1
   `in_niger_delta` column is no longer read anywhere. `seed.sql` is regenerated for the next reseed.
+
+---
+
+### Pass 5 (2026-10-17): enrichment — live thermal, population demand, power gap, security (KFL-M 1.3)
+| Channel | Role | Effort |
+|---|---|---|
+| **Claude Code (Opus 5.5, subscription)** | Led the whole pass: source discovery and verification, the four ingestion scripts, the shared core maths, Worker + front end, scheduler, source validator, docs, deploy, live HTTP + headless-browser verification, commit | All codegen this pass |
+| **OpenRouter** | Orchestrator only: wrote the brief (`docs/BUILD-BRIEF-ENRICH.md`); local verification was run on this box by the Claude Code session | Brief only, no codegen |
+| **Codex (subscription)** | Not used | 0 |
+
+**Run cost:** still effectively $0. The daily FIRMS pull is a GitHub Action (free minutes on a public
+repository). The Worker reads the committed file, so there is no new Cloudflare product and no Cron Trigger.
+Population, access and security are precomputed offline and bundled: the Worker is 98 KiB gzipped, and
+`/api/sites` is 1.9 MB raw. Heavy inputs (the 45 MB GRID3 raster, 11 MB COD-AB, the ACLED workbooks) stay in
+`data/cache/` (git-ignored) and are never shipped.
+
+What shipped (B → C → A → D):
+- **B. Population demand.** GRID3 v3.0 100 m zonal sums for all 476 sites, plus GRID3 named settlements →
+  `pop_demand.json`.
+- **C. Power gap.** `core.powerGap` gives gas wasted, generator MW, households and people without access, all
+  labelled estimates. Access context comes from WDI and NDHS 2023-24, with a derived state rural proxy. It
+  appears in the drawer's "Generation opportunity" block and in every brief.
+- **A. Live thermal.** NASA FIRMS VIIRS 375 m, pulled daily by `.github/workflows/live-thermal.yml`, with a
+  rolling 30-night window, an under-report flag, a last-24h layer and a "Live now" pill. First snapshot
+  recorded: 85 sites detected, 24 burning, 8 flagged.
+- **D. Security.** Real ACLED LGA monthly aggregates (HDX), joined by P-code to COD-AB, with a 12-month trend
+  and an LGA layer. Point-radius counts are pending a myACLED account (harness built, self-tested on a
+  SYNTHETIC fixture).
+- **Registry.** `validate_sources.py` now checks 22 sources (10 new): 22/22 reachable, pins match, exit 0.
+
+Verification:
+- **Live HTTP:** 22 endpoints/assets → 200 (the two `.html` pages answer 308 to their pretty URLs, then 200).
+- **API:** `/api/sites` carries the new fields for Oso, Egbema West and Odidi. There is no NaN or Infinity,
+  and no null population or gap field on any site.
+- **Headless Chrome (production):** drawer (Odidi, Oso), the Generation opportunity / population / live /
+  security blocks, both new layers with attribution, blog, methodology and data pages. 0 console errors,
+  0 failed requests.
+
+Not done:
+- ACLED point events. There is no myACLED account on this box, so the per-site 10/25/50 km counts are
+  null and marked pending.
+- Security and population refreshes are manual (`ingest_acled.py`, `pop_demand.py`) and need a Worker
+  redeploy; only the live thermal file refreshes automatically.

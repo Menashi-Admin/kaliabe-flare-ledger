@@ -109,7 +109,18 @@ C5 scenario slider · E2 watchlist · F1 export brief.
 
 **Wave 2 — the commercial hooks:**
 A4 normalised intensity · C2/C3 abatement economics · D1 EU threshold check · D4 supplier
-scorecard · E3 risk score.
+scorecard · E3 risk score · **enrichment layers (KFL-M 1.3, below)**.
+
+**Wave 2 enrichment — live & opportunity (KFL-M 1.3):** ✅ shipped 2026-10-17 (B → C → A → D)
+
+| Item | Shipped as | Where |
+|---|---|---|
+| ✅ B. Population demand | `pop5km/10km/25km/50km`, nearest GRID3 named settlement (+ 2 km population, distance), largest centre within 25 km, state — GRID3 Population v3.0, 100 m zonal sums; 476-row JSON, raster never shipped | `scripts/pop_demand.py` → `web/public/data/pop_demand.json` |
+| ✅ C. Power gap (the deal number) | `gas_available_GWh`, `electric_potential_MW`, `households_servable`, `people_within_10km_not_grid`, each labelled *estimate* with its assumption; "Generation opportunity" block in the drawer and the brief; national/operator roll-ups (people not summed — circles overlap) | `ledger-core.js powerGap`, `scripts/fetch_access_rates.py` |
+| ✅ C. Access context | WDI national/urban/rural (2024: 62.5 / 85.5 / 23.5%); NDHS 2023-24 state rates; derived state rural proxy (state × national rural/total) — no published rural-by-state figure exists | `web/public/data/access_rates.json` |
+| ✅ A. Live flare thermal | Daily NASA FIRMS VIIRS 375 m pull (GitHub Action), 1 km site match, rolling 30-night window: `live_last_seen`, `live_nights_detected_pct`, `live_mean_bright_ti4_K`, `live_mean_frp_MW`, `live_site_burning`; **under-report (live check) flag** when archive says falling but burning on ≥50% of nights; "Live thermal (last 24h)" layer + "Live now" pill | `scripts/live_thermal.py`, `.github/workflows/live-thermal.yml`, `/api/live` |
+| ✅ D. Security overlay (LGA level) | Real ACLED monthly events by LGA (HDX), P-code join to OCHA COD-AB: site LGA, 25/50 km LGA-area counts by type, 12-month `sec_trend`; LGA choropleth layer; drawer + brief block with citation | `scripts/ingest_acled.py` → `security.json`, `layers/security-lga.geojson` |
+| ⏳ D. Security point counts | `sec_events_10km/25km/50km` need ACLED point events (myACLED account). Harness (`--api`) built and self-tested on a SYNTHETIC fixture; fields null, marked pending | `scripts/ingest_acled.py --api` |
 
 **Wave 3 — the deep tools:**
 A3 change-point detection · B4 quadrant · C4 monetisation value · D2 OGMP gap · E1 portfolio

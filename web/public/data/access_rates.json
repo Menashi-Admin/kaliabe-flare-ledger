@@ -1,0 +1,331 @@
+{
+ "meta": {
+  "generated": "2026-10-17",
+  "script": "scripts/fetch_access_rates.py",
+  "sources": [
+   {
+    "id": "wdi-access",
+    "name": "World Bank WDI — Access to electricity (Tracking SDG7, ESMAP / IEA / IRENA / UNSD / WHO)",
+    "url": "https://api.worldbank.org/v2/country/NGA/indicator/EG.ELC.ACCS.ZS",
+    "licence": "CC BY 4.0",
+    "vintage": "WDI last updated 2026-10-08; latest data year 2024"
+   },
+   {
+    "id": "ndhs-2024",
+    "name": "Nigeria Demographic and Health Survey 2023-24 (NPC & ICF), via The DHS Program API",
+    "url": "https://api.dhsprogram.com/rest/dhs/data?indicatorIds=HC_ELEC_P_ELC&surveyIds=NG2024DHS&breakdown=all&f=json&perpage=1000",
+    "licence": "DHS Program terms: free public aggregate indicators, cite NPC/ICF",
+    "vintage": "survey 2023-24, published 2025-10-15"
+   }
+  ],
+  "rural_proxy_method": "No published rural-by-state access rate exists in WDI or NDHS. Rural proxy = NDHS 2024 state population-with-electricity × the national rural/total ratio (27.7 ÷ 50.5 = 0.549). A state without an NDHS figure falls back to the national NDHS rural figure.",
+  "caveat": "\"With electricity\" in NDHS means the household reports an electricity connection or supply; it says nothing about hours of supply or reliability, so it overstates usable access. WDI and NDHS differ by method and year."
+ },
+ "national": {
+  "wdi": {
+   "year": "2024",
+   "total_pct": 62.5,
+   "urban_pct": 85.5,
+   "rural_pct": 23.5,
+   "series_total": {
+    "2024": 62.5,
+    "2023": 61.2,
+    "2022": 60.5,
+    "2021": 59.5,
+    "2020": 55.4,
+    "2019": 55.4
+   },
+   "series_urban": {
+    "2024": 85.5,
+    "2023": 85,
+    "2022": 89,
+    "2021": 89.2,
+    "2020": 83.9,
+    "2019": 83.9
+   },
+   "series_rural": {
+    "2024": 23.5,
+    "2023": 32.9,
+    "2022": 27,
+    "2021": 26.3,
+    "2020": 24.6,
+    "2019": 25.5
+   },
+   "population": 232679478,
+   "people_without_access": 87254804,
+   "people_without_access_basis": "WDI 2024 population × (1 − WDI 2024 national access)"
+  },
+  "ndhs_2024": {
+   "total_pct": 50.5,
+   "urban_pct": 77.9,
+   "rural_pct": 27.7,
+   "households_total_pct": 55.2,
+   "households_urban_pct": 79.8,
+   "households_rural_pct": 29.9,
+   "rural_to_total_ratio": 0.5485
+  },
+  "fallback_rural_pct": 27.7,
+  "fallback_rural_basis": "NDHS 2024 national rural population-with-electricity"
+ },
+ "states": {
+  "Abia": {
+   "access_total_pct": 76.7,
+   "households_with_electricity_pct": 77.3,
+   "rural_proxy_pct": 42.1,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 76.7% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Adamawa": {
+   "access_total_pct": 28.8,
+   "households_with_electricity_pct": 29.1,
+   "rural_proxy_pct": 15.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 28.8% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Akwa Ibom": {
+   "access_total_pct": 61.2,
+   "households_with_electricity_pct": 60.3,
+   "rural_proxy_pct": 33.6,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 61.2% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Anambra": {
+   "access_total_pct": 87.1,
+   "households_with_electricity_pct": 86.3,
+   "rural_proxy_pct": 47.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 87.1% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Bauchi": {
+   "access_total_pct": 35.9,
+   "households_with_electricity_pct": 34.4,
+   "rural_proxy_pct": 19.7,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 35.9% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Bayelsa": {
+   "access_total_pct": 64.5,
+   "households_with_electricity_pct": 64.1,
+   "rural_proxy_pct": 35.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 64.5% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Benue": {
+   "access_total_pct": 39.4,
+   "households_with_electricity_pct": 37.8,
+   "rural_proxy_pct": 21.6,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 39.4% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Borno": {
+   "access_total_pct": 25.3,
+   "households_with_electricity_pct": 23.8,
+   "rural_proxy_pct": 13.9,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 25.3% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Cross River": {
+   "access_total_pct": 39.7,
+   "households_with_electricity_pct": 39.1,
+   "rural_proxy_pct": 21.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 39.7% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Delta": {
+   "access_total_pct": 76.4,
+   "households_with_electricity_pct": 73.8,
+   "rural_proxy_pct": 41.9,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 76.4% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Ebonyi": {
+   "access_total_pct": 32.9,
+   "households_with_electricity_pct": 35.9,
+   "rural_proxy_pct": 18.0,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 32.9% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Edo": {
+   "access_total_pct": 89.6,
+   "households_with_electricity_pct": 88.4,
+   "rural_proxy_pct": 49.1,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 89.6% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Ekiti": {
+   "access_total_pct": 71.8,
+   "households_with_electricity_pct": 75.1,
+   "rural_proxy_pct": 39.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 71.8% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Enugu": {
+   "access_total_pct": 82.3,
+   "households_with_electricity_pct": 80.8,
+   "rural_proxy_pct": 45.1,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 82.3% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Federal Capital Territory": {
+   "access_total_pct": 84.2,
+   "households_with_electricity_pct": 86.4,
+   "rural_proxy_pct": 46.2,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 84.2% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Gombe": {
+   "access_total_pct": 45.2,
+   "households_with_electricity_pct": 44.4,
+   "rural_proxy_pct": 24.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 45.2% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Imo": {
+   "access_total_pct": 62.6,
+   "households_with_electricity_pct": 63.3,
+   "rural_proxy_pct": 34.3,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 62.6% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Jigawa": {
+   "access_total_pct": 16.2,
+   "households_with_electricity_pct": 15.9,
+   "rural_proxy_pct": 8.9,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 16.2% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Kaduna": {
+   "access_total_pct": 44.4,
+   "households_with_electricity_pct": 42.9,
+   "rural_proxy_pct": 24.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 44.4% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Kano": {
+   "access_total_pct": 45,
+   "households_with_electricity_pct": 42.9,
+   "rural_proxy_pct": 24.7,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 45% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Katsina": {
+   "access_total_pct": 45.1,
+   "households_with_electricity_pct": 45.6,
+   "rural_proxy_pct": 24.7,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 45.1% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Kebbi": {
+   "access_total_pct": 20.7,
+   "households_with_electricity_pct": 18.8,
+   "rural_proxy_pct": 11.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 20.7% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Kogi": {
+   "access_total_pct": 39.7,
+   "households_with_electricity_pct": 45.9,
+   "rural_proxy_pct": 21.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 39.7% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Kwara": {
+   "access_total_pct": 67.7,
+   "households_with_electricity_pct": 74.3,
+   "rural_proxy_pct": 37.1,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 67.7% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Lagos": {
+   "access_total_pct": 94.4,
+   "households_with_electricity_pct": 94.8,
+   "rural_proxy_pct": 51.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 94.4% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Nasarawa": {
+   "access_total_pct": 64.3,
+   "households_with_electricity_pct": 65.2,
+   "rural_proxy_pct": 35.3,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 64.3% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Niger": {
+   "access_total_pct": 38.6,
+   "households_with_electricity_pct": 41.2,
+   "rural_proxy_pct": 21.2,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 38.6% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Ogun": {
+   "access_total_pct": 81.2,
+   "households_with_electricity_pct": 80.9,
+   "rural_proxy_pct": 44.5,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 81.2% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Ondo": {
+   "access_total_pct": 67.5,
+   "households_with_electricity_pct": 69.7,
+   "rural_proxy_pct": 37.0,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 67.5% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Osun": {
+   "access_total_pct": 92.8,
+   "households_with_electricity_pct": 90.6,
+   "rural_proxy_pct": 50.9,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 92.8% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Oyo": {
+   "access_total_pct": 77.3,
+   "households_with_electricity_pct": 78,
+   "rural_proxy_pct": 42.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 77.3% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Plateau": {
+   "access_total_pct": 25.9,
+   "households_with_electricity_pct": 27,
+   "rural_proxy_pct": 14.2,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 25.9% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Rivers": {
+   "access_total_pct": 87.3,
+   "households_with_electricity_pct": 86.3,
+   "rural_proxy_pct": 47.9,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 87.3% × national rural/total ratio 0.549",
+   "oil_producing": true
+  },
+  "Sokoto": {
+   "access_total_pct": 23.3,
+   "households_with_electricity_pct": 21.8,
+   "rural_proxy_pct": 12.8,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 23.3% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Taraba": {
+   "access_total_pct": 24.7,
+   "households_with_electricity_pct": 23.1,
+   "rural_proxy_pct": 13.5,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 24.7% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Yobe": {
+   "access_total_pct": 44.4,
+   "households_with_electricity_pct": 42,
+   "rural_proxy_pct": 24.4,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 44.4% × national rural/total ratio 0.549",
+   "oil_producing": false
+  },
+  "Zamfara": {
+   "access_total_pct": 29.6,
+   "households_with_electricity_pct": 27,
+   "rural_proxy_pct": 16.2,
+   "rural_proxy_basis": "derived: NDHS 2024 state population-with-electricity 29.6% × national rural/total ratio 0.549",
+   "oil_producing": false
+  }
+ }
+}

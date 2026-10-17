@@ -19,6 +19,10 @@
  */
 import core from '../../web/public/js/ledger-core.js';
 import ND from './niger-delta.json';
+import POP from '../../web/public/data/pop_demand.json';
+import ACCESS from '../../web/public/data/access_rates.json';
+import SEC from '../../web/public/data/security.json';
+import LIVE_BUNDLED from '../../web/public/data/live/live_thermal.json';
 
 const T = core.THRESHOLDS;
 
@@ -54,6 +58,13 @@ const K = {
   ch4_mt_per_bcm: CH4_MT_PER_BCM,
   ch4_co2e_mt_per_bcm: CH4_CO2E_MT_PER_BCM,
   ngn_per_usd_indicative: NGN_PER_USD,
+  // KFL-M 1.3 power-gap assumptions (core.powerGap). Every output is an estimate.
+  gap: {
+    gas_mwh_per_m3: 0.0100,      // thermal (higher heating value) energy of methane-rich associated gas, ≈ 36–38 MJ/m³
+    gen_efficiency: 0.40,        // simple-cycle gas turbine / gas-engine electrical efficiency
+    capacity_factor: 0.85,       // availability of the generator over a year
+    household_mwh_per_yr: 1.2,   // 100 kWh/month per household — just under the ESMAP Multi-Tier Framework Tier 4 floor (1,250 kWh/yr)
+  },
 };
 
 const PENALTY = {
@@ -75,8 +86,8 @@ const PENALTY = {
 const PENALTY_BASIS = 'Flare Gas Regulations 2018 (S.I. No. 9 of 2018) Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 1,000 scf (28.317 m³)';
 
 // Method version + data vintage: stamped on every API response and brief.
-const METHOD_VERSION = 'KFL-M 1.2 (2026-10-17)';
-const METHOD_CHANGES = 'KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
+const METHOD_VERSION = 'KFL-M 1.3 (2026-10-17)';
+const METHOD_CHANGES = 'KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
 const VINTAGE = {
   dataset: 'World Bank GFMR, Flare Volume Estimates by Individual Flare Location 2012–2025 (xlsx)',
   release: 'Global Gas Flaring Tracker, 23 June 2026',
@@ -99,6 +110,103 @@ function ndOf(siteId) {
     : r.class === 'offshore' ? `Offshore, beyond the state boundary — nearest state ${r.nearest_state}${r.nearest_is_niger_delta ? ' (Niger Delta)' : ' (not Niger Delta)'}, ${r.nearest_km} km`
       : r.class === 'outside' ? `Outside the Niger Delta — ${r.state} State` : 'Unclassified';
   return { in_niger_delta: r.class === 'niger_delta', niger_delta_class: r.class, niger_delta_label: label, niger_delta_detail: r };
+}
+
+// ---- KFL-M 1.3 enrichment: population (Part B), power gap (C), live thermal (A), security (D) ----
+const GAP_ASSUMPTIONS = [
+  `gas energy ${K.gap.gas_mwh_per_m3} MWh per m³ (thermal, higher heating value of methane-rich gas)`,
+  `generator electrical efficiency ${K.gap.gen_efficiency * 100}% (simple-cycle gas turbine / gas engine)`,
+  `capacity factor ${K.gap.capacity_factor}`,
+  `${K.gap.household_mwh_per_yr} MWh per household per year (100 kWh/month; just under the ESMAP Multi-Tier Framework Tier 4 floor of 1,250 kWh/yr)`,
+  'people without access = GRID3 pop10km × (1 − state rural access proxy, NDHS 2024 state rate × national rural/total ratio)',
+  'latest-year flared volume only; assumes all of it could be captured and that the flare continues',
+];
+const GAP_NOTE = 'Estimates on stated assumptions — not a feasibility study. The generator size is what the flared gas could fuel continuously; deliverable power depends on capture, gas quality, uptime and offtake.';
+
+function accessFor(state) {
+  const st = ACCESS.states[state];
+  if (st) return { pct: st.rural_proxy_pct, basis: `${state}: ${st.rural_proxy_basis}` };
+  return { pct: ACCESS.national.fallback_rural_pct, basis: `no NDHS state figure${state ? ' for ' + state : ''}; national rural rate used (${ACCESS.national.fallback_rural_basis})` };
+}
+
+function enrich(site, latestMillionM3) {
+  const p = POP.sites[site.site_id] || null;
+  const acc = accessFor(p && p.state);
+  const gap = core.powerGap(latestMillionM3, { pop10km: p ? p.pop10km : null, rural_access_pct: acc.pct }, K);
+  const sec = SEC.sites[site.site_id] || null;
+  const st = core.secTrend(sec && sec.pv_monthly_area25, T);
+  return {
+    pop5km: p ? p.pop5km : null, pop10km: p ? p.pop10km : null, pop25km: p ? p.pop25km : null, pop50km: p ? p.pop50km : null,
+    nearest_settlement: p ? p.nearest_settlement : null, nearest_settlement_lga: p ? p.nearest_settlement_lga : null,
+    nearest_settlement_pop: p ? p.nearest_settlement_pop : null, dist_km: p ? p.dist_km : null,
+    main_centre_25km: p ? p.main_centre_25km : null, main_centre_25km_pop: p ? p.main_centre_25km_pop : null,
+    main_centre_25km_dist_km: p ? p.main_centre_25km_dist_km : null,
+    state: p ? p.state : null, state_basis: p ? p.state_basis : null,
+    gas_available_GWh: gap.gas_available_GWh,
+    electric_potential_MW: gap.electric_potential_MW,
+    households_servable: gap.households_servable,
+    people_within_10km_not_grid: gap.people_within_10km_not_grid,
+    rural_access_proxy_pct: acc.pct,
+    rural_access_basis: acc.basis,
+    gap_label: 'estimate',
+    sec_lga: sec ? sec.sec_lga : null,
+    sec_lga_12m: sec ? sec.sec_lga_12m : null,
+    sec_area25_12m: sec ? sec.sec_area25_12m : null,
+    sec_area50_12m: sec ? sec.sec_area50_12m : null,
+    sec_trend: st.sec_trend,
+    sec_trend_detail: { pv_last12: st.last12, pv_prev12: st.prev12, pct: st.pct == null ? null : round(st.pct, 0), basis: 'political-violence events, LGAs touching the 25 km circle, last 12 complete months vs the 12 before' },
+    sec_events_10km: sec ? sec.sec_events_10km : null,
+    sec_events_25km: sec ? sec.sec_events_25km : null,
+    sec_events_50km: sec ? sec.sec_events_50km : null,
+    sec_point_status: sec ? sec.sec_point_status : 'pending live data',
+  };
+}
+
+// Live FIRMS file: committed daily by .github/workflows/live-thermal.yml and read
+// from the public repo, so a refresh needs no redeploy. The bundled copy (the
+// snapshot at deploy time) is the fallback; whichever was retrieved later wins.
+const LIVE_URL = 'https://raw.githubusercontent.com/Menashi-Admin/kaliabe-flare-ledger/main/web/public/data/live/live_thermal.json';
+let liveCache = null;
+async function loadLive(env) {
+  if (liveCache && Date.now() - liveCache.at < 900e3) return liveCache.data;
+  let data = LIVE_BUNDLED, origin = 'bundled snapshot (deploy time)';
+  try {
+    const r = await fetch((env && env.LIVE_URL) || LIVE_URL, { cf: { cacheTtl: 900, cacheEverything: true } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.meta && d.sites && String(d.meta.retrieved) >= String(LIVE_BUNDLED.meta.retrieved)) { data = d; origin = 'repository (daily GitHub Action)'; }
+    }
+  } catch (e) { /* keep the bundled snapshot */ }
+  liveCache = { at: Date.now(), data: { ...data, origin } };
+  return liveCache.data;
+}
+
+function attachLive(site, live) {
+  const l = live.sites[site.site_id];
+  const win = live.meta.window_nights;
+  const chk = core.liveCheck(l, win, site.trend_label, T);
+  Object.assign(site, {
+    live_last_seen: l ? l.live_last_seen : null,
+    live_nights_detected: l ? l.live_nights_detected : 0,
+    live_window_nights: win,
+    live_nights_detected_pct: l ? l.live_nights_detected_pct : 0,
+    live_mean_bright_ti4_K: l ? l.live_mean_bright_ti4_K : null,
+    live_mean_frp_MW: l ? l.live_mean_frp_MW : null,
+    live_detected_24h: l ? l.live_detected_24h : false,
+    live_site_burning: chk.live_site_burning,
+    live_status: chk.live_status,
+    live_flag: chk.live_flag,
+  });
+}
+
+function enrichmentMeta(live) {
+  return {
+    population: { ...POP.meta.population, settlements: POP.meta.settlements, method: POP.meta.method, generated: POP.meta.generated },
+    access: { ...ACCESS.meta, national: ACCESS.national },
+    gap: { constants: K.gap, assumptions: GAP_ASSUMPTIONS, note: GAP_NOTE, label: 'estimate' },
+    live: { ...live.meta, origin: live.origin, rule: `live_site_burning when detected on ≥${T.live_burning_night_share_pct}% of nights in a window of ≥${T.live_min_window_nights} nights; under-report flag when the archive trend is “falling” and the site is live-burning` },
+    security: SEC.meta,
+  };
 }
 
 const corsHeaders = {
@@ -187,6 +295,7 @@ function estimate(site, annual) {
     year_series: years.map((r) => ({ year: r.year, million_m3: round(r.flaring_vol_m3, 2) })),
     first_detected_year: (years.find((r) => r.flaring_vol_m3 > 0) || {}).year || null,
     ...seriesStats(volMillionM3),
+    ...enrich(site, latestMillionM3),
   };
 }
 
@@ -326,7 +435,8 @@ async function loadLedger(env) {
     .filter((s) => bySite.has(s.site_id))
     .map((s) => estimate(s, bySite.get(s.site_id)))
     .sort((x, y) => (y.latest_year_vol_million_m3 || 0) - (x.latest_year_vol_million_m3 || 0));
-  for (const s of sites) s.operator = String(s.operator).trim() || 'Unattributed';
+  const live = await loadLive(env);
+  for (const s of sites) { s.operator = String(s.operator).trim() || 'Unattributed'; attachLive(s, live); }
   rank(sites, 'latest_year_vol_million_m3');
   const decile = topDecile(sites);
   const latestYear = sites.reduce((y, s) => Math.max(y, s.latest_year || 0), 0);
@@ -342,9 +452,28 @@ async function loadLedger(env) {
   rank(operators, 'total_vol_million_m3_latest');
   const national = { scope: 'Nigeria (GFMR site set)', operators: operators.length, ...aggregate(sites, latestYear) };
 
-  const data = { sites, operators, national, meta: buildMeta(latestYear, decile) };
+  national.opportunity = opportunity(sites);
+  for (const o of operators) o.opportunity = opportunity(sites.filter((s) => s.operator === o.operator));
+  const data = { sites, operators, national, live, meta: { ...buildMeta(latestYear, decile), enrichment: enrichmentMeta(live) } };
   ledgerCache = { at: Date.now(), data };
   return data;
+}
+
+// Roll-up of the 1.3 site fields. People are NOT summed: 10 km circles overlap,
+// so a sum would count the same people several times.
+function opportunity(list) {
+  const sum = (k) => list.reduce((a, s) => a + (Number.isFinite(s[k]) ? s[k] : 0), 0);
+  const mw = list.reduce((a, s) => a + (s.latest_year_vol_million_m3 > 0 ? core.powerGap(s.latest_year_vol_million_m3, null, K).electric_potential_MW_exact : 0), 0);
+  return {
+    gas_available_GWh: round(sum('gas_available_GWh'), 0),
+    electric_potential_MW: round(mw, 0),
+    households_servable: core.util.sig(sum('households_servable'), 2),
+    people_note: 'people within 10 km are not summed across sites — the circles overlap',
+    sites_live_burning: list.filter((s) => s.live_site_burning).length,
+    sites_detected_24h: list.filter((s) => s.live_detected_24h).length,
+    sites_live_flagged: list.filter((s) => s.live_flag).length,
+    label: 'estimate',
+  };
 }
 
 function buildMeta(latestYear, decile) {
@@ -377,6 +506,10 @@ function buildMeta(latestYear, decile) {
       penalty: `${PENALTY.instrument}, ${PENALTY.citation}; Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 28.317 m³ (1,000 scf)`,
       emissions: 'World Bank Global Gas Flaring Tracker, June 2026 (data year 2025): 167 bcm ≈ 429 MtCO₂e incl. 50 MtCO₂e unburned methane (1.8 Mt CH₄)',
       boundary: 'Niger Delta: union of the nine Niger Delta states, geoBoundaries gbOpen NGA ADM1 (GRID3), CC BY 4.0',
+      population: 'GRID3 NGA Population v3.0 (100 m, UN-WPP 2025-scaled), CC BY 4.0; GRID3 NGA Settlement Points (2021), CC BY 4.0',
+      access: 'World Bank WDI access to electricity (Tracking SDG7), CC BY 4.0; Nigeria DHS 2023-24 (NPC/ICF) via The DHS Program API',
+      live: 'NASA FIRMS (LANCE) VIIRS 375 m active fire NRT (Suomi NPP, NOAA-20, NOAA-21) — NASA open data',
+      security: 'ACLED (acleddata.com) Nigeria monthly events by LGA via HDX; OCHA COD-AB admin-2 boundaries (CC BY-IGO)',
     },
   };
 }
@@ -503,6 +636,41 @@ function brief(url, ledger) {
     ['penalty', 'cumulative_volume', o.cumulative_million_m3, 'million m³', `${yr0}–${Y}`],
     ...PENALTY.exemptions.map((e, i) => ['penalty', `exemption_${i + 1}`, e, '', 'not deducted: exempt volumes are not visible in satellite data']),
   );
+  // KFL-M 1.3 — generation opportunity (estimates), live check, security context.
+  const en = meta.enrichment;
+  if (scope === 'site') {
+    rows.push(
+      ['opportunity', 'gas_available', o.gas_available_GWh, 'GWh/yr', `ESTIMATE · ${Y} volume × ${K.gap.gas_mwh_per_m3} MWh/m³ — fuel currently flared`],
+      ['opportunity', 'electric_potential', o.electric_potential_MW, 'MW', `ESTIMATE · ÷ 8,760 h × ${K.gap.gen_efficiency * 100}% efficiency (simple cycle)`],
+      ['opportunity', 'households_servable', o.households_servable, 'households', `ESTIMATE · MW × 8,760 × ${K.gap.capacity_factor} ÷ ${K.gap.household_mwh_per_yr} MWh/household/yr`],
+      ['opportunity', 'people_within_10km_not_grid', o.people_within_10km_not_grid, 'people', `ESTIMATE · pop10km ${o.pop10km} × (1 − ${o.rural_access_proxy_pct}%) — ${o.rural_access_basis}`],
+      ['population', 'pop5km', o.pop5km, 'people', 'GRID3 NGA Population v3.0 (modelled)'], ['population', 'pop10km', o.pop10km, 'people', ''],
+      ['population', 'pop25km', o.pop25km, 'people', ''], ['population', 'pop50km', o.pop50km, 'people', ''],
+      ['population', 'nearest_settlement', o.nearest_settlement, '', `${o.nearest_settlement_lga} · ${o.dist_km} km · ${o.nearest_settlement_pop} people within 2 km`],
+      ['population', 'main_centre_25km', o.main_centre_25km, '', o.main_centre_25km ? `${o.main_centre_25km_dist_km} km · ${o.main_centre_25km_pop} people within 2 km` : 'no named settlement within 25 km'],
+      ['live', 'status', o.live_status, '', `NASA FIRMS VIIRS 375 m; window ${o.live_window_nights} nights to ${en.live.window_last}; retrieved ${en.live.retrieved}`],
+      ['live', 'nights_detected_pct', o.live_nights_detected_pct, '%', `${o.live_nights_detected}/${o.live_window_nights} nights (cloudy nights count as misses — a lower bound)`],
+      ['live', 'last_seen', o.live_last_seen, 'UTC', ''], ['live', 'mean_bright_ti4', o.live_mean_bright_ti4_K, 'K', ''], ['live', 'mean_frp', o.live_mean_frp_MW, 'MW', ''],
+      ['live', 'flag', o.live_flag || 'none', '', 'under-report flag: archive trend falling but live-burning'],
+      ['security', 'trend', o.sec_trend, '', o.sec_trend_detail.basis],
+      ['security', 'lga', o.sec_lga ? `${o.sec_lga.name}, ${o.sec_lga.state}` : 'none within 50 km', '', o.sec_lga ? o.sec_lga.basis : ''],
+      ['security', 'political_violence_12m_area25', o.sec_area25_12m ? o.sec_area25_12m.pv : null, 'events', `ACLED via HDX, LGAs touching 25 km, ${en.security.window_12m.join('–')}`],
+      ['security', 'fatalities_12m_area25', o.sec_area25_12m ? o.sec_area25_12m.pv_fat : null, 'people', ''],
+      ['security', 'demonstrations_12m_area25', o.sec_area25_12m ? o.sec_area25_12m.demo : null, 'events', ''],
+      ['security', 'point_counts', o.sec_point_status, '', ''],
+    );
+  } else {
+    const op = o.opportunity;
+    rows.push(
+      ['opportunity', 'gas_available', op.gas_available_GWh, 'GWh/yr', 'ESTIMATE · sum over sites'],
+      ['opportunity', 'electric_potential', op.electric_potential_MW, 'MW', 'ESTIMATE · sum over sites'],
+      ['opportunity', 'households_servable', op.households_servable, 'households', 'ESTIMATE · sum over sites'],
+      ['opportunity', 'people_note', op.people_note, '', ''],
+      ['live', 'sites_live_burning', op.sites_live_burning, 'sites', `NASA FIRMS window ${en.live.window_nights} nights to ${en.live.window_last}`],
+      ['live', 'sites_live_flagged', op.sites_live_flagged, 'sites', 'archive falling but live-burning — investigate'],
+    );
+  }
+  rows.push(['opportunity', 'assumptions', GAP_ASSUMPTIONS.join('; '), '', GAP_NOTE]);
   for (const f of o.forecast) {
     rows.push(['projection', `penalty_${f.year}_upper_2usd_tier`, f.penalty_usd_upper, 'US$', `PROJECTION · ${num(f.million_m3, 1)} million m³ · ${FORECAST_METHOD}`],
       ['projection', `penalty_${f.year}_lower_050usd_tier`, f.penalty_usd_lower, 'US$', `PROJECTION · ${num(f.million_m3, 1)} million m³`]);
@@ -516,7 +684,8 @@ function brief(url, ledger) {
   for (const p of o.year_series) rows.push(['series', String(p.year), p.million_m3, 'million m³', '']);
   const SOURCES = [
     meta.sources.volume, meta.sources.penalty, meta.sources.emissions, meta.sources.boundary,
-    `Kaliabe derivations (${METHOD_VERSION}): trend, N-yr change, percentile, cumulative and projection — see docs/METHODOLOGY.md`,
+    meta.sources.population, meta.sources.access, meta.sources.live, meta.sources.security,
+    `Kaliabe derivations (${METHOD_VERSION}): trend, N-yr change, percentile, cumulative, projection, power-gap estimates, live check and security trend — see docs/METHODOLOGY.md`,
   ];
   rows.push(...SOURCES.map((s, i) => ['source', String(i + 1), s, '', '']));
 
@@ -588,6 +757,27 @@ ${o.forecast.map((f) => `<tr class="proj"><td>${f.year}<span class="tag">project
 </tbody></table>
 <p class="s">Exemptions in the Regulations, <b>not deducted</b> here because exempt volumes cannot be seen from satellite data: ${PENALTY.exemptions.map(esc).join(' ')} ${esc(PENALTY.not_modelled)}</p>
 <p class="s">Projection: ${esc(FORECAST_METHOD)}.</p>
+<h2>Generation opportunity <span class="tag">estimate</span></h2>
+${scope === 'site' ? `<div class="figs">
+  ${fig('Gas wasted', `${num(o.gas_available_GWh, 1)} <span class="s">GWh/yr</span>`, `${Y} flared volume as fuel`)}
+  ${fig('Generator it could fuel', `${num(o.electric_potential_MW, 1)} <span class="s">MW</span>`, `${K.gap.gen_efficiency * 100}% simple-cycle`)}
+  ${fig('Households it could power', num(o.households_servable, 0), `${K.gap.household_mwh_per_yr} MWh/household/yr`)}
+  ${fig('People within 10 km without access', o.people_within_10km_not_grid == null ? 'n/a' : num(o.people_within_10km_not_grid, 0), `of ${num(o.pop10km, 0)} people · access proxy ${o.rural_access_proxy_pct}%`)}
+</div>
+<p class="s">Population (GRID3 v3.0, modelled): ${num(o.pop5km, 0)} within 5 km · ${num(o.pop10km, 0)} within 10 km · ${num(o.pop25km, 0)} within 25 km · ${num(o.pop50km, 0)} within 50 km. Nearest named settlement <b>${esc(o.nearest_settlement)}</b> (${esc(o.nearest_settlement_lga)}), ${num(o.dist_km, 1)} km${o.main_centre_25km ? `; largest centre within 25 km <b>${esc(o.main_centre_25km)}</b>, ${num(o.main_centre_25km_dist_km, 1)} km, ~${num(o.main_centre_25km_pop, 0)} people within 2 km` : ''}. Access proxy: ${esc(o.rural_access_basis)}.</p>
+<h2>Live check (NASA FIRMS)</h2>
+<p class="big">Status <b>${esc(o.live_status)}</b> — detected on ${o.live_nights_detected}/${o.live_window_nights} nights (${num(o.live_nights_detected_pct, 0)}%, a lower bound: cloudy nights count as misses)${o.live_last_seen ? `; last seen ${esc(o.live_last_seen)}; mean bright_ti4 ${num(o.live_mean_bright_ti4_K, 0)} K, FRP ${num(o.live_mean_frp_MW, 1)} MW` : ''}.${o.live_flag ? ` <span class="tag">${esc(o.live_flag)}</span>` : ''}</p>
+<p class="s">NASA FIRMS / LANCE VIIRS 375 m NRT · window ${esc(en.live.window_first)} – ${esc(en.live.window_last)} · retrieved ${esc(en.live.retrieved)}.</p>
+<h2>Security context (ACLED)</h2>
+<p class="big">12-month trend <b>${esc(o.sec_trend)}</b>${o.sec_area25_12m ? ` — ${o.sec_area25_12m.pv} political-violence events (${o.sec_area25_12m.pv_fat} fatalities) and ${o.sec_area25_12m.demo} demonstrations in the ${o.sec_area25_12m.lgas} LGAs touching 25 km, ${esc(en.security.window_12m.join(' – '))}` : ''}.</p>
+<p class="s">${o.sec_lga ? `Site LGA: ${esc(o.sec_lga.name)}, ${esc(o.sec_lga.state)} (${esc(o.sec_lga.basis)}). ` : ''}LGA aggregates, not point counts; reported events, not a risk judgement. Point counts: ${esc(o.sec_point_status)}. Source: ACLED, acleddata.com, via HDX (as of ${esc(en.security.as_of)}).</p>`
+  : `<div class="figs">
+  ${fig('Gas wasted', `${num(o.opportunity.gas_available_GWh, 0)} <span class="s">GWh/yr</span>`, 'sum over sites')}
+  ${fig('Generators it could fuel', `${num(o.opportunity.electric_potential_MW, 0)} <span class="s">MW</span>`, 'sum over sites')}
+  ${fig('Households it could power', num(o.opportunity.households_servable, 0), `${K.gap.household_mwh_per_yr} MWh/household/yr`)}
+  ${fig('Live-burning sites', `${o.opportunity.sites_live_burning}`, `${o.opportunity.sites_live_flagged} flagged under-report · FIRMS ${esc(en.live.window_last)}`)}
+</div><p class="s">${esc(o.opportunity.people_note)}.</p>`}
+<p class="s"><b>Assumptions.</b> ${GAP_ASSUMPTIONS.map(esc).join('; ')}. ${esc(GAP_NOTE)}</p>
 ${sc ? `<h2>Scenario: flaring cut by ${cut}% <span class="tag">scenario</span></h2>
 <p class="big"><b>Scenario assumption.</b> ${esc(sc.assumption)} (${Y} recorded volume). Rounded to 3 significant figures.</p>
 <table><thead><tr><th>Measure (${Y})</th><th class="n">As recorded</th><th class="n">Scenario <span class="tag">scenario</span></th><th class="n">Difference</th></tr></thead><tbody>
@@ -622,6 +812,26 @@ export default {
       if (path === '/api/sites') {
         const { sites, national, meta } = await loadLedger(env);
         return json({ count: sites.length, basis: PENALTY_BASIS, meta, national, sites });
+      }
+
+      if (path === '/api/live') {
+        const { sites, live, meta } = await loadLedger(env);
+        return json({
+          meta: meta.enrichment.live,
+          points_24h: live.points_24h,
+          sites: sites.filter((s) => s.live_nights_detected > 0 || s.live_detected_24h).map((s) => ({
+            site_id: s.site_id, field_name: s.field_name, operator: s.operator, lat: s.lat, lon: s.lon,
+            live_last_seen: s.live_last_seen, live_nights_detected: s.live_nights_detected, live_window_nights: s.live_window_nights,
+            live_nights_detected_pct: s.live_nights_detected_pct, live_mean_bright_ti4_K: s.live_mean_bright_ti4_K,
+            live_mean_frp_MW: s.live_mean_frp_MW, live_detected_24h: s.live_detected_24h, live_site_burning: s.live_site_burning,
+            live_flag: s.live_flag, trend_label: s.trend_label,
+          })),
+        });
+      }
+
+      if (path === '/api/context') {
+        const { national, meta } = await loadLedger(env);
+        return json({ method_version: METHOD_VERSION, enrichment: meta.enrichment, opportunity: national.opportunity });
       }
 
       if (path === '/api/national') {

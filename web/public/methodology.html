@@ -40,7 +40,9 @@
       (NUPRC), NNPC, or any operator. Penalty figures are <em>derived estimates</em>
       from the published regulatory basis and are not official assessments.
     </div>
-    <p class="lede" style="font-size:.92rem">Method version <strong>KFL-M 1.2</strong> (2026-10-17). Changes from 1.1: penalty basis corrected to the
+    <p class="lede" style="font-size:.92rem">Method version <strong>KFL-M 1.3</strong> (2026-10-17). New in 1.3: population around every site
+      (GRID3), power-gap estimates, a live NASA FIRMS thermal check with an under-report flag, and ACLED security context — see
+      <a href="#enrichment">§7a</a>. Changes in 1.2 from 1.1: penalty basis corrected to the
       <em>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018</em> (S.I. No. 9 of 2018) with both Reg. 13 tiers;
       the GFMR data vintage is labelled; emissions ratios updated to the June 2026 tracker (and unburned methane now
       reported as CH₄ mass); the Niger Delta flag uses the nine-state boundary instead of a rectangle; every threshold is
@@ -184,6 +186,33 @@
       <li><strong>Year player</strong> — each year shows that year's GFMR volume; “detected” means a positive volume in that year.</li>
     </ul>
     <p>The full method, with every constant and its source, is kept in the repository at <code>docs/METHODOLOGY.md</code>. Every decision brief is stamped with this method version and the data vintage.</p>
+
+    <h2 id="enrichment">7a. Opportunity and live enrichment <span style="font-weight:400;font-size:.9rem;color:var(--ink-soft)">method KFL-M 1.3 · 2026-10-17</span></h2>
+    <p>These turn a flare record into a development brief: the flared gas as fuel, the people nearby as demand, and a live
+      and a security check as current ground truth. <strong>Every figure here is an estimate</strong> on the assumptions shown.</p>
+    <ul>
+      <li><strong>Population</strong> (<code>scripts/pop_demand.py</code>) — people in GRID3 NGA Population v3.0 100 m cells whose
+        centre lies within 5, 10, 25 and 50 km of the site (zonal sum, raster to point; sea cells count as zero). The nearest
+        settlement is the nearest GRID3 named settlement point; its population is the people within 2 km of that point. The main
+        centre is the named settlement within 25 km with the largest 2 km population. Modelled population, not a census.</li>
+      <li><strong>Gas wasted</strong> = latest-year flared m³ × 0.0100 MWh/m³ (thermal energy of methane-rich gas), in GWh/yr.</li>
+      <li><strong>Generator it could fuel</strong> = that energy ÷ 8,760 h × 40% (simple-cycle gas turbine or gas engine). Under 10 MW
+        it is rounded to 0.1 MW, above to 1 MW.</li>
+      <li><strong>Households it could power</strong> = MW × 8,760 × 0.85 capacity factor ÷ 1.2 MWh per household per year
+        (100 kWh/month, just under the ESMAP Multi-Tier Framework Tier 4 floor of 1,250 kWh/yr). Rounded to 2 significant figures.</li>
+      <li><strong>People within 10 km without access</strong> = pop10km × (1 − the state rural access proxy). No rural-by-state access
+        rate is published, so the proxy is <em>derived</em>: the NDHS 2023-24 state population-with-electricity rate × the national
+        rural/total ratio (27.7 ÷ 50.5). States without an NDHS figure use the national rural rate. Applying a rural rate inside
+        urban rings such as Port Harcourt overstates the gap there.</li>
+      <li><strong>Live check</strong> (<code>scripts/live_thermal.py</code>, daily) — NASA FIRMS VIIRS 375 m detections within 1 km of a
+        site, over a rolling 30-night window. <em>Burning</em> = detected on ≥ 50% of nights (window ≥ 3 nights). Cloudy nights count as
+        misses, so the share is a lower bound. A site whose archive trend is <em>falling</em> but which is burning is flagged
+        <strong>under-report (live check) — investigate</strong>. That is a prompt to look, not a finding.</li>
+      <li><strong>Security</strong> (<code>scripts/ingest_acled.py</code>) — ACLED monthly events by LGA (via HDX), summed over the LGAs
+        that touch the 25 km and 50 km circles; trend = political-violence events in the last 12 complete months against the 12
+        before (rising or declining beyond ±25% and at least 3 events, otherwise flat). These are LGA aggregates, not point counts.
+        They are reported events, not a risk judgement. Point counts are pending a myACLED account.</li>
+    </ul>
 
     <h2 id="niger-delta">8. Niger Delta classification</h2>
     <p>

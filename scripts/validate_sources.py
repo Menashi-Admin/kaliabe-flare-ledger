@@ -1,4 +1,4 @@
-"""Source registry + validator for the Kaliabe Flare Ledger (KFL-M 1.2).
+"""Source registry + validator for the Kaliabe Flare Ledger (KFL-M 1.3).
 
 For every external source the ledger depends on, this script:
   * fetches it (HTTP GET, following redirects) and records reachability,
@@ -31,6 +31,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -94,6 +95,44 @@ SOURCES = [
          url='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
          used_for='slippy map (runtime dependency)', licence='BSD-2-Clause (declared)',
          pinned=None, check='bytes'),
+    # ---- KFL-M 1.3 enrichment sources
+    dict(id='grid3-pop', name='GRID3 NGA Population v3.0 — gridded population, 100 m (zip via WorldPop WOPR)',
+         url='https://wopr.worldpop.org/download/611',
+         used_for='pop5km / pop10km / pop25km / pop50km and settlement populations (scripts/pop_demand.py)',
+         licence='CC BY 4.0 (declared; GRID3 / WorldPop)',
+         pinned='12a45438c233bbfa52d120001eca20660cff86e715a91b3cfd66c94fc31aee42',
+         pinned_note='zip downloaded 2026-10-17; GeoTIFF sha256 b9d72f2d…c31aee42 → b9d72f2d7f538c69daca8ce68008bfdc07aa848b1885544af4ae77428ffbbe5e; national sum 237,527,782', check='grid3zip'),
+    dict(id='grid3-pop-svc', name='GRID3 NGA Population v3.0 — ArcGIS tile service metadata',
+         url='https://tiles.arcgis.com/tiles/BU6Aadhn6tbBEdyk/arcgis/rest/services/NGA_gridded_population_v3_tile_package/MapServer/0?f=json',
+         used_for='discovery / cross-check of the population release', licence='CC BY 4.0 (declared)', pinned=None, check='arcgis_layer'),
+    dict(id='grid3-settle', name='GRID3 NGA Settlement Points (settlement names) — ArcGIS feature service',
+         url='https://services3.arcgis.com/BU6Aadhn6tbBEdyk/arcgis/rest/services/Settlements_in_Nigeria/FeatureServer/0?f=json',
+         used_for='nearest_settlement and main_centre_25km names', licence='CC BY 4.0 (per the ArcGIS item, grid3-settle-item)', pinned=None, check='arcgis_fs'),
+    dict(id='grid3-settle-item', name='GRID3 NGA Settlement Names — ArcGIS item (licence)',
+         url='https://www.arcgis.com/sharing/rest/content/items/73d8522d1c4d4c75be6c10fa790c685c?f=json',
+         used_for='licence of the settlement points', licence=None, pinned=None, check='arcgis'),
+    dict(id='wdi-access', name='World Bank WDI — Access to electricity, % of population (EG.ELC.ACCS.ZS, NGA)',
+         url='https://api.worldbank.org/v2/country/NGA/indicator/EG.ELC.ACCS.ZS?format=json&per_page=5&mrv=3',
+         used_for='national access context (with .UR / .RU and SP.POP.TOTL; scripts/fetch_access_rates.py)',
+         licence='CC BY 4.0 (declared; World Bank open data)', pinned=None, check='wdi'),
+    dict(id='ndhs-2024', name='Nigeria DHS 2023-24 — population with electricity by state (The DHS Program API, HC_ELEC_P_ELC)',
+         url='https://api.dhsprogram.com/rest/dhs/data?indicatorIds=HC_ELEC_P_ELC&surveyIds=NG2024DHS&breakdown=subnational&f=json&perpage=200',
+         used_for='state access rates → the derived state rural access proxy',
+         licence='DHS Program terms: public aggregate indicators, cite NPC & ICF (declared)', pinned=None, check='dhs'),
+    dict(id='firms-viirs', name='NASA FIRMS — VIIRS 375 m NRT active fire, NOAA-20, Northern & Central Africa 24h CSV',
+         url='https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_Northern_and_Central_Africa_24h.csv',
+         used_for='live thermal check + last-24h layer (scripts/live_thermal.py; also the Suomi NPP and NOAA-21 files)',
+         licence='NASA Earth Science open data policy; acknowledgement requested (declared)', pinned=None, check='firms'),
+    dict(id='acled-hdx', name='ACLED Nigeria conflict events — HDX package (monthly events by LGA)',
+         url='https://data.humdata.org/api/3/action/package_show?id=nigeria-acled-conflict-data',
+         used_for='security context: LGA events, fatalities and 12-month trend (scripts/ingest_acled.py)', licence=None, pinned=None, check='hdx'),
+    dict(id='acled-api', name='ACLED API (point events) — requires a myACLED account',
+         url='https://acleddata.com/api/acled/read',
+         used_for='per-site radius counts sec_events_10/25/50km — PENDING CREDENTIALS (reachability only)',
+         licence='ACLED Terms of Use & Attribution Policy (declared)', pinned=None, check='acled_api'),
+    dict(id='cod-ab-nga', name='OCHA COD-AB Nigeria administrative boundaries — HDX package',
+         url='https://data.humdata.org/api/3/action/package_show?id=cod-ab-nga',
+         used_for='LGA polygons with P-codes for the ACLED join and the security layer', licence=None, pinned=None, check='hdx'),
 ]
 
 LOCAL = [
@@ -102,16 +141,26 @@ LOCAL = [
     ('web/public/layers/nga-lgas.geojson', 'LGA layer (simplified, rounded)'),
     ('web/public/layers/nga-pipelines.geojson', 'pipelines layer (clipped)'),
     ('data/gfmr_nigeria_sites_seed.json', 'Nigeria seed (476 sites)'),
+    ('web/public/data/pop_demand.json', 'population + settlements per site (scripts/pop_demand.py)'),
+    ('web/public/data/access_rates.json', 'electricity access, national + state (scripts/fetch_access_rates.py)'),
+    ('web/public/data/security.json', 'ACLED LGA security context per site (scripts/ingest_acled.py)'),
+    ('web/public/layers/security-lga.geojson', 'security layer: LGAs within 50 km of a site'),
+    ('web/public/data/live/live_thermal.json', 'live FIRMS summary (changes daily; checksum is a snapshot)'),
 ]
 
 
-def fetch(url):
+def fetch(url, src=None):
     req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': '*/*'})
     last = None
     for _ in range(2):
         try:
-            with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+            with urllib.request.urlopen(req, timeout=TIMEOUT if not src or src['check'] != 'grid3zip' else 900) as r:
                 return r.status, r.headers.get('content-type', ''), r.read(), r.geturl()
+        except urllib.error.HTTPError as e:
+            # An endpoint that answers 401/403 without credentials is reachable; the check decides.
+            if src and src['check'] == 'acled_api' and e.code in (401, 403):
+                return e.code, e.headers.get('content-type', ''), e.read(), url
+            last = e
         except Exception as e:  # noqa: BLE001 — record any failure verbatim
             last = e
     raise last
@@ -190,9 +239,66 @@ def check(src, data, ctype):
             mod = dt.datetime.fromtimestamp(m['modified'] / 1000, dt.timezone.utc).date().isoformat() if m.get('modified') else '?'
             lic = (m.get('licenseInfo') or '').strip()
             lic = re.sub('<[^>]+>', '', lic)[:160]
-            return f"item '{m.get('title')}', last modified {mod}", (f'USGS public domain — item licence text: “{lic}…” (machine-read)' if lic else None), notes
+            pre = 'USGS public domain — ' if src['id'] == 'usgs-pipelines' else ''
+            return f"item '{m.get('title')}', last modified {mod}", (f'{pre}item licence text: “{lic.strip()}…” (machine-read)' if lic else None), notes
         except Exception as e:  # noqa: BLE001
             return f'unverified: metadata not parseable ({e})', None, notes
+    if kind == 'grid3zip':
+        try:
+            z = zipfile.ZipFile(io.BytesIO(data))
+            tifs = [i for i in z.infolist() if i.filename.endswith('.tif')]
+            return (f"{', '.join(i.filename.split('/')[-1] for i in tifs)} (zip entry dated {'-'.join(map(str, tifs[0].date_time[:3]))}, "
+                    f"{tifs[0].file_size:,} B)" if tifs else 'unverified: no GeoTIFF in the zip'), None, notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: not a readable zip ({e})', None, notes
+    if kind == 'arcgis_layer':
+        try:
+            m = json.loads(data)
+            return f"layer '{m.get('name')}' ({m.get('type')})", None, notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: metadata not parseable ({e})', None, notes
+    if kind == 'arcgis_fs':
+        try:
+            m = json.loads(data)
+            ed = (m.get('editingInfo') or {}).get('dataLastEditDate')
+            ed = dt.datetime.fromtimestamp(ed / 1000, dt.timezone.utc).date().isoformat() if ed else '?'
+            if (m.get('copyrightText') or '').strip():
+                notes.append('copyright: ' + m['copyrightText'].strip()[:160])
+            return f"layer '{m.get('name')}', data last edited {ed}", None, notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: metadata not parseable ({e})', None, notes
+    if kind == 'wdi':
+        try:
+            m = json.loads(data)
+            rows = [r for r in m[1] if r['value'] is not None]
+            return f"WDI last updated {m[0].get('lastupdated')}; latest {rows[0]['date']} = {rows[0]['value']}%", 'CC BY 4.0 (World Bank open data; declared)', notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: WDI response not parseable ({e})', None, notes
+    if kind == 'dhs':
+        try:
+            d = json.loads(data)['Data']
+            st = [x for x in d if x['CharacteristicLabel'].startswith('..')]
+            riv = next((x['Value'] for x in st if 'Rivers' in x['CharacteristicLabel']), '?')
+            return f"NG2024DHS, {len(st)} state values (Rivers {riv}%)", None, notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: DHS response not parseable ({e})', None, notes
+    if kind == 'firms':
+        lines = data.decode('utf-8', 'ignore').splitlines()
+        if not lines or not lines[0].startswith('latitude,longitude,bright_ti4'):
+            return 'unverified: not a FIRMS VIIRS CSV', None, notes
+        dates = sorted({ln.split(',')[5] for ln in lines[1:] if ln.count(',') >= 12})
+        notes.append('near-real-time file: bytes change on every pass, so no checksum is pinned')
+        return f"VIIRS C2 NRT, {len(lines) - 1:,} detections, acq dates {dates[0] if dates else '?'} … {dates[-1] if dates else '?'}", None, notes
+    if kind == 'hdx':
+        try:
+            m = json.loads(data)['result']
+            notes.append('resources: ' + '; '.join(r['name'] for r in m['resources'])[:300])
+            return f"'{m['title']}', last modified {m.get('last_modified', '?')[:10]}", f"{m.get('license_title')} (machine-read from HDX)", notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: HDX response not parseable ({e})', None, notes
+    if kind == 'acled_api':
+        notes.append('PENDING CREDENTIALS: needs a myACLED account (OAuth). The sample in data/samples/ is SYNTHETIC and only exercises the code path.')
+        return 'endpoint reachable; not pulled — no myACLED account on this box', None, notes
     if kind == 'pdf':
         return ('PDF' if data[:4] == b'%PDF' else 'unverified: response is not a PDF') + ' (no version field to read)', None, notes
     if kind == 'html':
@@ -207,8 +313,8 @@ def main():
     for src in SOURCES:
         rec = dict(src)
         try:
-            status, ctype, data, final = fetch(src['url'])
-            rec.update(reachable=200 <= status < 400, status=status, ctype=ctype.split(';')[0], size=len(data),
+            status, ctype, data, final = fetch(src['url'], src)
+            rec.update(reachable=200 <= status < 400 or (src['check'] == 'acled_api' and status in (401, 403)), status=status, ctype=ctype.split(';')[0], size=len(data),
                        sha256=hashlib.sha256(data).hexdigest(), final=final)
             ver, lic, notes = check(src, data, ctype)
             rec['version'] = ver
@@ -240,7 +346,7 @@ def main():
     md = [
         '# Data sources registry',
         '',
-        f'Generated by `scripts/validate_sources.py` on **{now.isoformat()}** · method KFL-M 1.2.',
+        f'Generated by `scripts/validate_sources.py` on **{now.isoformat()}** · method KFL-M 1.3.',
         f'Result: **{len(rows) - failed}/{len(rows)} reachable**' + (f' — **{failed} UNREACHABLE** (the script exited non-zero)' if failed else '') + '.',
         '',
         'Each entry records reachability, the version or vintage we could establish, a SHA-256 checksum of the fetched bytes, and the licence.',
@@ -261,6 +367,13 @@ def main():
         md.append(f"- **{r['id']}** — used for: {r['used_for']}." + (' ' + ' '.join(n.rstrip('.') + '.' for n in extra) if extra else ''))
     md += ['', '## Local derived artefacts', '', '| File | What | Bytes | SHA-256 |', '|---|---|---|---|']
     md += [f'| `{p}` | {w} | {s:,} | `{h}` |' for p, w, s, h in local]
+    md += ['', '## Status flags', '',
+           '- **ACLED — requires myACLED account; LGA aggregates (real, via HDX) ingested; point-event bulk pull pending credentials.** '
+           'The per-site radius fields `sec_events_10km/25km/50km` are null with `sec_point_status = pending`. '
+           '`data/samples/acled_point_sample_SYNTHETIC.csv` is invented test data for `scripts/ingest_acled.py --self-test` only — never shipped.',
+           '- **State rural access** — no published rural-by-state figure exists (WDI, NDHS). The proxy is derived: NDHS 2024 state population-with-electricity × national rural/total ratio; national rural rate as fallback.',
+           '- **NASA FIRMS** — near-real-time; refreshed daily by `.github/workflows/live-thermal.yml`; the local `live_thermal.json` checksum below is a snapshot.',
+           '']
     md += ['', 'Not ingested (studied only): Kayrros, GHGSat, Enverus — proprietary terms. Raw VIIRS Nightfire per-night files need an EOG login and are not fetched.', '']
 
     if '--no-write' not in sys.argv:

@@ -31,6 +31,11 @@
     top_decile_fraction: 0.1,
     scenario_step_pct: 5,
     scenario_sig_figs: 3,
+    // KFL-M 1.3 — live thermal (NASA FIRMS) and security trend (ACLED).
+    live_min_window_nights: 3,
+    live_burning_night_share_pct: 50,
+    sec_trend_band_pct: 25,
+    sec_trend_min_abs_events: 3,
   };
   const THRESHOLD_DOCS = [
     ['trend_stable_band_pct', 'Trend: stable band', '±5%', 'A recent-vs-baseline change inside ±5% is labelled stable.'],
@@ -43,6 +48,9 @@
     ['newly_detected_years', 'Watchlist “newly detected”', 'last 2 years', 'First positive volume in the latest year or the year before.'],
     ['top_decile_fraction', 'Top decile', 'top 10% of the full site set', 'Latest-year volume, ranked over every site in the ledger (detected or not); the cut-off volume is shown beside the list.'],
     ['scenario_sig_figs', 'Scenario rounding', '3 significant figures', 'Scenario outputs are rounded to 3 significant figures (step 5%) so they are not read as precise; always labelled “scenario” with the assumption.'],
+    ['live_burning_night_share_pct', 'Live thermal: “burning now”', '≥50% of nights in the window, window ≥3 nights', 'A site is live-burning when VIIRS (NASA FIRMS) detected it on at least half the nights in the rolling window. Cloudy nights count as misses, so the share is a lower bound.'],
+    ['live_min_window_nights', 'Live thermal: minimum window', '3 nights', 'No live verdict until the window covers this many nights.'],
+    ['sec_trend_band_pct', 'Security trend band', '±25% and ±3 events', 'Political-violence events in the LGAs touching the 25 km circle, last 12 months vs the 12 before: rising / declining only if the change is beyond ±25% and at least 3 events; otherwise flat.'],
   ];
 
   // million m³ → every derived unit. k: { m3_per_1000scf, penalty_usd_per_1000scf_upper,
@@ -93,6 +101,70 @@
     const saved = {};
     for (const key of Object.keys(base)) saved[key] = base[key] - after[key];
     return { cut_pct: cut, base, after, saved, label: 'scenario', assumption: `a uniform ${cut}% cut to the recorded latest-year volume; every output scales linearly with volume — a scenario, not a forecast` };
+  }
+
+  // ------------------------------------------------------- power gap (1.3)
+  // The flared gas as fuel, the people nearby as demand. Every output is an
+  // ESTIMATE on stated assumptions (k.gap, published by the Worker):
+  //   gas_available_GWh     = latest-year m³ × gas_mwh_per_m3 ÷ 1,000
+  //   electric_potential_MW = gas_available_MWh ÷ 8,760 × gen_efficiency
+  //       (the generator size the gas could fuel continuously)
+  //   households_servable   = MW × 8,760 × capacity_factor ÷ household_mwh_per_yr
+  //   people_within_10km_not_grid = pop10km × (1 − rural access proxy)
+  // ctx: { pop10km, rural_access_pct }. Missing inputs give null, never a guess.
+  function roundMW(mw) {
+    if (mw == null || !isFinite(mw)) return null;
+    return mw < 10 ? Math.round(mw * 10) / 10 : Math.round(mw);
+  }
+  function powerGap(millionM3, ctx, k) {
+    const g = k.gap;
+    const v = Number.isFinite(millionM3) && millionM3 > 0 ? millionM3 : 0;
+    const mwh = v * 1e6 * g.gas_mwh_per_m3;
+    const mw = (mwh / 8760) * g.gen_efficiency;
+    const hh = (mw * 8760 * g.capacity_factor) / g.household_mwh_per_yr;
+    const acc = ctx && Number.isFinite(ctx.rural_access_pct) ? ctx.rural_access_pct : null;
+    const pop = ctx && Number.isFinite(ctx.pop10km) ? ctx.pop10km : null;
+    const dark = pop != null && acc != null ? pop * (1 - acc / 100) : null;
+    return {
+      gas_available_GWh: mwh / 1e3 >= 10 ? Math.round(mwh / 1e3) : Math.round(mwh / 1e2) / 10,
+      electric_potential_MW: roundMW(mw),
+      electric_potential_MW_exact: mw,
+      households_servable: hh > 0 ? sig(hh, 2) : 0,
+      people_within_10km_not_grid: dark == null ? null : dark > 0 ? sig(dark, 2) : 0,
+      rural_access_proxy_pct: acc,
+      label: 'estimate',
+    };
+  }
+
+  // ------------------------------------------------ live thermal check (1.3)
+  // live: per-site FIRMS summary (or undefined), win: nights in the window.
+  // Returns burning status and the under-report flag: the archive says
+  // "falling" but VIIRS still sees the flare on ≥ half the recent nights.
+  function liveCheck(live, win, trendLabel, T = THRESHOLDS) {
+    if (!(win >= T.live_min_window_nights)) return { live_site_burning: null, live_status: 'insufficient window', live_flag: null };
+    const share = live ? live.live_nights_detected_pct : 0;
+    const burning = share >= T.live_burning_night_share_pct;
+    const flag = burning && trendLabel === 'falling' ? 'under-report (live check) — investigate' : null;
+    return {
+      live_site_burning: burning,
+      live_status: !live ? 'not detected in window' : burning ? 'burning' : 'intermittent',
+      live_flag: flag,
+    };
+  }
+
+  // ------------------------------------------------------ security trend (1.3)
+  // monthly: 24 counts, oldest first. Last 12 vs the 12 before.
+  function secTrend(monthly, T = THRESHOLDS) {
+    if (!Array.isArray(monthly) || monthly.length < 24) return { sec_trend: 'pending live data', last12: null, prev12: null, pct: null };
+    const sum = (a) => a.reduce((x, y) => x + y, 0);
+    const prev = sum(monthly.slice(-24, -12)), last = sum(monthly.slice(-12));
+    if (!prev && !last) return { sec_trend: 'none recorded', last12: 0, prev12: 0, pct: null };
+    const pct = prev ? ((last - prev) / prev) * 100 : null;
+    const big = Math.abs(last - prev) >= T.sec_trend_min_abs_events;
+    const out = (s) => ({ sec_trend: s, last12: last, prev12: prev, pct });
+    if (big && (pct == null || pct > T.sec_trend_band_pct) && last > prev) return out('rising');
+    if (big && pct != null && pct < -T.sec_trend_band_pct) return out('declining');
+    return out('flat');
   }
 
   // ---------------------------------------------------------------- formatting
@@ -172,5 +244,5 @@
     </svg>`;
   }
 
-  return { THRESHOLDS, THRESHOLD_DOCS, convert, scenario, changeSignificant, rising, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
+  return { THRESHOLDS, THRESHOLD_DOCS, convert, scenario, changeSignificant, rising, powerGap, liveCheck, secTrend, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
 });

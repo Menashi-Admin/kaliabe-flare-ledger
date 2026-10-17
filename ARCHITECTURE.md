@@ -28,6 +28,9 @@
    │  verdict engine · penalty + CO₂e math · REST API                 │
    │  /api/summary /api/sites /api/sites/trend /api/operators         │
    │  /api/national /api/brief (HTML/CSV) /api/digest.csv /api/health │
+   │  /api/live /api/context (KFL-M 1.3 enrichment)                   │
+   │  bundles pop_demand / access_rates / security JSON; reads the    │
+   │  daily FIRMS file from the public repo (bundled copy fallback)   │
    │  decision fields in one pass: change, percentile, cumulative,    │
    │  projection — maths shared with web via js/ledger-core.js        │
    └──────────────────────────────────────────────────────────────────┘
@@ -46,6 +49,20 @@
    │  functions/api/[[path]].js — same-origin proxy to the Worker     │
    └──────────────────────────────────────────────────────────────────┘
 ```
+
+## Enrichment data flow (KFL-M 1.3)
+
+```
+GRID3 pop raster (100 m) ─ scripts/pop_demand.py ────────┐
+GRID3 settlement points  ─┘                               ├─▶ web/public/data/*.json ─▶ bundled by the Worker
+WDI + NDHS 2023-24 ────── scripts/fetch_access_rates.py ──┤     (powerGap / secTrend in ledger-core.js)
+ACLED (HDX) + COD-AB ──── scripts/ingest_acled.py ────────┘──▶ web/public/layers/security-lga.geojson (Pages)
+NASA FIRMS VIIRS NRT ──── scripts/live_thermal.py (GitHub Action, daily 06:30 UTC)
+                             └▶ commit web/public/data/live/live_thermal.json
+                                 └▶ Worker fetches raw.githubusercontent.com (15-min cache) → liveCheck()
+```
+
+The daily refresh needs no redeploy and no Cloudflare secret in GitHub: the Action only writes to the repo.
 
 ## Why this shape
 

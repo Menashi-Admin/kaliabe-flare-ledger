@@ -60,6 +60,36 @@
           <td>Public government gazette.</td>
           <td>ngfcp.nuprc.gov.ng (scanned PDF)</td>
         </tr>
+        <tr>
+          <td><strong>GRID3 NGA Population v3.0</strong> <span class="kv__sub">KFL-M 1.3</span></td>
+          <td>Bayesian-modelled gridded population, 100 m cells, scaled to UN-WPP 2025 (national total 237.5 m). Summed within 5 / 10 / 25 / 50 km of every site. The raster is processed offline; only the 476-row result ships.</td>
+          <td>CC BY 4.0</td>
+          <td>wopr.worldpop.org/download/611</td>
+        </tr>
+        <tr>
+          <td><strong>GRID3 NGA Settlement Points</strong> (2021)</td>
+          <td>Named settlement points (eHealth Africa, Proxy Logics, ORNL): nearest settlement and largest centre within 25 km.</td>
+          <td>CC BY 4.0</td>
+          <td>GRID3 ArcGIS feature service</td>
+        </tr>
+        <tr>
+          <td><strong>Electricity access</strong> — World Bank WDI (Tracking SDG7) and Nigeria DHS 2023-24</td>
+          <td>National access 62.5% (urban 85.5%, rural 23.5%; WDI 2024). State population-with-electricity from NDHS 2024; the state rural proxy is <em>derived</em> (state rate × national rural/total ratio) because no rural-by-state figure is published.</td>
+          <td>CC BY 4.0 (WDI); DHS Program terms, cite NPC/ICF</td>
+          <td>api.worldbank.org · api.dhsprogram.com</td>
+        </tr>
+        <tr>
+          <td><strong>NASA FIRMS — VIIRS 375 m active fire NRT</strong></td>
+          <td>Hot-pixel detections (bright_ti4 K, FRP MW) from Suomi NPP, NOAA-20 and NOAA-21, pulled daily for the live thermal check and the last-24h layer.</td>
+          <td>NASA open data (acknowledgement requested)</td>
+          <td>firms.modaps.eosdis.nasa.gov (regional CSV, no key)</td>
+        </tr>
+        <tr>
+          <td><strong>ACLED — Nigeria conflict events</strong></td>
+          <td>Monthly political-violence, civilian-targeting and demonstration events (and fatalities) by LGA, via HDX. Point events need a myACLED account and are <em>not yet ingested</em>.</td>
+          <td>ACLED Terms of Use &amp; Attribution Policy (non-commercial monitoring)</td>
+          <td>data.humdata.org/dataset/nigeria-acled-conflict-data</td>
+        </tr>
       </tbody>
     </table>
 
@@ -70,6 +100,8 @@
         <tr><td><strong>Nigeria states</strong> (37)</td><td>geoBoundaries gbOpen NGA ADM1 (GRID3)</td><td>CC BY 4.0</td><td><a class="link" href="layers/nga-states.geojson">nga-states.geojson</a></td></tr>
         <tr><td><strong>Local Government Areas</strong> (774)</td><td>geoBoundaries gbOpen NGA ADM2 (GRID3)</td><td>CC BY 4.0</td><td><a class="link" href="layers/nga-lgas.geojson">nga-lgas.geojson</a></td></tr>
         <tr><td><strong>Oil &amp; gas pipelines</strong> (154)</td><td>USGS Africa oil &amp; gas infrastructure; attributes from Cross-border Information (London) Ltd. / African Energy Live Data</td><td>Public domain (USGS)</td><td><a class="link" href="layers/nga-pipelines.geojson">nga-pipelines.geojson</a></td></tr>
+        <tr><td><strong>Live thermal (last 24h)</strong></td><td>NASA FIRMS / LANCE VIIRS 375 m NRT, Nigeria bbox, refreshed daily by a GitHub Action</td><td>NASA open data</td><td><a class="link" href="/api/live">/api/live</a></td></tr>
+        <tr><td><strong>Security: ACLED events by LGA</strong> (LGAs within 50 km of a site)</td><td>ACLED via HDX, joined by P-code to OCHA COD-AB admin-2 boundaries</td><td>ACLED terms; COD-AB CC BY-IGO</td><td><a class="link" href="layers/security-lga.geojson">security-lga.geojson</a></td></tr>
       </tbody>
     </table>
     <p>Coordinates are rounded to 5 decimal places (~1 m) for the web; geometry is otherwise unchanged.
@@ -94,13 +126,14 @@
       <a href="kaliabe-flare-digest.csv" class="link" download>kaliabe-flare-digest.csv</a>.
     </p>
 
-    <h2>Live ingestion (stub)</h2>
+    <h2>Live ingestion</h2>
     <div class="notice">
-      Raw per-night VIIRS Nightfire (VNF) files at eogdata.mines.edu require an
-      Earth Observation Group account login. Until that credential exists, the
-      ledger is fed by the published GFMR per-site dataset (which is itself VIIRS
-      Nightfire–derived and license-clean). This is noted honestly rather than
-      faked: nightly ingest is the documented next slice.
+      <strong>Live thermal (KFL-M 1.3).</strong> A GitHub Action (<code>.github/workflows/live-thermal.yml</code>) pulls the
+      NASA FIRMS VIIRS 375 m regional files every day, matches detections to ledger sites within 1 km, and commits a rolling
+      30-night summary that the API reads. The archive verdicts still come from GFMR annual volumes; the live check adds
+      “is it burning now?”. Raw per-night VIIRS Nightfire (VNF) files at eogdata.mines.edu need an EOG login and are not fetched.<br><br>
+      <strong>Security.</strong> ACLED point events need a myACLED account. Until that exists, the security block uses ACLED's
+      public LGA-level monthly aggregates; per-site radius counts are marked pending.
     </div>
 
     <h2>Sources</h2>
@@ -110,6 +143,10 @@
       <li>Flare Gas (Prevention of Waste and Pollution) Regulations, 2018, S.I. No. 9 of 2018, Official Gazette No. 88 Vol. 105 (9 July 2018), as hosted by the NUPRC Nigerian Gas Flare Commercialisation Programme: <a href="https://ngfcp.nuprc.gov.ng/wp-content/uploads/2022/09/FGN-Official-Gazette-on-Flare-Gas-v2.0-002.pdf" target="_blank" rel="noopener">ngfcp.nuprc.gov.ng</a> (the 2022 in the URL is the upload date, not the instrument)</li>
       <li>World Bank, Global Gas Flaring Tracker, June 2026: <a href="https://thedocs.worldbank.org/en/doc/b34e0c054bb3fe3695e70154c28eef3f-0400072026/original/Global-Gas-FlaringTracker-June-23-2026.pdf" target="_blank" rel="noopener">thedocs.worldbank.org</a></li>
       <li>Schuit et al. 2023 (methane hot-spot detection method, CAMS): <a href="https://confluence.ecmwf.int/spaces/CKB/pages/505389789/Methane+Hotspot+Explorer+documentation" target="_blank" rel="noopener">atmosphere.copernicus.eu / CAMS documentation</a></li>
+      <li>GRID3 NGA Population v3.0 and Settlement Points (CC BY 4.0): <a href="https://grid3.org" target="_blank" rel="noopener">grid3.org</a> · <a href="https://wopr.worldpop.org/?NGA/Population/v3.0" target="_blank" rel="noopener">WorldPop WOPR</a></li>
+      <li>NASA FIRMS / LANCE: <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">firms.modaps.eosdis.nasa.gov</a> — “We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS), part of NASA's Earth Science Data and Information System (ESDIS).”</li>
+      <li>ACLED (Armed Conflict Location &amp; Event Data): <a href="https://acleddata.com" target="_blank" rel="noopener">acleddata.com</a>, via <a href="https://data.humdata.org/dataset/nigeria-acled-conflict-data" target="_blank" rel="noopener">HDX</a>; boundaries OCHA COD-AB (<a href="https://data.humdata.org/dataset/cod-ab-nga" target="_blank" rel="noopener">HDX cod-ab-nga</a>)</li>
+      <li>World Bank WDI (EG.ELC.ACCS.*) and Nigeria DHS 2023-24 (NPC &amp; ICF), via <a href="https://api.dhsprogram.com" target="_blank" rel="noopener">The DHS Program API</a></li>
       <li>World Bank, <em>Gas Flaring Estimates: Methodology for determining flare gas volumes from satellite data</em>: <a href="https://pubdocs.worldbank.org/en/853661587048977000/Estimation-of-flare-gas-volumes-from-satellite-data-002.pdf" target="_blank" rel="noopener">pubdocs.worldbank.org</a></li>
     </ul>
 

@@ -117,6 +117,13 @@
     return o || d || 'Unnamed segment';
   }
 
+  // KFL-M 1.3 — live thermal (NASA FIRMS bright_ti4 ramp, FRP size) and ACLED LGA choropleth.
+  const BT4 = [[0, '#f2d27a', '< 310 K'], [310, '#e8a33a', '310–330 K'], [330, '#d0602a', '330–350 K'], [350, '#9e2a1c', '≥ 350 K']];
+  const bt4Col = (k) => BT4.reduce((c, b) => (k >= b[0] ? b[1] : c), BT4[0][1]);
+  const frpR = (f) => Math.min(9, 2 + Math.sqrt(Math.max(0, f)) * 1.1);
+  const SEC = [[0, 'transparent', '0'], [1, '#f1dccb', '1–2'], [3, '#e3b08c', '3–5'], [6, '#cf7a52', '6–10'], [11, '#a8432a', '11+']];
+  const secCol = (n) => SEC.reduce((c, b) => (n >= b[0] ? b[1] : c), SEC[0][1]);
+
   // ------------------------------------------------------------- sparkline
   // Hand-rolled SVG bars; brackets mark the trend's baseline and recent windows.
   function sparkline(series) {
@@ -182,7 +189,7 @@
     map.on('blur', () => map.scrollWheelZoom.disable());
 
     // Panes = explicit z-order for our overlay stack.
-    [['lgas', 405], ['states', 410], ['pipes', 420], ['context', 430], ['flares', 450], ['halo', 460]]
+    [['sec', 403], ['lgas', 405], ['states', 410], ['pipes', 420], ['context', 430], ['flares', 450], ['live', 455], ['halo', 460]]
       .forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
     map.getPane('context').style.pointerEvents = 'none';
     map.getPane('halo').style.pointerEvents = 'none';
@@ -231,6 +238,8 @@
       pipes: { group: L.layerGroup(), on: true },
       states: { group: L.layerGroup(), on: true },
       lgas: { group: L.layerGroup(), on: false },
+      live: { group: L.layerGroup(), on: false },
+      security: { group: L.layerGroup(), on: false },
     };
     const ctx = L.layerGroup().addTo(map);   // selection context (pipeline / LGA highlight)
     const halo = L.layerGroup().addTo(map);
@@ -240,12 +249,16 @@
       { id: 'pipes', name: 'Oil & gas pipelines', src: 'USGS Africa O&G infrastructure', lic: 'Public domain', file: 'nga-pipelines.geojson' },
       { id: 'states', name: 'States', src: 'geoBoundaries ADM1 · GRID3', lic: 'CC BY 4.0', file: 'nga-states.geojson' },
       { id: 'lgas', name: 'Local Government Areas', src: 'geoBoundaries ADM2 · GRID3', lic: 'CC BY 4.0', file: 'nga-lgas.geojson' },
+      { id: 'live', name: 'Live thermal (last 24h)', src: 'NASA FIRMS / LANCE · VIIRS 375 m NRT', lic: 'NASA open data', url: opts.liveUrl || '/api/live' },
+      { id: 'security', name: 'Security: ACLED events by LGA', src: 'ACLED via HDX · political violence, last 12 months', lic: 'ACLED terms, attribution', file: 'security-lga.geojson' },
     ];
     const swatch = {
       flares: `<svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="${C.accent}"/></svg>`,
       pipes: `<svg viewBox="0 0 14 14"><path d="M1 10 13 4" stroke="${C.ink}" stroke-width="1.4"/></svg>`,
       states: `<svg viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="11" height="11" fill="none" stroke="${C.ink}" stroke-opacity=".6"/></svg>`,
       lgas: `<svg viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="11" height="11" fill="none" stroke="${C.soft}" stroke-dasharray="2 2"/></svg>`,
+      live: `<svg viewBox="0 0 14 14"><circle cx="5" cy="8" r="2.4" fill="${BT4[2][1]}"/><circle cx="10" cy="5" r="3.2" fill="${BT4[3][1]}"/></svg>`,
+      security: `<svg viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="11" height="11" fill="${SEC[3][1]}" fill-opacity=".7" stroke="${C.soft}" stroke-width=".6"/></svg>`,
     };
     for (const d of DEFS) {
       const li = document.createElement('li');
@@ -281,8 +294,9 @@
       if (state.geo[id + '_p']) return state.geo[id + '_p'];
       const def = DEFS.find((d) => d.id === id);
       setCount(id, '…');
-      const p = fetch(layerBase + def.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((gj) => {
+      const p = fetch(def.url || layerBase + def.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((gj) => {
         state.geo[id] = gj;
+        if (id === 'live') { buildLive(gj); return gj; }
         state.idx[id] = indexOf(gj);
         build(id, gj);
         setCount(id, num(gj.features.length, 0));
@@ -298,6 +312,20 @@
         L.geoJSON(gj, { pane: 'states', interactive: false, style: { color: C.ink, weight: 0.9, opacity: 0.5, fill: false } }).addTo(g);
       } else if (id === 'lgas') {
         L.geoJSON(gj, { pane: 'lgas', renderer: lgaRenderer, interactive: false, style: { color: C.soft, weight: 0.5, opacity: 0.45, dashArray: '2 3', fill: false } }).addTo(g);
+      } else if (id === 'security') {
+        L.geoJSON(gj, {
+          pane: 'sec',
+          style: (f) => ({ color: C.soft, weight: 0.5, opacity: 0.5, fillColor: secCol(f.properties.pv), fillOpacity: f.properties.pv ? 0.62 : 0 }),
+          onEachFeature: (f, lyr) => {
+            const p = f.properties;
+            lyr.bindTooltip(`<b>${esc(p.name)}</b>, ${esc(p.state)}<br>${p.pv} political-violence events (${p.pv_fat} fatalities)<br>${p.demo} demonstrations · previous 12 months: ${p.pv_prev12} events`, { className: 'kfl-tip', sticky: true });
+          },
+        }).addTo(g);
+        const m = gj.meta || {};
+        row('security').querySelector('[data-legend]').innerHTML =
+          SEC.slice(1).map(([, c, l]) => `<span class="lg"><svg viewBox="0 0 14 14"><rect x="1.5" y="1.5" width="11" height="11" fill="${c}"/></svg>${l} events</span>`).join('') +
+          `<span class="lg">Point clusters: pending (needs a myACLED account)</span>`;
+        row('security').querySelector('.layer__src').innerHTML = `ACLED (acleddata.com) via HDX · LGA aggregates, ${esc((m.window_12m || []).join(' – '))} · as of ${esc(m.as_of || '—')} · reported events, not a risk judgement · boundaries OCHA COD-AB`;
       } else if (id === 'pipes') {
         L.geoJSON(gj, {
           pane: 'pipes',
@@ -314,6 +342,27 @@
         row('pipes').querySelector('[data-legend]').innerHTML = Object.entries(PIPE).map(([k, v]) =>
           `<span class="lg"><svg viewBox="0 0 22 8"><path d="M1 4H21" stroke="${C.ink}" stroke-width="1.4" ${v.dashArray ? `stroke-dasharray="${v.dashArray}"` : ''} stroke-linecap="round"/></svg>${v.label}<em>${counts[k] || 0}</em></span>`).join('');
       }
+    }
+
+    // Live thermal: every VIIRS detection in the Nigeria bbox in the last 24 h.
+    // Points at a ledger site get an ink outline; the rest are mostly bush fires.
+    function buildLive(d) {
+      const g = layers.live.group, m = d.meta || {};
+      const pts = d.points_24h || [];
+      for (const [lat, lon, bt4, frp, sat, at, dn, sid] of pts) {
+        const site = sid ? state.byId.get(sid) : null;
+        L.circleMarker([lat, lon], { pane: 'live', radius: frpR(frp), color: site ? C.ink : bt4Col(bt4), weight: site ? 1.2 : 0.4, fillColor: bt4Col(bt4), fillOpacity: 0.85, bubblingMouseEvents: false })
+          .bindTooltip(`<b>${site ? esc(site.field_name || sid) + ' · ledger site' : 'VIIRS hotspot'}</b><br>bright_ti4 ${num(bt4, 1)} K · FRP ${num(frp, 1)} MW<br>${esc(sat)} · ${esc(at)} · ${dn === 'N' ? 'night' : 'day'}`, { className: 'kfl-tip', direction: 'top' })
+          .on('click', () => site && select(sid))
+          .addTo(g);
+      }
+      const atSites = pts.filter((p) => p[7]).length;
+      setCount('live', num(pts.length, 0));
+      row('live').querySelector('[data-legend]').innerHTML =
+        BT4.map(([, c, l]) => `<span class="lg"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="4" fill="${c}"/></svg>${l}</span>`).join('') +
+        `<span class="lg"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="4" fill="${BT4[2][1]}" stroke="${C.ink}" stroke-width="1.2"/></svg>at a ledger site<em>${atSites}</em></span>` +
+        `<span class="lg">size ∝ √FRP (MW)</span>`;
+      row('live').querySelector('.layer__src').innerHTML = `NASA FIRMS / LANCE · VIIRS 375 m NRT (Suomi NPP, NOAA-20, NOAA-21) · NASA open data · last acquisition ${esc(m.latest_acquisition || '—')} · retrieved ${esc((m.retrieved || '').slice(0, 16).replace('T', ' '))} UTC`;
     }
 
     function toggle(id, on) {
@@ -342,7 +391,7 @@
         const m = L.circleMarker([s.lat, s.lon], { renderer: flareRenderer, bubblingMouseEvents: false, opacity: 1 });
         m.bindTooltip(() => {
           const v = volAt(s), y = yearLbl() || s.latest_year;
-          return `<b>${esc(s.field_name || s.site_id)}</b> · ${esc(s.operator)}<br>${y}: ${v > 0 ? num(v, 1) + ' million m³' : 'below detection floor'}`;
+          return `<b>${esc(s.field_name || s.site_id)}</b> · ${esc(s.operator)}<br>${y}: ${v > 0 ? num(v, 1) + ' million m³' : 'below detection floor'}${s.live_detected_24h ? '<br><span class="live-dot"></span>live now · VIIRS, last 24 h' : ''}`;
         }, { className: 'kfl-tip', direction: 'top' });
         m.on('click', () => select(s.site_id));
         markers.set(s.site_id, m);
@@ -456,7 +505,9 @@
         <p class="drawer__verdict">
           <span class="verdict ${on ? 'verdict--on' : 'verdict--off'}">${on ? 'Verified flare' : 'Unverified · below floor'}</span>
           <span class="drawer__conf">${Math.round((s.confidence || 0) * 100)}% confidence<sup>5</sup></span>
+          ${s.live_detected_24h ? '<span class="live-pill"><span class="live-dot"></span>Live now<sup>10</sup></span>' : ''}
         </p>
+        ${s.live_flag ? `<p class="live-flag">${esc(s.live_flag)}<span class="kv__sub">The archive trend is falling, but VIIRS saw this flare on ${s.live_nights_detected} of ${s.live_window_nights} recent nights.</span></p>` : ''}
 
         <div class="fig">
           <p class="fig__label">${s.latest_year} flared volume<sup>1</sup></p>
@@ -473,6 +524,7 @@
           <div><dt>CO₂e<sup>4</sup></dt><dd>${num(s.co2e_tonnes_latest, 0)} t</dd><dd class="kv__sub">unburned CH₄ ${num(s.methane_tonnes_latest, 0)} t</dd></div>
         </dl>
         <p class="drawer__floor"><b>Detection floor<sup>5</sup></b>${esc(s.detection_floor)}</p>
+        ${opportunityHtml(s, m)}
         ${opts.drawerExtra ? opts.drawerExtra(s, m) : ''}
 
         <h4 class="drawer__h">Site</h4>
@@ -501,6 +553,10 @@
           <li>Kaliabe verdict method; see <a href="methodology.html">methodology</a>.</li>
           <li>geoBoundaries gbOpen NGA ADM1/ADM2 (GRID3), CC BY 4.0. Point-in-polygon computed in your browser.</li>
           <li>USGS Africa oil &amp; gas infrastructure (attributes: Cross-border Information / African Energy), public domain. Nearest-line distance computed in your browser.</li>
+          <li>GRID3 NGA Population v3.0 (100 m, UN-WPP 2025-scaled; modelled) and GRID3 NGA Settlement Points (2021), CC BY 4.0. Zonal sums in <span class="mono">scripts/pop_demand.py</span>.</li>
+          <li>Kaliabe power-gap estimate (${esc((m.method_version || '').split(' ')[0] + ' ' + ((m.method_version || '').split(' ')[1] || ''))}): ${esc(((m.enrichment || {}).gap || {}).assumptions ? m.enrichment.gap.assumptions.join('; ') : '')}. Access: World Bank WDI (CC BY 4.0) and Nigeria DHS 2023-24 (NPC/ICF).</li>
+          <li>NASA FIRMS / LANCE, VIIRS 375 m active fire NRT (Suomi NPP, NOAA-20, NOAA-21); NASA open data. Window ${esc(((m.enrichment || {}).live || {}).window_first || '')} – ${esc(((m.enrichment || {}).live || {}).window_last || '')}, retrieved ${esc((((m.enrichment || {}).live || {}).retrieved || '').slice(0, 10))}.</li>
+          <li>ACLED (Armed Conflict Location &amp; Event Data), acleddata.com — Nigeria monthly events by LGA via HDX, as of ${esc(((m.enrichment || {}).security || {}).as_of || '')}; OCHA COD-AB boundaries (CC BY-IGO). Non-commercial monitoring evidence, not a judgement.</li>
         </ol>`;
       drawer.querySelector('.drawer__close').addEventListener('click', close);
       if (opts.onDrawer) opts.onDrawer(drawer, s, m);
@@ -510,6 +566,50 @@
       if (c.pipe) L.geoJSON(c.pipe.f, { pane: 'context', interactive: false, style: { color: C.accent, weight: 3.2, opacity: 0.95, lineCap: 'round' } }).addTo(ctx);
       const admin = c.lga || c.state;
       if (admin) L.geoJSON(admin, { pane: 'context', interactive: false, style: { color: C.ink, weight: 1.4, opacity: 0.7, fillColor: C.accent, fillOpacity: 0.05 } }).addTo(ctx);
+    }
+
+    // KFL-M 1.3 drawer blocks: generation opportunity, population, live check, security.
+    function opportunityHtml(s, m) {
+      const en = m.enrichment || {};
+      const live = en.live || {}, sec = en.security || {};
+      const a25 = s.sec_area25_12m;
+      const tcls = { rising: 'trend-up', declining: 'trend-down' }[s.sec_trend] || '';
+      return `
+        <h4 class="drawer__h">Generation opportunity <span class="est">estimate</span><sup>9</sup></h4>
+        <dl class="facts facts--2">
+          <div><dt>Gas wasted</dt><dd>${num(s.gas_available_GWh, 1)} GWh/yr</dd><dd class="kv__sub">${s.latest_year} flared volume as fuel</dd></div>
+          <div><dt>Generator it could fuel</dt><dd>${s.electric_potential_MW > 0 && s.electric_potential_MW < 0.1 ? '&lt; 0.1' : num(s.electric_potential_MW, 1)} MW</dd><dd class="kv__sub">40% simple-cycle</dd></div>
+          <div><dt>Households it could power</dt><dd>${num(s.households_servable, 0)}</dd><dd class="kv__sub">1.2 MWh/household/yr</dd></div>
+          <div><dt>People within 10 km without access</dt><dd>${s.people_within_10km_not_grid == null ? 'n/a' : num(s.people_within_10km_not_grid, 0)}</dd><dd class="kv__sub">of ${num(s.pop10km, 0)} · access proxy ${num(s.rural_access_proxy_pct, 1)}%</dd></div>
+        </dl>
+        <p class="drawer__floor">Estimates on stated assumptions, not a feasibility study. ${esc(s.rural_access_basis || '')}</p>
+
+        <h4 class="drawer__h">Population nearby<sup>8</sup></h4>
+        <dl class="kv">
+          <div><dt>Within 5 / 10 km</dt><dd>${num(s.pop5km, 0)} / ${num(s.pop10km, 0)}</dd></div>
+          <div><dt>Within 25 / 50 km</dt><dd>${num(s.pop25km, 0)} / ${num(s.pop50km, 0)}</dd></div>
+          <div><dt>Nearest settlement</dt><dd>${esc(s.nearest_settlement || '—')} <span class="kv__sub">${esc(s.nearest_settlement_lga || '')} · ${s.dist_km != null ? kmTxt(s.dist_km) : '—'} · ~${num(s.nearest_settlement_pop, 0)} people within 2 km</span></dd></div>
+          <div><dt>Main centre ≤ 25 km</dt><dd>${s.main_centre_25km ? `${esc(s.main_centre_25km)} <span class="kv__sub">${kmTxt(s.main_centre_25km_dist_km)} · ~${num(s.main_centre_25km_pop, 0)} people within 2 km</span>` : 'None named within 25 km'}</dd></div>
+          <div><dt>State</dt><dd>${esc(s.state || '—')} <span class="kv__sub">${esc(s.state_basis || '')}</span></dd></div>
+        </dl>
+
+        <h4 class="drawer__h">Live check<sup>10</sup></h4>
+        <dl class="kv">
+          <div><dt>Status</dt><dd>${esc(titleCase(s.live_status || '—'))} <span class="kv__sub">${s.live_site_burning ? 'burning on ≥ half of recent nights' : s.live_site_burning === false ? 'below the ≥50%-of-nights rule' : ''}</span></dd></div>
+          <div><dt>Nights detected</dt><dd>${s.live_nights_detected || 0} of ${s.live_window_nights || 0} <span class="kv__sub">${num(s.live_nights_detected_pct, 0)}% · a lower bound (cloudy nights count as misses)</span></dd></div>
+          ${s.live_last_seen ? `<div><dt>Last seen</dt><dd class="mono">${esc(s.live_last_seen)}</dd></div>
+          <div><dt>Mean bright_ti4 / FRP</dt><dd>${num(s.live_mean_bright_ti4_K, 0)} K · ${num(s.live_mean_frp_MW, 1)} MW</dd></div>` : ''}
+          <div><dt>Window</dt><dd>${esc(live.window_first || '—')} – ${esc(live.window_last || '—')} <span class="kv__sub">NASA FIRMS, retrieved ${esc((live.retrieved || '').slice(0, 16).replace('T', ' '))} UTC</span></dd></div>
+        </dl>
+
+        <h4 class="drawer__h">Security context<sup>11</sup></h4>
+        <dl class="kv">
+          <div><dt>12-month trend</dt><dd><span class="${tcls}">${esc(titleCase(s.sec_trend || '—'))}</span> <span class="kv__sub">${s.sec_trend_detail && s.sec_trend_detail.pv_last12 != null ? `${s.sec_trend_detail.pv_last12} vs ${s.sec_trend_detail.pv_prev12} political-violence events, LGAs touching 25 km` : ''}</span></dd></div>
+          ${a25 ? `<div><dt>Last 12 months</dt><dd>${a25.pv} events · ${a25.pv_fat} fatalities <span class="kv__sub">${a25.civ} civilian-targeting · ${a25.demo} demonstrations · ${a25.lgas} LGAs · ${esc((sec.window_12m || []).join(' – '))}</span></dd></div>` : ''}
+          <div><dt>Site LGA</dt><dd>${s.sec_lga ? `${esc(s.sec_lga.name)}, ${esc(s.sec_lga.state)} <span class="kv__sub">${esc(s.sec_lga.basis)}${s.sec_lga_12m ? ` · ${s.sec_lga_12m.pv} events, ${s.sec_lga_12m.pv_fat} fatalities` : ''}</span>` : 'No LGA within 50 km'}</dd></div>
+          <div><dt>Point counts</dt><dd><span class="kv__sub">${esc(s.sec_point_status || '')}</span></dd></div>
+        </dl>
+        <p class="drawer__floor">Reported conflict events (ACLED), aggregated by LGA — evidence for monitoring, not a judgement on the site or its operator.</p>`;
     }
 
     function haloAt(s) {
