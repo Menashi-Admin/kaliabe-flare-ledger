@@ -35,6 +35,7 @@ import json
 import math
 import os
 import sys
+import time
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,10 +52,20 @@ WINDOW_NIGHTS = 30
 UA = 'Mozilla/5.0 (KaliabeFlareLedger live_thermal; +https://kaliabe-flare-web.pages.dev/data.html)'
 
 
-def get(url):
+def get(url, attempts=4):
+    # FIRMS is intermittently unreachable from some CI runners (connect timeout,
+    # then IPv6 unreachable); retry with backoff before giving up. A failed run
+    # leaves the previous snapshot in place, and its retrieval date says so.
     req = urllib.request.Request(url, headers={'User-Agent': UA})
-    with urllib.request.urlopen(req, timeout=180) as r:
-        return r.read().decode('utf-8', 'replace'), r.headers.get('Last-Modified')
+    for i in range(attempts):
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read().decode('utf-8', 'replace'), r.headers.get('Last-Modified')
+        except OSError as e:
+            if i == attempts - 1:
+                raise
+            print(f'  retry {i + 1}/{attempts - 1} after {type(e).__name__}: {e}', file=sys.stderr)
+            time.sleep(20 * (i + 1))
 
 
 def km(lat1, lon1, lat2, lon2):
