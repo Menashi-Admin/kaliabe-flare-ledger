@@ -1169,7 +1169,7 @@ export default {
             });
           }
         }
-        quietRows.sort((a, b) => -(b.latest_year_vol_million_m3 || 0) + (a.latest_year_vol_million_m3 || 0));
+        quietRows.sort((a, b) => (b.latest_year_vol_million_m3 || 0) - (a.latest_year_vol_million_m3 || 0));
         const feed = (news.feed || []).map((item) => ({
           title: item.title, source: item.source, url: item.url, published: item.published,
           matched_sites: (item.matched_sites || []).length ? item.matched_sites.map((sid) => {

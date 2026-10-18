@@ -50,6 +50,12 @@ OUTLETS = [
     ('Vanguard', 'https://www.vanguardngr.com/feed/'),
     ('The Guardian NG', 'https://guardian.ng/feed/'),
 ]
+# Outlet feeds are general news (sports, crime, politics), so only items that
+# match the energy sector pass into the flare cross-check feed. Google News RSS
+# queries are already targeted; this gate keeps the whole feed on-topic.
+ENERGY = ['gas', 'oil', 'flare', 'energy', 'pipeline', 'lng', 'nnpc', 'petrol', 'fuel',
+          'refiner', 'crude', 'power', 'electric', 'niger delta', 'hydrocarbon', 'lpg',
+          'akpo', 'egbema', 'bonny', 'renewable', 'seafarers', 'marine', 'plant shutdown']
 
 UA_CTX = None  # set lazily (kept importable without network)
 
@@ -157,7 +163,8 @@ def main():
         except OSError as e:
             err.append(f'{name} {type(e).__name__}')
 
-    # Recency window + dedupe by normalised title.
+    # Recency window + dedupe by normalised title. Only energy-sector items pass
+    # so the cross-check feed stays on-topic even though outlet feeds are noisy.
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=days)
     feed = []
     seen_t = set()
@@ -165,12 +172,14 @@ def main():
         pd = it['published']
         if pd and pd < cutoff.strftime('%Y-%m-%dT%H:%MZ'):
             continue
+        hay = it['title'] + ' ' + (it['source'] or '')
+        if not any(w in hay.lower() for w in ENERGY):
+            continue
         key = re.sub(r'[^a-z0-9]+', '', it['title'].lower())[:60]
         if key in seen_t:
             continue
         seen_t.add(key)
         title = it['title']
-        hay = title + ' ' + (it['source'] or '')
         feed.append({
             'title': title, 'source': it['source'],
             'url': it['url'], 'published': pd,
