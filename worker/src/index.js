@@ -25,6 +25,7 @@ import SEC from '../../web/public/data/security.json';
 import LIVE_BUNDLED from '../../web/public/data/live/live_thermal.json';
 import SITING_INPUTS from '../../web/public/data/siting.json';
 import FIRMS_HISTORY from '../../web/public/data/live/firms_history.json';
+import NEWS_BUNDLED from '../../web/public/data/news/feed.json';
 
 const T = core.THRESHOLDS;
 
@@ -88,8 +89,8 @@ const PENALTY = {
 const PENALTY_BASIS = 'Flare Gas Regulations 2018 (S.I. No. 9 of 2018) Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 1,000 scf (28.317 m³)';
 
 // Method version + data vintage: stamped on every API response and brief.
-const METHOD_VERSION = 'KFL-M 1.6 (2026-10-18)';
-const METHOD_CHANGES = 'KFL-M 1.6: investable score (/api/invest, invest.html) - every site scored 0 to 100 on fuel consistency (GFMR record, volume, trend, NASA FIRMS night persistence and FRP intensity), demand (unserved people, access, proximity, main centre), security (distance- and age-weighted attack record as a ceiling, deaths, ACLED conflict and trend) and viability (1.5 soft gates, solar); hard gates onshore and 0.1 MW set the score to 0 with the ungated score kept; bands A to D, band margin, record-versus-live flags; reproducible offline (scripts/build_invest.mjs -> web/public/data/invest.json, invest_stress.json); no existing field or route changed. KFL-M 1.5: mini-grid siting screen (/api/siting, siting.html) - every site scored 0 to 100 on grid access gap, gas-to-power potential, population demand, security posture and solar resource (Global Solar Atlas 2, CC BY 4.0), with four screening gates and 20 km opportunity clusters; all terms are labelled estimates; no existing field changed. KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
+const METHOD_VERSION = 'KFL-M 1.7 (2026-10-18)';
+const METHOD_CHANGES = 'KFL-M 1.7: quiet-flare + news cross-check (/api/news, news_cross_check on /api/invest) - a site is flagged quiet when its NASA FIRMS thermal signature drops out of the window (a transition for a former burner, or a full-window absence for an archive-tracked flare >= 10M m3); a matched headline naming the operator (daily keyless Google News RSS + outlet feed, scripts/news_feed.py -> web/public/data/news/feed.json) corroborates, not confirms, the quiet record (cloud, missed passes and deliberate cuts also cause quiet); every quiet item carries the caveat. KFL-M 1.6: investable score (/api/invest, invest.html) - every site scored 0 to 100 on fuel consistency (GFMR record, volume, trend, NASA FIRMS night persistence and FRP intensity), demand (unserved people, access, proximity, main centre), security (distance- and age-weighted attack record as a ceiling, deaths, ACLED conflict and trend) and viability (1.5 soft gates, solar); hard gates onshore and 0.1 MW set the score to 0 with the ungated score kept; bands A to D, band margin, record-versus-live flags; reproducible offline (scripts/build_invest.mjs -> web/public/data/invest.json, invest_stress.json); no existing field or route changed. KFL-M 1.5: mini-grid siting screen (/api/siting, siting.html) - every site scored 0 to 100 on grid access gap, gas-to-power potential, population demand, security posture and solar resource (Global Solar Atlas 2, CC BY 4.0), with four screening gates and 20 km opportunity clusters; all terms are labelled estimates; no existing field changed. KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
 const VINTAGE = {
   dataset: 'World Bank GFMR, Flare Volume Estimates by Individual Flare Location 2012–2025 (xlsx)',
   release: 'Global Gas Flaring Tracker, 23 June 2026',
@@ -213,6 +214,22 @@ function attachLive(site, live) {
     live_status: chk.live_status,
     live_flag: chk.live_flag,
   });
+}
+
+const NEWS_URL = 'https://raw.githubusercontent.com/Menashi-Admin/kaliabe-flare-ledger/main/web/public/data/news/feed.json';
+let newsCache = null;
+async function loadNews(env) {
+  if (newsCache && Date.now() - newsCache.at < 900e3) return newsCache.data;
+  let data = NEWS_BUNDLED, origin = 'bundled snapshot (deploy time)';
+  try {
+    const r = await fetch((env && env.NEWS_URL) || NEWS_URL, { cf: { cacheTtl: 900, cacheEverything: true } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.meta && Array.isArray(d.feed) && String(d.meta.retrieved) >= String(NEWS_BUNDLED.meta.retrieved)) { data = d; origin = 'repository (daily GitHub Action)'; }
+    }
+  } catch (e) { /* keep bundled */ }
+  newsCache = { at: Date.now(), data: { ...data, origin } };
+  return newsCache.data;
 }
 
 function enrichmentMeta(live) {
@@ -937,6 +954,47 @@ function sitingResponse(url, ledger) {
 // is reproducible offline: node scripts/build_invest.mjs -> web/public/data/invest.json.
 const INVEST_FOOTNOTE = 'A screening score for triage, not a feasibility study or an investment recommendation. Every term is a normalised estimate from public data on stated assumptions; the weights are judgement calls, published so they can be challenged. It does not assess gas rights, offtake, tariff, licensing, land, community consent, capex or returns. Recorded attacks describe the past, not current risk, and satellite non-detections can be cloud.';
 const FIRMS_WINDOW = core.firmsWindow(FIRMS_HISTORY);
+// KFL-M 1.7: quiet + news cross-check. The quiet signal is per site and needs
+// the site's own live record (was it ever detected, and when) plus its archive
+// volume, so it is computed per row in investAll; the news index is built once
+// here from the bundled feed (fits the "reproducible offline" rule).
+const NEWS_JOIN = (() => {
+  const bySite = {};
+  for (const item of (NEWS_BUNDLED.feed || [])) {
+    for (const sid of item.matched_sites || []) (bySite[sid] || (bySite[sid] = [])).push(item);
+  }
+  return { bySite, bySiteIds: Object.keys(bySite) };
+})();
+// A site "went quiet" by either rule: (transition) it was detected earlier in
+// the window then silent for QUIET_GAP_NIGHTS+ recent nights, or (dark) it has
+// an archive-tracked flare (GFMR volume >= QUIET_MIN_VOL) with no detection in
+// the window at all. Both are "possibly" not verdicts — cloud/missed passes and
+// deliberate cuts produce them too. It is "news-corroborated" only when the
+// archive shows a real flare AND a matched headline names its operator, so a
+// story latches onto a real site rather than noise.
+const QUIET_GAP_NIGHTS = 4;
+const QUIET_MIN_VOL = 10;
+function quietFor(site, live, windowNights) {
+  const hasVol = (site.latest_year_vol_million_m3 || 0) >= QUIET_MIN_VOL;
+  const last = live ? live.last_seen : null;
+  const news = NEWS_JOIN.bySite[site.site_id] || null;
+  if (!hasVol) return { quiet_since: null, quiet_nights: 0, quiet_rule: null, news, news_corroborates: false };
+  if (live && last) {
+    // transition: calendar nights since the last detection vs the window end
+    const day = (iso) => new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)));
+    const end = FIRMS_WINDOW.last ? day(FIRMS_WINDOW.last) : day(last);
+    const nightsQuiet = Math.max(0, Math.round((end - day(last)) / 864e5));
+    if (nightsQuiet >= QUIET_GAP_NIGHTS) {
+      return { quiet_since: last.slice(0, 10), quiet_nights: nightsQuiet, quiet_rule: 'transition', label: 'estimate', news, news_corroborates: !!(news && news.length) };
+    }
+    return { quiet_since: null, quiet_nights: 0, quiet_rule: null, label: 'estimate', news, news_corroborates: false };
+  }
+  // dark: archive flare, no detection anywhere in the window
+  if (!live || !live.last_seen) {
+    return { quiet_since: FIRMS_WINDOW.first, quiet_nights: windowNights, quiet_rule: 'dark', label: 'estimate', news, news_corroborates: !!(news && news.length) };
+  }
+  return { quiet_since: null, quiet_nights: 0, quiet_rule: null, label: 'estimate', news, news_corroborates: false };
+}
 let investCache = null;
 const pctile = (sorted, q) => (sorted.length ? sorted[Math.min(sorted.length - 1, Math.max(0, Math.round(q * (sorted.length - 1))))] : null);
 function spreadOf(vals) {
@@ -963,6 +1021,7 @@ function investAll(ledger) {
     return {
       site_id: s.site_id, field_name: s.field_name, operator: s.operator, lat: s.lat, lon: s.lon,
       state: s.state, niger_delta_class: s.niger_delta_class, in_niger_delta: s.in_niger_delta,
+      ...quietFor(s, live, FIRMS_WINDOW.nights),
       ...r,
       siting_score: sr ? sr.siting_score : null, siting_screened_in: sr ? sr.screened_in : null, siting_rank_national: sr ? sr.rank_national : null,
       inputs: {
@@ -1015,6 +1074,7 @@ function investResponse(url, ledger) {
   const lim = parseInt(q.get('limit'), 10);
   if (lim > 0) list = list.slice(0, lim);
   const agg = investAggregate(inScope);
+  const quietRows = rows.filter((r) => r.quiet_since);
   const body = {
     method_version: METHOD_VERSION,
     label: 'estimate',
@@ -1023,6 +1083,13 @@ function investResponse(url, ledger) {
     tiers: {
       public: ['screening score, per-site components, methodology, underlying open inputs (GFMR volume, FIRMS persistence and FRP, population, access, incident overlay, solar)', 'everything on this public surface is reproducible from open sources on stated assumptions'],
       partner: ['verified operator and facility registry, measured flow and gas-composition validation, offtake and PPA price scenarios, tariff and grid stress tests, project-level investment memos, full data-pack export and API, ongoing monitoring', 'requires a partnership engagement and our official-capacity data licence: contact@kaliabe.ng'],
+    },
+    news_cross_check: {
+      note: `${QUIET_GAP_NIGHTS}-night gap rule for former burners plus a full-window absence for archive-tracked flares; a matched headline names the operator, which corroborates (not confirms) a quiet record — cloud and deliberate cuts also cause quiet, and a deliberate cut is good news`,
+      quiet_sites: quietRows.length,
+      news_corroborated: quietRows.filter((r) => r.news_corroborates).length,
+      news_items: NEWS_BUNDLED.feed.length,
+      origin: 'bundled snapshot (deploy time); the /api/news route serves the live daily feed',
     },
     aggregate: { national: investAggregate(rows), delta: investAggregate(rows.filter(SITING_SCOPES.delta.test)) },
     spread: { scored: agg.scored, gated: agg.gated, score: agg.score, ungated: agg.ungated },
@@ -1074,7 +1141,7 @@ export default {
       if (path === '/api/live') {
         const { sites, live, meta } = await loadLedger(env);
         return json({
-          meta: meta.enrichment.live,
+          meta: { ...meta.enrichment.live, news: NEWS_BUNDLED.meta },
           points_24h: live.points_24h,
           sites: sites.filter((s) => s.live_nights_detected > 0 || s.live_detected_24h).map((s) => ({
             site_id: s.site_id, field_name: s.field_name, operator: s.operator, lat: s.lat, lon: s.lon,
@@ -1083,6 +1150,38 @@ export default {
             live_mean_frp_MW: s.live_mean_frp_MW, live_detected_24h: s.live_detected_24h, live_site_burning: s.live_site_burning,
             live_flag: s.live_flag, trend_label: s.trend_label,
           })),
+        });
+      }
+
+      if (path === '/api/news') {
+        const news = await loadNews(env);
+        const { sites } = await loadLedger(env);
+        const quietRows = [];
+        for (const s of sites) {
+          const live = FIRMS_WINDOW.sites[s.site_id] || null;
+          const q = quietFor(s, live, FIRMS_WINDOW.nights);
+          if (q.quiet_since) {
+            quietRows.push({
+              site_id: s.site_id, field_name: s.field_name, operator: s.operator, state: s.state,
+              quiet_since: q.quiet_since, quiet_nights: q.quiet_nights, quiet_rule: q.quiet_rule,
+              latest_year_vol_million_m3: s.latest_year_vol_million_m3,
+              news_corroborates: q.news_corroborates, news: q.news || [],
+            });
+          }
+        }
+        quietRows.sort((a, b) => -(b.latest_year_vol_million_m3 || 0) + (a.latest_year_vol_million_m3 || 0));
+        const feed = (news.feed || []).map((item) => ({
+          title: item.title, source: item.source, url: item.url, published: item.published,
+          matched_sites: (item.matched_sites || []).length ? item.matched_sites.map((sid) => {
+            const s = sites.find((x) => x.site_id === sid);
+            return s ? { site_id: sid, field_name: s.field_name, operator: s.operator, state: s.state } : { site_id: sid };
+          }) : [],
+        }));
+        return json({
+          meta: { ...news.meta, origin: news.origin },
+          quiet_sites: quietRows,
+          quiet_note: `${QUIET_GAP_NIGHTS}-night gap rule for former burners plus a full-window absence for archive-tracked flares; corroborated = archive flare + a headline naming the operator (still a “possibly”, not a verdict)`,
+          feed,
         });
       }
 
