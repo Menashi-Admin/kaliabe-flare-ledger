@@ -9,3 +9,6 @@
 
 /data/invest.json
   Cache-Control: public, max-age=300
+
+/data/kcc/*
+  Cache-Control: public, max-age=300

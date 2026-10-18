@@ -167,3 +167,7 @@ cd web    && npx wrangler pages deploy public --project-name=kaliabe-flare-web -
 Built by **Kaliabe** (Tiger Dojo). Origin: `Kaliabe-Detection-App-Research.md` §4 C1.
 Method and confidence: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) ·
 Build record: [`docs/BUILD-COST.md`](docs/BUILD-COST.md).
+
+## Commodity cost tracker (KCC 1.0)
+
+A separate surface from the Flare Tracker: `web/public/kcc.html` and `/api/kcc/quote?from=..&to=..&commodity=..` give a low / central / high cost per tonne to move a commodity between two Nigerian places, on an open owned rate model. Negotiation-planning ranges, not quotes. Method, assumptions, sources and gaps: [`docs/METHODOLOGY-KCC.md`](docs/METHODOLOGY-KCC.md). Build: `scripts/build_commodities.py`, `scripts/build_route_table.py`, `scripts/kcc_reference.mjs`.

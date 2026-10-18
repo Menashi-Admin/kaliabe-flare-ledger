@@ -1,0 +1,154 @@
+{
+ "schema": "kcc-model/1",
+ "version": "KCC 1.0",
+ "built": "2026-10-18",
+ "honesty": "Every parameter is an ESTIMATE: {low, central, high, unit, source, vintage, assumed}. Products of three or four bands make a wide band on purpose. Negotiation-planning ranges, not quotes.",
+ "rate_anchor_usd_per_km": {
+  "value": 2.43,
+  "unit": "USD per loaded container-truck km",
+  "verified": false,
+  "assumed": false,
+  "source": "tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.",
+  "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)"
+ },
+ "sa_us_multiple": {
+  "low": 1.5,
+  "high": 2.2,
+  "unit": "x South Africa / US per-km cost",
+  "source": "same as anchor (build brief); verified: false",
+  "vintage": "not confirmed",
+  "assumed": false,
+  "implied_sa_us_usd_per_km": [
+   1.1,
+   1.62
+  ]
+ },
+ "rate_band_multiplier": {
+  "low": 0.75,
+  "central": 1.0,
+  "high": 1.4,
+  "unit": "x anchor",
+  "source": "KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured",
+  "vintage": "2026-10 (KCC 1.0)",
+  "assumed": true
+ },
+ "anchor_applies_to": "one loaded truck-km on a container/articulated truck; the commodity payload turns truck-km into tonne-km (assumption: container-truck km and commodity-truck km cost the same before the vehicle factor)",
+ "winding_factor": {
+  "low": 1.19,
+  "central": 1.3,
+  "high": 1.44,
+  "unit": "road km / straight-line km",
+  "source": "derived from this build's own OSRM table: 10th percentile / median / 90th percentile of road km over Haversine km, 430 routed pairs over 30 km",
+  "vintage": "2026-10-18",
+  "assumed": false
+ },
+ "routed_distance_band": {
+  "low": 0.95,
+  "central": 1.0,
+  "high": 1.1,
+  "unit": "x OSRM km",
+  "source": "KCC analyst assumption: free OSRM profile ignores road quality, ferries and detours around insecurity",
+  "vintage": "2026-10 (KCC 1.0)",
+  "assumed": true
+ },
+ "min_effective_km": {
+  "value": 50,
+  "unit": "km",
+  "source": "KCC analyst assumption: very short hauls still cost a minimum trip (waiting, positioning)",
+  "vintage": "2026-10 (KCC 1.0)",
+  "assumed": true
+ },
+ "corridor_factor": {
+  "niger_delta_feeder": {
+   "low": 1.0,
+   "central": 1.15,
+   "high": 1.35,
+   "unit": "x",
+   "source": "KCC analyst assumption: creek, security and checkpoint friction when both ends are Niger Delta states and the leg is under 250 km",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "port_hinterland": {
+   "low": 1.0,
+   "central": 1.1,
+   "high": 1.3,
+   "unit": "x",
+   "source": "KCC analyst assumption: port-gate queues and tanker/truck call-up systems when either end is a port",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "north_long_haul": {
+   "low": 0.95,
+   "central": 1.1,
+   "high": 1.3,
+   "unit": "x",
+   "source": "KCC analyst assumption: insecurity and escort costs when either end is in a northern zone",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "inland_default": {
+   "low": 0.9,
+   "central": 1.0,
+   "high": 1.15,
+   "unit": "x",
+   "source": "KCC analyst assumption: baseline for all other legs",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "rule": "the class with the highest central factor that applies is used (one class per quote)"
+ },
+ "road_condition_proxy": {
+  "South South": {
+   "low": 1.0,
+   "central": 1.1,
+   "high": 1.25,
+   "unit": "x",
+   "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "South East": {
+   "low": 1.0,
+   "central": 1.08,
+   "high": 1.2,
+   "unit": "x",
+   "source": "KCC analyst assumption (PROXY)",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "default": {
+   "low": 1.0,
+   "central": 1.05,
+   "high": 1.15,
+   "unit": "x",
+   "source": "KCC analyst assumption (PROXY)",
+   "vintage": "2026-10 (KCC 1.0)",
+   "assumed": true
+  },
+  "rule": "worse of the two endpoint zones by central value; labelled a proxy, never a measurement"
+ },
+ "niger_delta_states": [
+  "Abia",
+  "Akwa Ibom",
+  "Bayelsa",
+  "Cross River",
+  "Delta",
+  "Edo",
+  "Imo",
+  "Ondo",
+  "Rivers"
+ ],
+ "north_zones": [
+  "North Central",
+  "North East",
+  "North West"
+ ],
+ "fx_ngn_per_usd": {
+  "value": 1500,
+  "unit": "NGN per USD",
+  "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+  "vintage": "2026-10 (KCC 1.0)",
+  "assumed": true
+ },
+ "rounding": "USD figures are rounded to the nearest USD 1 per tonne (and to 2 decimals per km) so a band is never shown with false precision"
+}

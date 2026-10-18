@@ -1,0 +1,1195 @@
+{
+ "note": "Deterministic reference quotes from worker/src/kcc.js on bundled JSON. Re-run: node scripts/kcc_reference.mjs --check",
+ "quotes": [
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Port Harcourt, Rivers",
+    "to": "Apapa, Lagos",
+    "commodity": "cement_bagged"
+   },
+   "resolved": {
+    "from": {
+     "id": "port-harcourt",
+     "name": "Port Harcourt",
+     "state": "Rivers",
+     "zone": "South South",
+     "kind": "city",
+     "lat": 4.7677,
+     "lon": 7.0189,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "lagos-apapa",
+     "name": "Apapa",
+     "state": "Lagos",
+     "zone": "South West",
+     "kind": "port",
+     "lat": 6.4452,
+     "lon": 3.3684,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 31,
+     "central": 63,
+     "high": 153,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 46100,
+     "central": 93800,
+     "high": 229200,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 922,
+     "central": 1877,
+     "high": 4585,
+     "unit": "USD per truckload (central payload 30 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 1.54,
+     "central": 3.13,
+     "high": 7.64,
+     "unit": "USD per 50 kg bag",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 577,
+     "central": 608,
+     "high": 668,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 445,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.8225000000000002,
+     "central": 2.43,
+     "high": 3.402,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: port hinterland",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.3,
+     "unit": "x",
+     "source": "KCC analyst assumption: port-gate queues and tanker/truck call-up systems when either end is a port",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.25,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 25,
+     "central": 30,
+     "high": 36,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), dry bagged",
+     "low": 1.5,
+     "central": 3,
+     "high": 5,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 1400,
+     "central": 1450,
+     "high": 1500,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 29,
+    "central": 60,
+    "high": 148,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "port-harcourt>lagos-apapa",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id cement_bagged",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Dangote, BUA and Lafarge plants (Obajana, Gboko, Ewekoro, Ibese, Edo) serve most of the market by road.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Onne, Rivers",
+    "to": "Kano, Kano",
+    "commodity": "fertilizer_urea"
+   },
+   "resolved": {
+    "from": {
+     "id": "onne",
+     "name": "Onne",
+     "state": "Rivers",
+     "zone": "South South",
+     "kind": "port",
+     "lat": 4.725,
+     "lon": 7.1524,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "kano",
+     "name": "Kano",
+     "state": "Kano",
+     "zone": "North West",
+     "kind": "city",
+     "lat": 11.994,
+     "lon": 8.522,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 54,
+     "central": 107,
+     "high": 263,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 80800,
+     "central": 160200,
+     "high": 393900,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 1617,
+     "central": 3204,
+     "high": 7879,
+     "unit": "USD per truckload (central payload 30 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 2.69,
+     "central": 5.34,
+     "high": 13.13,
+     "unit": "USD per 50 kg bag",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 1006,
+     "central": 1059,
+     "high": 1165,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 822,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.8225000000000002,
+     "central": 2.43,
+     "high": 3.402,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: port hinterland",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.3,
+     "unit": "x",
+     "source": "KCC analyst assumption: port-gate queues and tanker/truck call-up systems when either end is a port",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.25,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 25,
+     "central": 30,
+     "high": 35,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), dry bagged",
+     "low": 1.5,
+     "central": 3,
+     "high": 5,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 700,
+     "central": 750,
+     "high": 800,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 52,
+    "central": 104,
+    "high": 258,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "onne>kano",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id fertilizer_urea",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Dangote and Indorama urea ex Port Harcourt/Onne area.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Aba, Abia",
+    "to": "Port Harcourt, Rivers",
+    "commodity": "palm_oil"
+   },
+   "resolved": {
+    "from": {
+     "id": "aba",
+     "name": "Aba",
+     "state": "Abia",
+     "zone": "South East",
+     "kind": "city",
+     "lat": 5.1128,
+     "lon": 7.3651,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "port-harcourt",
+     "name": "Port Harcourt",
+     "state": "Rivers",
+     "zone": "South South",
+     "kind": "city",
+     "lat": 4.7677,
+     "lon": 7.0189,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 5,
+     "central": 11,
+     "high": 32,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 7000,
+     "central": 16500,
+     "high": 48000,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 113,
+     "central": 264,
+     "high": 769,
+     "unit": "USD per truckload (central payload 24 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 0.89,
+     "central": 2.09,
+     "high": 6.08,
+     "unit": "USD per 200 L drum (about 190 kg)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 61,
+     "central": 64,
+     "high": 70,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 54,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.8225000000000002,
+     "central": 2.6730000000000005,
+     "high": 4.2525,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: niger delta feeder",
+     "low": 1,
+     "central": 1.15,
+     "high": 1.35,
+     "unit": "x",
+     "source": "KCC analyst assumption: creek, security and checkpoint friction when both ends are Niger Delta states and the leg is under 250 km",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.25,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 18,
+     "central": 24,
+     "high": 30,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), liquid edible",
+     "low": 1,
+     "central": 2,
+     "high": 4,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 890,
+     "central": 905,
+     "high": 920,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 4,
+    "central": 9,
+    "high": 28,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "aba>port-harcourt",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id palm_oil",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Drum loads have a lower payload than tankers.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Warri, Delta",
+    "to": "Benin City, Edo",
+    "commodity": "fuel_ago"
+   },
+   "resolved": {
+    "from": {
+     "id": "warri",
+     "name": "Warri",
+     "state": "Delta",
+     "zone": "South South",
+     "kind": "port",
+     "lat": 5.5186,
+     "lon": 5.748,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "benin-city",
+     "name": "Benin City",
+     "state": "Edo",
+     "zone": "South South",
+     "kind": "city",
+     "lat": 6.3331,
+     "lon": 5.6221,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 6,
+     "central": 12,
+     "high": 34,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 8500,
+     "central": 18200,
+     "high": 50500,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 187,
+     "central": 399,
+     "high": 1110,
+     "unit": "USD per truckload (central payload 33 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 0,
+     "central": 0.01,
+     "high": 0.03,
+     "unit": "USD per litre (about 0.84 kg)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 94,
+     "central": 99,
+     "high": 109,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 92,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.9136250000000004,
+     "central": 2.7944999999999998,
+     "high": 4.592700000000001,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: niger delta feeder",
+     "low": 1,
+     "central": 1.15,
+     "high": 1.35,
+     "unit": "x",
+     "source": "KCC analyst assumption: creek, security and checkpoint friction when both ends are Niger Delta states and the leg is under 250 km",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.25,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 28,
+     "central": 33,
+     "high": 37,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), liquid flammable",
+     "low": 0.8,
+     "central": 1.5,
+     "high": 3.5,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 820,
+     "central": 840,
+     "high": 860,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 5,
+    "central": 11,
+    "high": 30,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "warri>benin-city",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id fuel_ago",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Depot to filling station and depot to site.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Gboko, Benue",
+    "to": "Enugu, Enugu",
+    "commodity": "cement_bulk"
+   },
+   "resolved": {
+    "from": {
+     "id": "gboko",
+     "name": "Gboko",
+     "state": "Benue",
+     "zone": "North Central",
+     "kind": "plant",
+     "lat": 7.3778,
+     "lon": 8.8713,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "enugu",
+     "name": "Enugu",
+     "state": "Enugu",
+     "zone": "South East",
+     "kind": "city",
+     "lat": 6.4497,
+     "lon": 7.5137,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 12,
+     "central": 26,
+     "high": 68,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 18200,
+     "central": 39100,
+     "high": 101300,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 387,
+     "central": 834,
+     "high": 2160,
+     "unit": "USD per truckload (central payload 32 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 12.11,
+     "central": 26.06,
+     "high": 67.5,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 235,
+     "central": 248,
+     "high": 272,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 182,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.8225000000000002,
+     "central": 2.6730000000000005,
+     "high": 4.2525,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: north long haul",
+     "low": 0.95,
+     "central": 1.1,
+     "high": 1.3,
+     "unit": "x",
+     "source": "KCC analyst assumption: insecurity and escort costs when either end is in a northern zone",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.08,
+     "high": 1.2,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 28,
+     "central": 32,
+     "high": 36,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), dry bulk pneumatic",
+     "low": 0.8,
+     "central": 1.5,
+     "high": 3,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 1300,
+     "central": 1400,
+     "high": 1500,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 11,
+    "central": 25,
+    "high": 65,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "gboko>enugu",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id cement_bulk",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Bulk tanker fleets; payload depends on tanker class.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "Kano, Kano",
+    "to": "Onitsha, Anambra",
+    "commodity": "rice"
+   },
+   "resolved": {
+    "from": {
+     "id": "kano",
+     "name": "Kano",
+     "state": "Kano",
+     "zone": "North West",
+     "kind": "city",
+     "lat": 11.994,
+     "lon": 8.522,
+     "how": "bundled place grid"
+    },
+    "to": {
+     "id": "onitsha",
+     "name": "Onitsha",
+     "state": "Anambra",
+     "zone": "South East",
+     "kind": "city",
+     "lat": 6.1462,
+     "lon": 6.8019,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 41,
+     "central": 86,
+     "high": 206,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 61300,
+     "central": 128900,
+     "high": 309300,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 1226,
+     "central": 2577,
+     "high": 6186,
+     "unit": "USD per truckload (central payload 30 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 2.04,
+     "central": 4.3,
+     "high": 10.31,
+     "unit": "USD per 50 kg bag",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 819,
+     "central": 862,
+     "high": 948,
+     "unit": "road km"
+    },
+    "method": "osrm_road",
+    "method_label": "Road distance from the OSRM public route table (OpenStreetMap data, ODbL), built 2026-10-18; band reflects route choice and detours",
+    "straight_line_km": 677,
+    "effective_km_floor": 50,
+    "source": "OSRM public demo server table service, driving profile, OpenStreetMap data (ODbL 1.0)",
+    "vintage": "2026-10-18",
+    "assumed": false
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.8225000000000002,
+     "central": 2.43,
+     "high": 3.402,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: north long haul",
+     "low": 0.95,
+     "central": 1.1,
+     "high": 1.3,
+     "unit": "x",
+     "source": "KCC analyst assumption: insecurity and escort costs when either end is in a northern zone",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.08,
+     "high": 1.2,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 25,
+     "central": 30,
+     "high": 36,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), grain bagged",
+     "low": 1.5,
+     "central": 3,
+     "high": 5,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 750,
+     "central": 800,
+     "high": 850,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 39,
+    "central": 83,
+    "high": 201,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": "kano>onitsha",
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id rice",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Milled rice; paddy has a different density and is not modelled.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  },
+  {
+   "version": "KCC 1.0",
+   "note": "Negotiation-planning ranges, not quotes. Every figure is an estimate built from open sources and stated assumptions; actual haulier prices vary with season, fuel, security, queues and counterparty.",
+   "request": {
+    "from": "6.5,3.4, Lagos",
+    "to": "Uyo, Akwa Ibom",
+    "commodity": "steel_rebar"
+   },
+   "resolved": {
+    "from": {
+     "id": null,
+     "name": "6.5,3.4",
+     "state": "Lagos",
+     "zone": "South West",
+     "kind": "point",
+     "lat": 6.5,
+     "lon": 3.4,
+     "how": "coordinates; state and zone borrowed from nearest bundled place Apapa (7 km away): a proxy"
+    },
+    "to": {
+     "id": "uyo",
+     "name": "Uyo",
+     "state": "Akwa Ibom",
+     "zone": "South South",
+     "kind": "city",
+     "lat": 4.9902,
+     "lon": 7.9974,
+     "how": "bundled place grid"
+    }
+   },
+   "estimate": {
+    "per_tonne_usd": {
+     "low": 30,
+     "central": 66,
+     "high": 173,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_tonne_ngn": {
+     "low": 45600,
+     "central": 99100,
+     "high": 259400,
+     "unit": "NGN per tonne",
+     "source": "USD band x FX 1500 NGN/USD (PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=)",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    "per_truckload_usd": {
+     "low": 911,
+     "central": 1981,
+     "high": 5189,
+     "unit": "USD per truckload (central payload 30 t)",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    },
+    "per_typical_unit_usd": {
+     "low": 30.38,
+     "central": 66.04,
+     "high": 172.96,
+     "unit": "USD per tonne",
+     "source": "KCC rate model KCC 1.0 (docs/METHODOLOGY-KCC.md): ((anchor x band x vehicle factor) x km x corridor x road condition / payload) + handling. All inputs listed under components.",
+     "vintage": "2026-10-18",
+     "assumed": true
+    }
+   },
+   "distance": {
+    "km": {
+     "low": 637,
+     "central": 696,
+     "high": 771,
+     "unit": "road km"
+    },
+    "method": "haversine_winding",
+    "method_label": "Straight-line (Haversine) 536 km x winding factor 1.19 / 1.3 / 1.44, derived from our own OSRM table; no routed distance available for this pair",
+    "straight_line_km": 536,
+    "effective_km_floor": 50,
+    "source": "derived from this build's own OSRM table: 10th percentile / median / 90th percentile of road km over Haversine km, 430 routed pairs over 30 km",
+    "vintage": "2026-10-18",
+    "assumed": true
+   },
+   "components": [
+    {
+     "name": "Truck-km rate (anchor x band x vehicle factor)",
+     "low": 1.731375,
+     "central": 2.43,
+     "high": 3.7422000000000004,
+     "unit": "USD per truck-km",
+     "source": "anchor 2.43 USD/km: tralac, \"Transportation costs and efficiency in West and Central Africa\" (https://www.tralac.org/discussions/article/9364-transportation-costs-and-efficiency-in-west-and-central-africa.html), figure and 1.5 to 2.2x multiple as stated in the KCC build brief. NOT re-verified in this build: a web search did not surface the figure and the page fetch was blocked.; band KCC analyst assumption: Nigeria sits inside the WCA average but corridors differ; the spread is a stated judgement, not measured; vehicle factor: KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+     "vintage": "not confirmed (cited as tralac / World Bank WCA corridor evidence)",
+     "assumed": true,
+     "anchor_verified": false
+    },
+    {
+     "name": "Corridor factor: inland default",
+     "low": 0.9,
+     "central": 1,
+     "high": 1.15,
+     "unit": "x",
+     "source": "KCC analyst assumption: baseline for all other legs",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Road-condition factor (proxy)",
+     "low": 1,
+     "central": 1.1,
+     "high": 1.25,
+     "unit": "x",
+     "source": "KCC analyst assumption (PROXY): no measured road-condition data in the bundle; wet-zone road wear",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Truckload (payload, t)",
+     "low": 25,
+     "central": 30,
+     "high": 35,
+     "unit": "tonnes per truck",
+     "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true,
+     "note": "high payload pairs with the low estimate"
+    },
+    {
+     "name": "Handling (loading and offloading), breakbulk steel",
+     "low": 2,
+     "central": 4,
+     "high": 7,
+     "unit": "USD/tonne",
+     "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+     "vintage": "2026-10 (KCC 1.0)",
+     "assumed": true
+    },
+    {
+     "name": "Density",
+     "low": 7800,
+     "central": 7850,
+     "high": 7900,
+     "unit": "kg/m3",
+     "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+     "vintage": "n/a (physical property)",
+     "assumed": false,
+     "note": "shown for reference; the model prices by tonne, not by volume"
+    }
+   ],
+   "haul_only_usd_per_tonne": {
+    "low": 28,
+    "central": 62,
+    "high": 166,
+    "unit": "USD per tonne"
+   },
+   "table_reference": {
+    "route_key": null,
+    "route_table": "/data/kcc/routes.json",
+    "model": "/data/kcc/model.json",
+    "commodity_table": "/data/commodities.json (repo) ; commodity id steel_rebar",
+    "methodology": "docs/METHODOLOGY-KCC.md"
+   },
+   "commodity_note": "Volume is not the limit, axle weight is; density is shown for completeness.",
+   "fx": {
+    "value": 1500,
+    "unit": "NGN per USD",
+    "source": "PLACEHOLDER reference rate chosen by KCC. No FX feed is bundled and none was checked in this build. Press reports in 2026 cite rates near 1,600 (unverified). Override with ?fx=",
+    "vintage": "2026-10 (KCC 1.0)",
+    "assumed": true
+   }
+  }
+ ]
+}

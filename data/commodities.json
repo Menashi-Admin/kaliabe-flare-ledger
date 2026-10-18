@@ -1,0 +1,646 @@
+{
+  "schema": "kcc-commodities/1",
+  "version": "KCC 1.0",
+  "generated_by": "scripts/build_commodities.py",
+  "licence": "MIT (code and table); each figure carries its own source pointer",
+  "verified_in_build": false,
+  "honesty": "Every figure is an ESTIMATE. assumed=false marks a standard reference value that was not re-fetched in this build; assumed=true marks a KCC analyst assumption with no open survey behind it. Nothing here is a quote.",
+  "handling_classes": {
+    "dry_bagged": {
+      "handling_usd_per_tonne": {
+        "low": 1.5,
+        "central": 3.0,
+        "high": 5.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 1.0,
+        "central": 1.0,
+        "high": 1.0,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "dry_bulk_pneumatic": {
+      "handling_usd_per_tonne": {
+        "low": 0.8,
+        "central": 1.5,
+        "high": 3.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 1.0,
+        "central": 1.1,
+        "high": 1.25,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "dry_bulk_tipper": {
+      "handling_usd_per_tonne": {
+        "low": 0.8,
+        "central": 1.5,
+        "high": 3.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 0.95,
+        "central": 1.0,
+        "high": 1.1,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "liquid_flammable": {
+      "handling_usd_per_tonne": {
+        "low": 0.8,
+        "central": 1.5,
+        "high": 3.5,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 1.05,
+        "central": 1.15,
+        "high": 1.35,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "liquid_edible": {
+      "handling_usd_per_tonne": {
+        "low": 1.0,
+        "central": 2.0,
+        "high": 4.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 1.0,
+        "central": 1.1,
+        "high": 1.25,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "grain_bagged": {
+      "handling_usd_per_tonne": {
+        "low": 1.5,
+        "central": 3.0,
+        "high": 5.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 1.0,
+        "central": 1.0,
+        "high": 1.0,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    },
+    "breakbulk_steel": {
+      "handling_usd_per_tonne": {
+        "low": 2.0,
+        "central": 4.0,
+        "high": 7.0,
+        "unit": "USD/tonne",
+        "source": "KCC analyst assumption: loading plus offloading cost band; no open Nigerian tariff found",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "vehicle_factor": {
+        "low": 0.95,
+        "central": 1.0,
+        "high": 1.1,
+        "unit": "multiplier on truck-km rate",
+        "source": "KCC analyst assumption: tanker/pneumatic bodies cost more per km than a flatbed; no open source",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      }
+    }
+  },
+  "commodities": [
+    {
+      "id": "cement_bagged",
+      "name": "Bagged cement (OPC/PCC)",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 1400,
+        "central": 1450,
+        "high": 1500,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 50,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "50 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "dry_bagged",
+      "handling_note": "Bagged: manual loading; pallet-free in most yards.",
+      "note": "Dangote, BUA and Lafarge plants (Obajana, Gboko, Ewekoro, Ibese, Edo) serve most of the market by road."
+    },
+    {
+      "id": "cement_bulk",
+      "name": "Bulk cement",
+      "form": "bulk",
+      "density_kg_m3": {
+        "low": 1300,
+        "central": 1400,
+        "high": 1500,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "tonne",
+        "unit_mass_kg": {
+          "value": 1000,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "tonne"
+      },
+      "typical_truckload_t": {
+        "low": 28,
+        "central": 32,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "dry_bulk_pneumatic",
+      "handling_note": "Bulk tanker; pneumatic discharge.",
+      "note": "Bulk tanker fleets; payload depends on tanker class."
+    },
+    {
+      "id": "clinker",
+      "name": "Clinker",
+      "form": "bulk",
+      "density_kg_m3": {
+        "low": 1200,
+        "central": 1350,
+        "high": 1500,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "tonne",
+        "unit_mass_kg": {
+          "value": 1000,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "tonne"
+      },
+      "typical_truckload_t": {
+        "low": 28,
+        "central": 32,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "dry_bulk_tipper",
+      "handling_note": "Tipper or bulk trailer.",
+      "note": "Intermediate for cement grinding; often moved plant to grinding station."
+    },
+    {
+      "id": "gas_condensate",
+      "name": "Gas condensate",
+      "form": "liquid",
+      "density_kg_m3": {
+        "low": 700,
+        "central": 740,
+        "high": 780,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "tonne",
+        "unit_mass_kg": {
+          "value": 1000,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "tonne"
+      },
+      "typical_truckload_t": {
+        "low": 22,
+        "central": 28,
+        "high": 32,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "liquid_flammable",
+      "handling_note": "Road tanker; dangerous goods.",
+      "note": "Density band is a typical condensate range; field-specific grades vary."
+    },
+    {
+      "id": "crude_oil",
+      "name": "Crude oil (road-tanker haul only)",
+      "form": "liquid",
+      "density_kg_m3": {
+        "low": 820,
+        "central": 850,
+        "high": 880,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "drum",
+        "unit_mass_kg": {
+          "value": 170,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "200 L drum (about 170 kg)"
+      },
+      "typical_truckload_t": {
+        "low": 22,
+        "central": 28,
+        "high": 33,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "liquid_flammable",
+      "handling_note": "Road tanker; dangerous goods.",
+      "note": "Most crude moves by pipeline and barge. This models only road-tanker haul (for example to modular refineries). Not a pipeline or barge tariff."
+    },
+    {
+      "id": "fertilizer_npk",
+      "name": "Fertilizer NPK (bagged)",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 900,
+        "central": 1000,
+        "high": 1100,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 50,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "50 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 35,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "dry_bagged",
+      "handling_note": "Bagged 50 kg.",
+      "note": "Seasonal peaks around planting."
+    },
+    {
+      "id": "fertilizer_urea",
+      "name": "Fertilizer urea (bagged)",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 700,
+        "central": 750,
+        "high": 800,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 50,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "50 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 35,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "dry_bagged",
+      "handling_note": "Bagged 50 kg.",
+      "note": "Dangote and Indorama urea ex Port Harcourt/Onne area."
+    },
+    {
+      "id": "palm_oil",
+      "name": "Palm oil (crude, bulk)",
+      "form": "liquid",
+      "density_kg_m3": {
+        "low": 890,
+        "central": 905,
+        "high": 920,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "drum",
+        "unit_mass_kg": {
+          "value": 190,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "200 L drum (about 190 kg)"
+      },
+      "typical_truckload_t": {
+        "low": 18,
+        "central": 24,
+        "high": 30,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "liquid_edible",
+      "handling_note": "Food-grade tanker or drums.",
+      "note": "Drum loads have a lower payload than tankers."
+    },
+    {
+      "id": "soya",
+      "name": "Soya beans",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 720,
+        "central": 750,
+        "high": 780,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 100,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "100 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "grain_bagged",
+      "handling_note": "Bagged grain; manual loading.",
+      "note": "Northern origin; moves south to feed mills."
+    },
+    {
+      "id": "rice",
+      "name": "Rice (milled, bagged)",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 750,
+        "central": 800,
+        "high": 850,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 50,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "50 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "grain_bagged",
+      "handling_note": "Bagged grain; manual loading.",
+      "note": "Milled rice; paddy has a different density and is not modelled."
+    },
+    {
+      "id": "maize",
+      "name": "Maize (grain, bagged)",
+      "form": "bagged",
+      "density_kg_m3": {
+        "low": 700,
+        "central": 740,
+        "high": 780,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "bag",
+        "unit_mass_kg": {
+          "value": 100,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "100 kg bag"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 36,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "grain_bagged",
+      "handling_note": "Bagged grain; manual loading.",
+      "note": "Northern origin; seasonal."
+    },
+    {
+      "id": "steel_rebar",
+      "name": "Steel rebar",
+      "form": "breakbulk",
+      "density_kg_m3": {
+        "low": 7800,
+        "central": 7850,
+        "high": 7900,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "tonne",
+        "unit_mass_kg": {
+          "value": 1000,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "tonne"
+      },
+      "typical_truckload_t": {
+        "low": 25,
+        "central": 30,
+        "high": 35,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "breakbulk_steel",
+      "handling_note": "Flatbed; crane or forklift.",
+      "note": "Volume is not the limit, axle weight is; density is shown for completeness."
+    },
+    {
+      "id": "fuel_ago",
+      "name": "Fuel: diesel/AGO (road tanker)",
+      "form": "liquid",
+      "density_kg_m3": {
+        "low": 820,
+        "central": 840,
+        "high": 860,
+        "unit": "kg/m3",
+        "source": "standard engineering reference value (bulk/handbook density); not re-fetched from a primary source in this build",
+        "vintage": "n/a (physical property)",
+        "assumed": false
+      },
+      "typical_unit": {
+        "unit": "litre",
+        "unit_mass_kg": {
+          "value": 0.84,
+          "unit": "kg per unit",
+          "source": "Trade convention for this unit (bag/drum/litre/tonne)",
+          "vintage": "n/a (convention)",
+          "assumed": false
+        },
+        "label": "litre (about 0.84 kg)"
+      },
+      "typical_truckload_t": {
+        "low": 28,
+        "central": 33,
+        "high": 37,
+        "unit": "tonnes per truck",
+        "source": "KCC analyst assumption: typical Nigerian articulated/tanker payload; no open survey found; challenge welcome",
+        "vintage": "2026-10 (KCC 1.0)",
+        "assumed": true
+      },
+      "truck_type": "articulated 30 to 40 t class (about 20 ft container equivalent) unless a tanker class is noted",
+      "handling_class": "liquid_flammable",
+      "handling_note": "Tanker (33 to 45 kL); dangerous goods.",
+      "note": "Depot to filling station and depot to site."
+    }
+  ]
+}

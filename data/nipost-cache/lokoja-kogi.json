@@ -1,0 +1,26 @@
+{
+  "schema": "kcc-place-cache/1",
+  "query": {
+    "name": "Lokoja",
+    "state": "Kogi",
+    "postcode": null
+  },
+  "resolved_at": "2026-10-18",
+  "nipost": {
+    "status": "not_attempted_no_postcode"
+  },
+  "coords": {
+    "lat": 7.8024,
+    "lon": 6.743,
+    "osm_ref": "relation/3717983",
+    "display_name": "Lokoja, Kogi, 260101, Nigeria",
+    "licence": "OpenStreetMap contributors, ODbL 1.0",
+    "resolver": "osm-nominatim",
+    "method": "place-name fallback (NIPOST L5 coordinates not available)"
+  },
+  "zone": {
+    "value": "North Central",
+    "resolver": "derived from state by KCC (six geopolitical zones), not from NIPOST",
+    "assumed": false
+  }
+}

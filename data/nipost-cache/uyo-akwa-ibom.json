@@ -1,0 +1,26 @@
+{
+  "schema": "kcc-place-cache/1",
+  "query": {
+    "name": "Uyo",
+    "state": "Akwa Ibom",
+    "postcode": null
+  },
+  "resolved_at": "2026-10-18",
+  "nipost": {
+    "status": "not_attempted_no_postcode"
+  },
+  "coords": {
+    "lat": 4.9902,
+    "lon": 7.9974,
+    "osm_ref": "relation/3715390",
+    "display_name": "Uyo, Akwa Ibom, Nigeria",
+    "licence": "OpenStreetMap contributors, ODbL 1.0",
+    "resolver": "osm-nominatim",
+    "method": "place-name fallback (NIPOST L5 coordinates not available)"
+  },
+  "zone": {
+    "value": "South South",
+    "resolver": "derived from state by KCC (six geopolitical zones), not from NIPOST",
+    "assumed": false
+  }
+}

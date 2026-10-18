@@ -1,0 +1,26 @@
+{
+  "schema": "kcc-place-cache/1",
+  "query": {
+    "name": "Sokoto",
+    "state": "Sokoto",
+    "postcode": null
+  },
+  "resolved_at": "2026-10-18",
+  "nipost": {
+    "status": "not_attempted_no_postcode"
+  },
+  "coords": {
+    "lat": 13.0611,
+    "lon": 5.2373,
+    "osm_ref": "node/501540904",
+    "display_name": "Sokoto, Sarkin Addar B, Sokoto South, Sokoto, Nigeria",
+    "licence": "OpenStreetMap contributors, ODbL 1.0",
+    "resolver": "osm-nominatim",
+    "method": "place-name fallback (NIPOST L5 coordinates not available)"
+  },
+  "zone": {
+    "value": "North West",
+    "resolver": "derived from state by KCC (six geopolitical zones), not from NIPOST",
+    "assumed": false
+  }
+}
