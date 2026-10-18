@@ -86,8 +86,8 @@ const PENALTY = {
 const PENALTY_BASIS = 'Flare Gas Regulations 2018 (S.I. No. 9 of 2018) Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 1,000 scf (28.317 m³)';
 
 // Method version + data vintage: stamped on every API response and brief.
-const METHOD_VERSION = 'KFL-M 1.3 (2026-10-17)';
-const METHOD_CHANGES = 'KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
+const METHOD_VERSION = 'KFL-M 1.4 (2026-10-18)';
+const METHOD_CHANGES = 'KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
 const VINTAGE = {
   dataset: 'World Bank GFMR, Flare Volume Estimates by Individual Flare Location 2012–2025 (xlsx)',
   release: 'Global Gas Flaring Tracker, 23 June 2026',
@@ -159,6 +159,20 @@ function enrich(site, latestMillionM3) {
     sec_events_25km: sec ? sec.sec_events_25km : null,
     sec_events_50km: sec ? sec.sec_events_50km : null,
     sec_point_status: sec ? sec.sec_point_status : 'pending live data',
+    // Incident-level energy-infrastructure attack overlay (Oxford/Inuwa 2026, CC BY 4.0).
+    sec_energy: sec && sec.incidents ? {
+      status: sec.incidents.status,
+      attacks_10km: sec.incidents.energy_attacks_10km,
+      oil_gas_10km: sec.incidents.oil_gas_10km,
+      power_10km: sec.incidents.power_10km,
+      attacks_25km: sec.incidents.energy_attacks_25km,
+      attacks_50km: sec.incidents.energy_attacks_50km,
+      deaths_25km: sec.incidents.deaths_25km,
+      dominant_state: sec.incidents.dominant_state,
+      most_recent_attack_year: sec.incidents.most_recent_attack_year,
+      focus_events_10km: Array.isArray(sec.incidents.focus_events_10km) ? sec.incidents.focus_events_10km : [],
+      source: 'Oxford / Inuwa, Leonard, Hirmer 2026 (CC BY 4.0), zenodo.org/records/15974757',
+    } : null,
   };
 }
 
