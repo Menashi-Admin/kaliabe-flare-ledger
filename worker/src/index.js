@@ -24,6 +24,7 @@ import ACCESS from '../../web/public/data/access_rates.json';
 import SEC from '../../web/public/data/security.json';
 import LIVE_BUNDLED from '../../web/public/data/live/live_thermal.json';
 import SITING_INPUTS from '../../web/public/data/siting.json';
+import FIRMS_HISTORY from '../../web/public/data/live/firms_history.json';
 
 const T = core.THRESHOLDS;
 
@@ -87,8 +88,8 @@ const PENALTY = {
 const PENALTY_BASIS = 'Flare Gas Regulations 2018 (S.I. No. 9 of 2018) Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 1,000 scf (28.317 m³)';
 
 // Method version + data vintage: stamped on every API response and brief.
-const METHOD_VERSION = 'KFL-M 1.5 (2026-10-18)';
-const METHOD_CHANGES = 'KFL-M 1.5: mini-grid siting screen (/api/siting, siting.html) - every site scored 0 to 100 on grid access gap, gas-to-power potential, population demand, security posture and solar resource (Global Solar Atlas 2, CC BY 4.0), with four screening gates and 20 km opportunity clusters; all terms are labelled estimates; no existing field changed. KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
+const METHOD_VERSION = 'KFL-M 1.6 (2026-10-18)';
+const METHOD_CHANGES = 'KFL-M 1.6: investable score (/api/invest, invest.html) - every site scored 0 to 100 on fuel consistency (GFMR record, volume, trend, NASA FIRMS night persistence and FRP intensity), demand (unserved people, access, proximity, main centre), security (distance- and age-weighted attack record as a ceiling, deaths, ACLED conflict and trend) and viability (1.5 soft gates, solar); hard gates onshore and 0.1 MW set the score to 0 with the ungated score kept; bands A to D, band margin, record-versus-live flags; reproducible offline (scripts/build_invest.mjs -> web/public/data/invest.json, invest_stress.json); no existing field or route changed. KFL-M 1.5: mini-grid siting screen (/api/siting, siting.html) - every site scored 0 to 100 on grid access gap, gas-to-power potential, population demand, security posture and solar resource (Global Solar Atlas 2, CC BY 4.0), with four screening gates and 20 km opportunity clusters; all terms are labelled estimates; no existing field changed. KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
 const VINTAGE = {
   dataset: 'World Bank GFMR, Flare Volume Estimates by Individual Flare Location 2012–2025 (xlsx)',
   release: 'Global Gas Flaring Tracker, 23 June 2026',
@@ -929,6 +930,129 @@ function sitingResponse(url, ledger) {
   });
 }
 
+// ---- KFL-M 1.6: investable score: /api/invest?scope=national|delta&band=A|B|C|D|gated&limit=N
+// Scored by core.invest from the same site record /api/sites serves, the 1.5
+// siting result (gates, solar and demand terms) and the FIRMS night window
+// bundled at deploy time (web/public/data/live/firms_history.json), so the score
+// is reproducible offline: node scripts/build_invest.mjs -> web/public/data/invest.json.
+const INVEST_FOOTNOTE = 'A screening score for triage, not a feasibility study or an investment recommendation. Every term is a normalised estimate from public data on stated assumptions; the weights are judgement calls, published so they can be challenged. It does not assess gas rights, offtake, tariff, licensing, land, community consent, capex or returns. Recorded attacks describe the past, not current risk, and satellite non-detections can be cloud.';
+const FIRMS_WINDOW = core.firmsWindow(FIRMS_HISTORY);
+let investCache = null;
+const pctile = (sorted, q) => (sorted.length ? sorted[Math.min(sorted.length - 1, Math.max(0, Math.round(q * (sorted.length - 1))))] : null);
+function spreadOf(vals) {
+  const v = vals.filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
+  if (!v.length) return { n: 0 };
+  const mean = v.reduce((a, b) => a + b, 0) / v.length;
+  const sd = Math.sqrt(v.reduce((a, b) => a + (b - mean) ** 2, 0) / v.length);
+  return { n: v.length, min: v[0], p10: pctile(v, 0.1), p25: pctile(v, 0.25), p50: pctile(v, 0.5), p75: pctile(v, 0.75), p90: pctile(v, 0.9), max: v[v.length - 1], iqr: pctile(v, 0.75) - pctile(v, 0.25), sd: round(sd, 1), distinct: new Set(v).size };
+}
+// Every number in the payload must be finite: JSON.stringify would silently turn NaN into null.
+function nonFinite(x, path = '', out = []) {
+  if (typeof x === 'number' && !Number.isFinite(x)) out.push(path);
+  else if (x && typeof x === 'object') for (const [k, v] of Object.entries(x)) nonFinite(v, path + '.' + k, out);
+  return out;
+}
+function investAll(ledger) {
+  if (investCache && investCache.ledger === ledger) return investCache.data;
+  const sit = new Map(sitingAll(ledger).rows.map((r) => [r.site_id, r]));
+  const rows = ledger.sites.map((s) => {
+    const exact = core.powerGap(s.latest_year_vol_million_m3, null, K).electric_potential_MW_exact;
+    const sr = sit.get(s.site_id);
+    const live = FIRMS_WINDOW.sites[s.site_id] || null;
+    const r = core.invest({ ...s, electric_potential_MW_exact: exact }, live, FIRMS_WINDOW.nights, sr, T);
+    return {
+      site_id: s.site_id, field_name: s.field_name, operator: s.operator, lat: s.lat, lon: s.lon,
+      state: s.state, niger_delta_class: s.niger_delta_class, in_niger_delta: s.in_niger_delta,
+      ...r,
+      siting_score: sr ? sr.siting_score : null, siting_screened_in: sr ? sr.screened_in : null, siting_rank_national: sr ? sr.rank_national : null,
+      inputs: {
+        latest_year: s.latest_year, latest_year_vol_million_m3: s.latest_year_vol_million_m3, trend_label: s.trend_label, trend_pct: s.trend_pct,
+        electric_potential_MW: s.electric_potential_MW, households_servable: s.households_servable,
+        firms_nights_detected: live ? live.nights_detected : 0, firms_window_nights: FIRMS_WINDOW.nights,
+        firms_detections: live ? live.detections : 0, firms_night_detections: live ? live.night_detections : 0,
+        firms_mean_bright_ti4_K: live ? live.mean_bright_ti4_K : null, firms_mean_frp_MW: live ? live.mean_frp_MW : null, firms_last_seen: live ? live.last_seen : null,
+        people_within_10km_not_grid: s.people_within_10km_not_grid, pop10km: s.pop10km, rural_access_proxy_pct: s.rural_access_proxy_pct,
+        nearest_settlement: s.nearest_settlement, nearest_settlement_dist_km: s.dist_km,
+        main_centre_25km: s.main_centre_25km, main_centre_25km_pop: s.main_centre_25km_pop, main_centre_25km_dist_km: s.main_centre_25km_dist_km,
+        energy_attacks_10km: s.sec_energy ? s.sec_energy.attacks_10km : null, energy_attacks_25km: s.sec_energy ? s.sec_energy.attacks_25km : null,
+        energy_attacks_50km: s.sec_energy ? s.sec_energy.attacks_50km : null, deaths_25km: s.sec_energy ? s.sec_energy.deaths_25km : null,
+        most_recent_attack_year: s.sec_energy ? s.sec_energy.most_recent_attack_year : null, dominant_state: s.sec_energy ? s.sec_energy.dominant_state : null,
+        acled_pv_area25_12m: s.sec_area25_12m ? s.sec_area25_12m.pv : null, sec_trend: s.sec_trend,
+        ghi_kwh_m2_day: (SITING_INPUTS.sites[s.site_id] || {}).ghi_kwh_m2_day ?? null,
+      },
+    };
+  });
+  // Scored first by score, then ungated score (so gated sites stay comparable), then MW.
+  rows.sort((a, b) => ((b.invest_score ?? -1) - (a.invest_score ?? -1)) || ((b.score_ungated ?? -1) - (a.score_ungated ?? -1)) || ((b.inputs.latest_year_vol_million_m3 || 0) - (a.inputs.latest_year_vol_million_m3 || 0)));
+  rows.forEach((r, i) => { r.rank_national = i + 1; });
+  investCache = { ledger, data: rows };
+  return rows;
+}
+function investAggregate(rows) {
+  const bands = { A: 0, B: 0, C: 0, D: 0, gated: 0 };
+  for (const r of rows) if (r.band) bands[r.band]++;
+  const scored = rows.filter((r) => !r.gated);
+  const comp = {};
+  for (const k of Object.keys(core.INVEST.weights)) comp[k] = spreadOf(scored.map((r) => r.components[k].score));
+  return {
+    sites: rows.length, scored: scored.length, gated: rows.length - scored.length, bands,
+    score: spreadOf(scored.map((r) => r.invest_score)),
+    ungated: spreadOf(rows.map((r) => r.score_ungated)),
+    components_scored: comp,
+    gated_by: { onshore: rows.filter((r) => r.failed_hard_gates.includes('onshore')).length, power: rows.filter((r) => r.failed_hard_gates.includes('power')).length },
+    label: 'estimate',
+  };
+}
+function investResponse(url, ledger) {
+  const q = url.searchParams;
+  const scope = Object.keys(SITING_SCOPES).includes(q.get('scope')) ? q.get('scope') : 'national';
+  const rows = investAll(ledger);
+  const inScope = rows.filter(SITING_SCOPES[scope].test);
+  let list = inScope;
+  const band = q.get('band');
+  if (band && ['A', 'B', 'C', 'D', 'gated'].includes(band)) list = list.filter((r) => r.band === band);
+  list = list.map((r, i) => ({ rank: i + 1, ...r }));
+  const lim = parseInt(q.get('limit'), 10);
+  if (lim > 0) list = list.slice(0, lim);
+  const agg = investAggregate(inScope);
+  const body = {
+    method_version: METHOD_VERSION,
+    label: 'estimate',
+    footnote: INVEST_FOOTNOTE,
+    scope, scope_label: SITING_SCOPES[scope].label,
+    aggregate: { national: investAggregate(rows), delta: investAggregate(rows.filter(SITING_SCOPES.delta.test)) },
+    spread: { scored: agg.scored, gated: agg.gated, score: agg.score, ungated: agg.ungated },
+    method: {
+      score: 'weighted mean of the four component scores (0 to 100); each component is a weighted mean of normalised terms (0 to 100); weights of missing terms are renormalised (weights_used < 1 marks it); a failed hard gate sets the score to 0 and score_ungated keeps the value before the gate',
+      weights: core.INVEST.weights,
+      terms: core.INVEST.terms,
+      scales: core.INVEST.scales,
+      bands: Object.fromEntries(core.INVEST.bands.map(([b, lo]) => [b, lo])),
+      band_labels: core.INVEST.band_labels,
+      hard_gates: { onshore: 'not offshore', power_min_MW: T.siting_min_mw },
+      raw_units: 'bright_ti4 (K) and FRP (MW) are published as inputs; only FRP enters the score, normalised on a log scale; bright_ti4 is not scored (it saturates near 367 K and is warmed by daytime sun)',
+      firms_window: { nights: FIRMS_WINDOW.nights, first: FIRMS_WINDOW.first, last: FIRMS_WINDOW.last, excluded_nights: FIRMS_WINDOW.excluded_nights, rule: 'a night counts only if at least one site had a night-time detection on it; a night with none anywhere is a missing file, not a dark night', snapshot: 'bundled at deploy time, so the score is reproducible; the live map reads the daily refresh' },
+      not_scored: { households_servable: core.GLOSSARY.households_servable, dominant_state: core.GLOSSARY.dominant_state, bright_ti4: 'shown as an input only' },
+      ranking: 'by investable score, then ungated score, then latest-year volume; rank_national is over every site',
+      reproduce: 'node scripts/build_invest.mjs runs this Worker on data/gfmr_nigeria_sites_seed.json and writes web/public/data/invest.json',
+    },
+    glossary: core.GLOSSARY,
+    sources: {
+      volume: 'World Bank GFMR flare-location estimates 2012-2025, June 2026 release',
+      live_thermal: `NASA FIRMS VIIRS 375 m NRT (Suomi NPP, NOAA-20, NOAA-21), nights ${FIRMS_WINDOW.first} to ${FIRMS_WINDOW.last}`,
+      population: 'GRID3 NGA Population v3.0 and Settlement Points (CC BY 4.0)',
+      access: 'World Bank WDI 2024; Nigeria DHS 2023-24 (NPC & ICF)',
+      security: 'Oxford / Inuwa, Leonard, Hirmer 2026 (CC BY 4.0), zenodo.org/records/15974757; ACLED via HDX (LGA aggregates)',
+      solar: SITING_INPUTS.meta.solar,
+    },
+    count: list.length,
+    sites: list,
+  };
+  const bad = nonFinite(body);
+  body.checks = { non_finite_numbers: bad.length, non_finite_paths: bad.slice(0, 10) };
+  return json(body);
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -971,6 +1095,8 @@ export default {
       if (path === '/api/brief') return brief(url, await loadLedger(env));
 
       if (path === '/api/siting') return sitingResponse(url, await loadLedger(env));
+
+      if (path === '/api/invest') return investResponse(url, await loadLedger(env));
 
       if (path === '/api/sites/trend') {
         // lightweight aggregate for map — latest year markers

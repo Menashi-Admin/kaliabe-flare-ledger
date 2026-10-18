@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Analytics by Traks -->
+<script>window.traks=window.traks||function(){(window.traks.q=window.traks.q||[]).push(arguments)}</script>
+<script defer data-site="pb_live_m6flokkgr4qejfk8ba9tp3gg" src="https://analytics-collect.menashi.dev/t.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Investable score | Kaliabe Flare Tracker</title>
+<meta name="description" content="Which of Nigeria's flare sites are worth a first look for a gas-to-power investment: every site scored on fuel consistency, unserved demand, security and siting viability, with the method, the stress tests and an explainer on every figure." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23b5761e%22/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="./css/base.css" />
+<style>
+  .inv-stats{max-width:none;margin:22px 0 0}
+  .inv-q{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:18px 0 0}
+  .inv-q .card{gap:6px}
+  .inv-q .card p{margin:0;font-size:.84rem;color:var(--ink-soft)}
+  .inv-w{font-family:var(--serif);font-size:1.5rem}
+  .inv-bar{display:inline-block;width:46px;height:6px;background:var(--paper-2);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+  .inv-bar i{display:block;height:100%;background:var(--accent)}
+  .inv-c{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:.8rem}
+  .inv-score{font-family:var(--serif);font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .inv-band{display:inline-block;min-width:1.6em;text-align:center;font-size:.72rem;font-weight:600;border:1px solid currentColor;border-radius:10px;padding:0 6px;margin-left:6px;vertical-align:middle}
+  .inv-band--A{color:var(--on)}
+  .inv-band--B{color:var(--accent)}
+  .inv-band--C{color:var(--ink-soft)}
+  .inv-band--D,.inv-band--gated{color:var(--off)}
+  .inv-gated{color:var(--off)}
+  .inv-flag{font-size:.72rem;color:var(--accent);white-space:nowrap}
+  .inv-btn{all:unset;cursor:pointer;color:var(--accent);font-size:.8rem;white-space:nowrap}
+  .inv-btn:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+  .table tbody tr.inv-detail:hover{background:transparent}
+  .inv-detail td{background:#fff}
+  .inv-comp{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:4px 28px;margin:0 0 10px}
+  .inv-comp h4{margin:10px 0 2px;font-size:.84rem}
+  .inv-why{margin:0;font-size:.8rem}
+  .inv-why div{padding:5px 0;border-top:1px solid var(--line)}
+  .inv-why dt{font-weight:600}
+  .inv-why dd{margin:2px 0 0;color:var(--ink-soft)}
+  .inv-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px 18px;margin:8px 0 0;font-size:.8rem}
+  .inv-inputs div{border-top:1px solid var(--line);padding:5px 0}
+  .inv-inputs dt{color:var(--ink-soft);font-size:.72rem}
+  .inv-inputs dd{margin:1px 0 0;font-variant-numeric:tabular-nums}
+  .inv-tools{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+  .inv-stress{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0 0}
+  .inv-stress .card{gap:6px}
+  .inv-stress .card p{margin:0;font-size:.84rem;color:var(--ink-soft)}
+  /* hover explainers: dotted underline marks a figure with an explainer */
+  .tip{border-bottom:1px dotted var(--ink-soft);cursor:help}
+  .tip:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+  #tipBox{position:fixed;z-index:1000;max-width:320px;pointer-events:none;margin:0}
+  #tipBox[hidden]{display:none}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand"><span class="brand__mark" aria-hidden="true"></span><span class="brand__name"><a href="./" style="color:inherit;text-decoration:none">Kaliabe Flare Tracker</a></span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="./index.html#map" class="nav__link">Map</a>
+      <a href="./index.html#operators" class="nav__link">Operators</a>
+      <a href="siting.html" class="nav__link">Siting</a>
+      <a href="invest.html" class="nav__link" aria-current="page">Invest</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+      <a href="blog/" class="nav__link">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <div class="wrap">
+    <p class="hero__kicker">Investable score · <span id="mv">KFL-M 1.6</span></p>
+    <h1>Which flare sites are worth a first look</h1>
+    <p class="lede">
+      Every flare site in the tracker, scored 0 to 100 on the three questions an investor in gas-to-power asks first.
+      Is the flare <strong>consistent</strong>, so the fuel will be there? Is it <strong>close to people without power</strong>,
+      so there is demand? Is it <strong>secure enough</strong> to build and run? A fourth, smaller term asks whether the 1.5 siting
+      screen would keep it. Hover or focus any figure with a dotted underline for a plain-language explainer.
+      <strong>Every figure is an estimate</strong>, and the score is for triage, not an investment recommendation.
+    </p>
+
+    <dl class="hero__stats inv-stats" id="stats">
+      <div class="stat"><dt><span class="tip" tabindex="0" data-tip="band">Band A sites</span></dt><dd id="sA">…</dd><dd class="stat__sub" id="sASub"></dd></div>
+      <div class="stat"><dt>Scored sites</dt><dd id="sScored">…</dd><dd class="stat__sub" id="sScoredSub"></dd></div>
+      <div class="stat"><dt><span class="tip" tabindex="0" data-tip="invest_score">Median score</span> <span class="est">estimate</span></dt><dd id="sMed">…</dd><dd class="stat__sub" id="sMedSub"></dd></div>
+      <div class="stat"><dt><span class="tip" tabindex="0" data-tip="hard_gates">Gated</span></dt><dd id="sGated">…</dd><dd class="stat__sub" id="sGatedSub"></dd></div>
+    </dl>
+    <p class="map__cite" id="statsNote">Figures above are national. Each is derived from the site records below.</p>
+
+    <h2>How a site is scored</h2>
+    <p>Each component is built from terms normalised to 0 to 100, mostly on log scales so that one very large flare or town does not
+      swamp the rest. The investable score is the weighted mean of the four components. Two hard gates come first: an offshore flare,
+      or one whose gas could not fuel a 0.1 MW generator, scores 0 (its <span class="tip" tabindex="0" data-tip="score_ungated">ungated score</span>
+      is still shown). Raw satellite units, <span class="tip" tabindex="0" data-tip="bright_ti4">bright_ti4</span> in kelvin and
+      <span class="tip" tabindex="0" data-tip="frp">FRP</span> in megawatts, are shown as inputs and normalised before they reach the score.</p>
+    <div class="inv-q" id="comps"></div>
+    <p class="ops__note">Bands: <span class="inv-band inv-band--A">A</span> 75 and up, <span class="inv-band inv-band--B">B</span> 65 to 74,
+      <span class="inv-band inv-band--C">C</span> 55 to 64, <span class="inv-band inv-band--D">D</span> under 55.
+      Scores within about 3 points of each other are effectively tied; see the <span class="tip" tabindex="0" data-tip="band_margin">band margin</span>.
+      Full method: <a class="link" href="methodology.html#invest">methodology section 7c</a>.</p>
+
+    <h2 id="ranked">Ranked sites</h2>
+    <div class="inv-tools">
+      <div class="seg" role="group" aria-label="Scope">
+        <button type="button" class="seg__opt" data-scope="national" aria-pressed="true">National</button>
+        <button type="button" class="seg__opt" data-scope="delta" aria-pressed="false">Niger Delta</button>
+      </div>
+      <div class="seg" role="group" aria-label="Band">
+        <button type="button" class="seg__opt" data-band="" aria-pressed="false">All</button>
+        <button type="button" class="seg__opt" data-band="scored" aria-pressed="true">Scored</button>
+        <button type="button" class="seg__opt" data-band="A" aria-pressed="false">A</button>
+        <button type="button" class="seg__opt" data-band="B" aria-pressed="false">B</button>
+        <button type="button" class="seg__opt" data-band="C" aria-pressed="false">C</button>
+        <button type="button" class="seg__opt" data-band="D" aria-pressed="false">D</button>
+        <button type="button" class="seg__opt" data-band="gated" aria-pressed="false">Gated</button>
+      </div>
+      <label class="filter__toggle"><input type="checkbox" id="onlyFlags" /> <span class="tip" tabindex="0" data-tip="flags">Flagged only</span></label>
+      <a class="link" id="apiLink" href="/api/invest">API: /api/invest</a>
+    </div>
+    <div class="tablewrap">
+      <table class="table table--tight" id="rankTable">
+        <caption class="visually-hidden">Flare sites ranked by investable score</caption>
+        <thead><tr>
+          <th class="num">#</th><th>Site / operator</th><th>State</th>
+          <th class="num"><span class="tip" tabindex="0" data-tip="invest_score">Score</span></th>
+          <th><span class="tip" tabindex="0" data-tip="consistency">Consistency</span></th>
+          <th><span class="tip" tabindex="0" data-tip="demand">Demand</span></th>
+          <th><span class="tip" tabindex="0" data-tip="security">Security</span></th>
+          <th><span class="tip" tabindex="0" data-tip="viability">Viability</span></th>
+          <th><span class="tip" tabindex="0" data-tip="flags">Flags</span></th><th>Detail</th>
+        </tr></thead>
+        <tbody id="rankBody"><tr><td colspan="10">Loading…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="ops__note" id="countNote"></p>
+
+    <h2 id="stress">Stress tests</h2>
+    <p>Before publishing, the method was tested against the cases most likely to mislead. The results below are re-run from the
+      committed data by <code>node scripts/build_invest.mjs</code> and published as
+      <a class="link" href="data/invest_stress.json">invest_stress.json</a>.</p>
+    <div class="inv-stress" id="stressCards"><div class="card"><p>Loading…</p></div></div>
+
+    <h2>Where judgement could mislead</h2>
+    <ul class="sources" id="caveats">
+      <li><strong>The weights are judgement calls.</strong> Consistency 28%, demand 34%, security 26%, viability 12% are not fitted to outcomes; there is no
+        record of built flare-to-power projects to fit them to. The stress tests show the ranking is stable when every weight moves by up to 30%, but a reader
+        with different priorities should re-weight from the published component scores.</li>
+      <li><strong>Security looks backwards.</strong> It counts recorded attacks since 2015 and ACLED events over the last 12 months. It does not know about
+        community agreements, host-community trusts, or a change in local politics. A clean record is not a guarantee.</li>
+      <li><strong>Eight nights of satellite data is short.</strong> October is rainy season in the Niger Delta, and cloud reads as "not burning". The
+        persistence term is a lower bound and carries 5.6% of the total score, so a single warm pixel cannot lift a site and a cloudy week cannot sink one. A
+        large flare that FIRMS barely saw is flagged instead.</li>
+      <li><strong>The access proxy is state-wide.</strong> Every site in a state shares one rural access figure, so the access term separates states, not
+        villages.</li>
+      <li><strong>Volume is not capturable gas.</strong> The volume term assumes the flared gas could be captured. Gas composition, pressure, the operator's
+        own plans and gas rights decide whether it can be.</li>
+      <li><strong>Bands are brittle at the edges.</strong> About half the scored sites are within 2 points of a band cut-off. Read the score and the band
+        margin, not the letter alone.</li>
+    </ul>
+
+    <h2>What this is not</h2>
+    <div class="notice" id="footnote">
+      A screening score for triage, not a feasibility study or an investment recommendation.
+    </div>
+    <ul class="sources" id="sources"></ul>
+
+    <p style="margin-top:36px"><a href="./" class="link">Back to the tracker</a> · <a href="methodology.html#invest" class="link">Investable score method</a> · <a href="siting.html" class="link">Mini-grid siting</a></p>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap foot__inner">
+  <p>Built by Kaliabe · open data · honest uncertainty. Investable scores are screening estimates, not investment advice.</p>
+  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a> · <a href="blog/">Writing</a></p>
+</div></footer>
+
+<p class="kfl-tip" id="tipBox" role="tooltip" hidden></p>
+
+<script src="./js/ledger-core.js"></script>
+<script>
+(function () {
+  'use strict';
+  var API = new URLSearchParams(location.search).get('api') || '';
+  var U = KaliabeCore.util, esc = U.esc;
+  var G = KaliabeCore.GLOSSARY;
+  var COMPS = [
+    ['consistency', 'Consistency', 'Is the flare reliable enough to be a fuel supply?'],
+    ['demand', 'Demand', 'Are there people without power close enough to sell to?'],
+    ['security', 'Security', 'Is the area safe enough to build and operate?'],
+    ['viability', 'Viability', 'Would the 1.5 siting screen keep it?'],
+  ];
+  var TERM_NAMES = {
+    record: 'Years on record', volume: 'Latest-year volume', trend: 'Trend', persistence: 'Night persistence', intensity: 'Intensity (FRP)',
+    unserved: 'People without access', access: 'Access proxy', proximity: 'Nearest settlement', centre: 'Main centre',
+    attacks: 'Attack record', recency: 'Recency', lethality: 'Deaths', conflict: 'Political violence', trend_sec: 'Conflict trend',
+    demand_gate: 'Demand gate', security_gate: 'Security gate', solar: 'Solar',
+  };
+  var FLAG_NAMES = { live_no_record: 'heat, no record', record_live_quiet: 'record, quiet live' };
+  var state = { scope: 'national', band: 'scored', onlyFlags: false, data: null };
+
+  function n(v, d) { return v == null || !isFinite(v) ? 'n/a' : U.num(v, d == null ? 0 : d); }
+  function tipAttr(key, extra) {
+    var t = (G[key] || '') + (extra ? ' This site: ' + extra : '');
+    return ' class="tip" tabindex="0" data-tip-text="' + esc(t) + '"';
+  }
+  function glossKey(comp, k) { return comp === 'security' && k === 'trend' ? 'sec_trend' : k; }
+
+  // ---- hover / focus explainer layer
+  var box = document.getElementById('tipBox');
+  var cur = null;
+  function textFor(el) { return el.getAttribute('data-tip-text') || G[el.getAttribute('data-tip')] || ''; }
+  function show(el) {
+    var t = textFor(el);
+    if (!t) return;
+    cur = el;
+    box.textContent = t;
+    box.hidden = false;
+    if (!box.id) box.id = 'tipBox';
+    el.setAttribute('aria-describedby', 'tipBox');
+    var r = el.getBoundingClientRect(), bw = box.offsetWidth, bh = box.offsetHeight;
+    var x = Math.max(8, Math.min(window.innerWidth - bw - 8, r.left + r.width / 2 - bw / 2));
+    var y = r.top - bh - 8;
+    if (y < 8) y = r.bottom + 8;
+    box.style.left = x + 'px';
+    box.style.top = y + 'px';
+  }
+  function hide() { if (cur) cur.removeAttribute('aria-describedby'); cur = null; box.hidden = true; }
+  document.addEventListener('mouseover', function (e) { var el = e.target.closest('.tip'); if (el && el !== cur) show(el); else if (!el && cur) hide(); });
+  document.addEventListener('focusin', function (e) { var el = e.target.closest('.tip'); if (el) show(el); });
+  document.addEventListener('focusout', function (e) { if (e.target.closest('.tip')) hide(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
+  window.addEventListener('scroll', hide, { passive: true });
+
+  function bar(c, key, r) {
+    if (!c || c.score == null) return '<span class="inv-c site-sub">n/a</span>';
+    var top = Object.keys(c.terms).map(function (k) { var t = c.terms[k]; return (TERM_NAMES[glossKey(key, k) === 'sec_trend' ? 'trend_sec' : k] || k) + ' ' + (t.score == null ? 'n/a' : t.score); }).join(', ');
+    return '<span' + tipAttr(key, top + '.') + '><span class="inv-c"><span class="inv-bar"><i style="width:' + c.score + '%"></i></span>' + c.score + '</span></span>';
+  }
+  function bandChip(b) { return b ? '<span class="inv-band inv-band--' + esc(b) + '">' + (b === 'gated' ? 'gated' : esc(b)) + '</span>' : ''; }
+
+  function header(d) {
+    var a = d.aggregate.national, sp = d.spread;
+    document.getElementById('mv').textContent = d.method_version;
+    document.getElementById('sA').textContent = n(a.bands.A);
+    document.getElementById('sASub').textContent = 'of ' + n(a.scored) + ' scored; B ' + n(a.bands.B) + ', C ' + n(a.bands.C) + ', D ' + n(a.bands.D);
+    document.getElementById('sScored').textContent = n(a.scored);
+    document.getElementById('sScoredSub').textContent = 'onshore, with gas for at least 0.1 MW';
+    document.getElementById('sMed').textContent = n(a.score.p50);
+    document.getElementById('sMedSub').textContent = 'scored sites; middle half ' + n(a.score.p25) + ' to ' + n(a.score.p75);
+    document.getElementById('sGated').textContent = n(a.gated);
+    document.getElementById('sGatedSub').textContent = n(a.gated_by.onshore) + ' offshore, ' + n(a.gated_by.power) + ' under 0.1 MW of gas';
+    document.getElementById('statsNote').textContent = 'Figures above are national (' + n(a.sites) + ' sites). Ungated scores across every site run from ' +
+      n(a.ungated.min) + ' to ' + n(a.ungated.max) + '. Each figure is derived from the site records below.';
+    var w = d.method.weights;
+    document.getElementById('comps').innerHTML = COMPS.map(function (c) {
+      var cs = a.components_scored[c[0]];
+      var terms = Object.keys(d.method.terms[c[0]]).concat(c[0] === 'security' ? ['attacks', 'recency'] : []);
+      return '<div class="card"><p class="fig__label"><span class="tip" tabindex="0" data-tip="' + c[0] + '">' + esc(c[1]) + '</span> <span class="est">estimate</span></p>' +
+        '<span class="inv-w">' + Math.round(w[c[0]] * 100) + '%</span><p>' + esc(c[2]) + '</p>' +
+        '<p class="site-sub">Terms: ' + terms.map(function (k) { var g = glossKey(c[0], k); return '<span class="tip" tabindex="0" data-tip="' + g + '">' + esc((TERM_NAMES[g === 'sec_trend' ? 'trend_sec' : k] || k).toLowerCase()) + '</span>'; }).join(', ') + '.</p>' +
+        '<p class="site-sub">Scored sites: middle half ' + n(cs.p25) + ' to ' + n(cs.p75) + '.</p></div>';
+    }).join('');
+    document.getElementById('footnote').textContent = d.footnote;
+    var s = d.sources, sol = s.solar || {};
+    document.getElementById('sources').innerHTML = [
+      'Flare volume: ' + s.volume,
+      'Live thermal: ' + s.live_thermal + '. ' + d.method.firms_window.rule + (d.method.firms_window.excluded_nights.length ? ' (left out: ' + d.method.firms_window.excluded_nights.join(', ') + ')' : '') + '.',
+      'Population and settlements: ' + s.population,
+      'Electricity access: ' + s.access,
+      'Security: ' + s.security,
+      'Solar: ' + (sol.dataset || '') + ', ' + (sol.publisher || '') + ', ' + (sol.licence || ''),
+      'Method ' + d.method_version + '. Reproduce: ' + d.method.reproduce + '.',
+    ].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
+  }
+
+  function detail(r) {
+    var item = function (label, key, sc, basis, note) {
+      return '<div><dt><span' + tipAttr(key) + '>' + esc(label) + '</span>' + (note ? ', ' + esc(note) : sc == null ? ', no input' : ', ' + sc) + '</dt><dd>' + esc(basis) + '</dd></div>';
+    };
+    var comps = COMPS.map(function (c) {
+      var comp = r.components[c[0]];
+      var rows = Object.keys(comp.terms).map(function (k) {
+        var t = comp.terms[k], g = glossKey(c[0], k);
+        return item(TERM_NAMES[g === 'sec_trend' ? 'trend_sec' : k] || k, g, t.score, t.basis, t.folded_into ? 'folded into the attack record, x' + (t.score / 100).toFixed(2) : null);
+      }).join('');
+      var extra = comp.formula ? '<div><dt>How it combines</dt><dd>' + esc(comp.formula) + (comp.context_score != null ? '; context ' + comp.context_score : '') + '</dd></div>' : '';
+      return '<div><h4><span' + tipAttr(c[0]) + '>' + esc(c[1]) + '</span> ' + (comp.score == null ? 'n/a' : comp.score) + ' <span class="site-sub">weight ' + Math.round(state.data.method.weights[c[0]] * 100) + '%</span></h4><dl class="inv-why">' + rows + extra + '</dl></div>';
+    }).join('');
+    var i = r.inputs;
+    var inp = function (label, key, v) { return '<div><dt>' + (key ? '<span' + tipAttr(key) + '>' + esc(label) + '</span>' : esc(label)) + '</dt><dd>' + esc(v) + '</dd></div>'; };
+    var inputs = [
+      inp('Gas, ' + (i.latest_year || 'latest year'), 'volume', n(i.latest_year_vol_million_m3, 2) + ' million m3'),
+      inp('Generator size', null, i.electric_potential_MW == null ? 'n/a' : n(i.electric_potential_MW, i.electric_potential_MW < 10 ? 1 : 0) + ' MW'),
+      inp('Households servable', 'households_servable', n(i.households_servable)),
+      inp('FIRMS nights seen', 'nights_window', n(i.firms_nights_detected) + ' of ' + n(i.firms_window_nights)),
+      inp('FIRMS detections', null, n(i.firms_detections) + ' (' + n(i.firms_night_detections) + ' at night)'),
+      inp('Mean bright_ti4', 'bright_ti4', i.firms_mean_bright_ti4_K == null ? 'not detected' : n(i.firms_mean_bright_ti4_K, 1) + ' K'),
+      inp('Mean FRP', 'frp', i.firms_mean_frp_MW == null ? 'not detected' : n(i.firms_mean_frp_MW, 2) + ' MW'),
+      inp('People within 10 km', null, n(i.pop10km)),
+      inp('Without access', 'unserved', n(i.people_within_10km_not_grid)),
+      inp('Access proxy', 'access', i.rural_access_proxy_pct == null ? 'n/a' : n(i.rural_access_proxy_pct, 1) + '%'),
+      inp('Attacks 10 / 25 / 50 km', 'attacks', n(i.energy_attacks_10km) + ' / ' + n(i.energy_attacks_25km) + ' / ' + n(i.energy_attacks_50km)),
+      inp('Last attack nearby', 'recency', i.most_recent_attack_year || 'none recorded'),
+      inp('Dominant state', 'dominant_state', i.dominant_state || 'n/a'),
+      inp('Siting score (1.5)', null, (r.siting_score == null ? 'n/a' : r.siting_score) + (r.siting_screened_in ? ', screened in' : ', screened out')),
+      inp('Score before gates', 'score_ungated', n(r.score_ungated)),
+      inp('Band margin', 'band_margin', r.band_margin == null ? 'n/a' : n(r.band_margin) + ' points'),
+      inp('Weights used', 'weights_used', String(r.weights_used)),
+    ].join('');
+    var flags = r.flags.length ? '<div class="notice" style="margin:8px 0">' + r.flags.map(function (f) { return esc(f.text); }).join('<br>') + '</div>' : '';
+    var gates = r.gated ? '<p class="inv-gated" style="margin:6px 0">Gated: ' + esc(r.failed_hard_gates.map(function (g) { return g === 'onshore' ? 'offshore' : 'gas under 0.1 MW'; }).join(', ')) + '. Score set to 0; ungated score ' + n(r.score_ungated) + '.</p>' : '';
+    return gates + flags + '<div class="inv-comp">' + comps + '</div><p class="fig__label" style="margin-top:10px">Inputs</p><dl class="inv-inputs">' + inputs + '</dl>';
+  }
+
+  function table() {
+    var d = state.data;
+    var rows = d.sites.filter(function (r) {
+      if (state.scope === 'delta' && !r.in_niger_delta) return false;
+      if (state.band === 'scored' && r.gated) return false;
+      if (state.band && state.band !== 'scored' && r.band !== state.band) return false;
+      if (state.onlyFlags && !r.flags.length) return false;
+      return true;
+    });
+    var q = 'scope=' + state.scope + (state.band && state.band !== 'scored' ? '&band=' + state.band : '');
+    document.getElementById('apiLink').href = API + '/api/invest?' + q;
+    document.getElementById('countNote').textContent = n(rows.length) + ' sites shown. Rank is national, over all ' + n(d.sites.length) + ' sites.';
+    if (!rows.length) { document.getElementById('rankBody').innerHTML = '<tr><td colspan="10">No sites in this view.</td></tr>'; return; }
+    document.getElementById('rankBody').innerHTML = rows.map(function (r, k) {
+      var c = r.components;
+      var flags = r.flags.map(function (f) { return '<span class="inv-flag tip" tabindex="0" data-tip-text="' + esc(f.text) + '">' + esc(FLAG_NAMES[f.id] || f.id) + '</span>'; }).join('<br>');
+      var scoreTip = r.gated ? 'Gated (' + r.failed_hard_gates.join(', ') + '); ungated score ' + n(r.score_ungated) + '.' : 'Band ' + r.band + ', ' + n(r.band_margin) + ' points from the nearest cut-off.';
+      return '<tr' + (r.gated ? ' class="inv-gated"' : '') + '>' +
+        '<td class="num">' + r.rank_national + '</td>' +
+        '<td><strong>' + esc(r.field_name || r.site_id) + '</strong><br><span class="site-sub">' + esc(r.operator) + '</span></td>' +
+        '<td>' + esc(r.state || 'n/a') + (r.niger_delta_class === 'offshore' ? '<br><span class="site-sub">offshore</span>' : '') + '</td>' +
+        '<td class="num" style="white-space:nowrap"><span' + tipAttr('invest_score', scoreTip) + '><span class="inv-score">' + (r.invest_score == null ? 'n/a' : r.invest_score) + '</span></span>' + bandChip(r.band) + '</td>' +
+        '<td>' + bar(c.consistency, 'consistency', r) + '</td><td>' + bar(c.demand, 'demand', r) + '</td><td>' + bar(c.security, 'security', r) + '</td><td>' + bar(c.viability, 'viability', r) + '</td>' +
+        '<td>' + (flags || '<span class="site-sub">none</span>') + '</td>' +
+        '<td><button type="button" class="inv-btn" aria-expanded="false" aria-controls="det' + k + '" data-id="' + esc(r.site_id) + '">Why</button></td>' +
+        '</tr><tr class="inv-detail" id="det' + k + '" hidden><td colspan="10"></td></tr>';
+    }).join('');
+  }
+
+  function stress(st) {
+    var p = st.persistence, se = st.security.by_group, sn = st.sensitivity, sp = st.spread;
+    var site = function (x) { return x ? esc(x.field_name) + ' (' + (x.band === 'gated' ? 'gated' : 'band ' + x.band + ', ' + x.invest_score) + ')' : ''; };
+    var bad = p.known_bad_one_warm_pixel_no_gas[0], live = p.known_bad_live_heat_no_record[0], weak = p.weak_pixel_big_record[0];
+    var good = p.known_good_siting_top5.filter(Boolean);
+    var g = function (k) { return se[k].invest_1_6.mean == null ? 'n/a' : Math.round(se[k].invest_1_6.mean); };
+    var o = function (k) { return se[k].siting_1_5.mean == null ? 'n/a' : Math.round(se[k].siting_1_5.mean); };
+    var cards = [
+      ['A warm pixel is not a flare', 'One night of FIRMS detection is worth at most ' + p.max_points_from_one_night + ' points. ' +
+        (bad ? site(bad) + ' had one detection (' + n(bad.firms.bright_ti4_K, 1) + ' K, ' + n(bad.firms.frp_MW, 2) + ' MW) and no GFMR gas: consistency ' + bad.consistency + '. ' : '') +
+        (live ? site(live) + ' shows heat on ' + live.firms.nights + ' of ' + live.firms.of + ' nights with no GFMR gas, so it is flagged and stays gated.' : '')],
+      ['Consistent flares rank high', 'The 1.5 siting top five: ' + good.map(site).join('; ') + '. ' +
+        (weak ? site(weak) + ' has a large GFMR record but one weak FIRMS pixel; it keeps its score and carries a flag to confirm the gas.' : '')],
+      ['Tense is not hostile', 'Mean security score, 1.6 against the 1.5 siting term: no attack within 50 km ' + g('clean') + ' (' + o('clean') + '); none within 10 km but 15+ within 50 km ' +
+        g('tense_but_stable') + ' (' + o('tense_but_stable') + '); one within 10 km ' + g('one_within_10km') + ' (' + o('one_within_10km') + '); 3+ within 10 km ' + g('hostile') + ' (' + o('hostile') +
+        '). Hostile sites no longer bottom out at 0, and tense sites no longer score as if they were quiet.'],
+      ['The score spreads', 'Scored sites run from ' + n(sp.national.min) + ' to ' + n(sp.national.max) + ', middle half ' + n(sp.national.p25) + ' to ' + n(sp.national.p75) +
+        '; components spread more (consistency middle half ' + n(sp.components_scored.consistency.p25) + ' to ' + n(sp.components_scored.consistency.p75) + '). Demand and security pull against each other, so the total is tighter than its parts. ' +
+        sp.near_band_edge_pct + '% of scored sites are within 2 points of a band edge.'],
+      ['The weights are not decisive', 'Moving every weight by up to 30%: the median site keeps its band (' + sn.band_changes_pct.median + '% change band, ' + sn.band_changes_pct.p90 +
+        '% in the worst tenth of draws), ' + sn.top10_kept.median + ' of the top 10 stay, rank correlation ' + sn.spearman_rho.median + ', no site moves more than ' + sn.max_site_shift_points.p90 + ' points in 90% of draws. Dropping demand or consistency entirely does reshuffle the top 10 (' +
+        sn.drop_one_component.demand.top10_kept + ' and ' + sn.drop_one_component.consistency.top10_kept + ' kept): those two carry the ranking.'],
+      ['No missing numbers', 'Every number in the API payload is checked before it is served: ' + st.checks.non_finite_numbers + ' non-finite values. Missing inputs give a blank term and renormalised weights, never a guess.'],
+    ];
+    document.getElementById('stressCards').innerHTML = cards.map(function (c) { return '<div class="card"><p class="fig__label">' + esc(c[0]) + '</p><p>' + c[1] + '</p></div>'; }).join('');
+  }
+
+  function fail(e) { document.getElementById('rankBody').innerHTML = '<tr><td colspan="10">Could not load the investable score API (' + esc(e.message) + ').</td></tr>'; }
+
+  document.querySelectorAll('[data-scope]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.scope = b.dataset.scope;
+      document.querySelectorAll('[data-scope]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      if (state.data) table();
+    });
+  });
+  document.querySelectorAll('[data-band]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.band = b.dataset.band;
+      document.querySelectorAll('[data-band]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      if (state.data) table();
+    });
+  });
+  document.getElementById('onlyFlags').addEventListener('change', function (e) { state.onlyFlags = e.target.checked; if (state.data) table(); });
+  document.getElementById('rankBody').addEventListener('click', function (e) {
+    var b = e.target.closest('.inv-btn');
+    if (!b) return;
+    var open = b.getAttribute('aria-expanded') !== 'true';
+    var row = document.getElementById(b.getAttribute('aria-controls'));
+    if (open && !row.firstChild.innerHTML) {
+      var r = state.data.sites.filter(function (x) { return x.site_id === b.dataset.id; })[0];
+      row.firstChild.innerHTML = detail(r);
+    }
+    b.setAttribute('aria-expanded', String(open));
+    row.hidden = !open;
+  });
+
+  fetch(API + '/api/invest?scope=national').then(function (r) {
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }).then(function (d) { state.data = d; header(d); table(); }).catch(fail);
+  fetch('data/invest_stress.json').then(function (r) { return r.ok ? r.json() : Promise.reject(new Error(r.status)); }).then(stress).catch(function () {
+    document.getElementById('stressCards').innerHTML = '<div class="card"><p>Stress test file not available.</p></div>';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Methodology & Confidence
 
-**Kaliabe Flare Ledger · method version KFL-M 1.5 (2026-10-18)**
+**Kaliabe Flare Ledger · method version KFL-M 1.6 (2026-10-18)**
 Mirrors the site's [methodology page](https://kaliabe-flare-web.pages.dev/methodology.html). The
 code that implements each rule is named next to it.
 
@@ -12,7 +12,8 @@ code that implements each rule is named next to it.
 
 | Version | Date | Change |
 |---|---|---|
-| **KFL-M 1.5** | 2026-10-18 | **Mini-grid siting screen** (§9.6). Every site scored 0 to 100 on access gap, gas-to-power, demand, security and solar resource (`core.siting`), four screening gates, 20 km leader-clustered opportunities (`core.sitingClusters`). New API route `/api/siting`, page `siting.html`, input file `web/public/data/siting.json` (`scripts/build_siting.py`, Global Solar Atlas 2, CC BY 4.0). New thresholds: `siting_min_mw`, `siting_min_people_not_grid`, `siting_max_energy_attacks_10km`, `siting_cluster_km`. No existing field or route changed. |
+| **KFL-M 1.6** | 2026-10-18 | **Investable score** (§9.7). Every site scored 0 to 100 on fuel consistency, demand, security and viability (`core.invest`), with hard gates (onshore, 0.1 MW), bands A to D, a band margin and two record-versus-live flags. Shared FIRMS night window (`core.firmsWindow`) that leaves out nights with no detection anywhere. New API route `/api/invest`, page `invest.html` with hover explainers from `core.GLOSSARY`, offline run `scripts/build_invest.mjs` writing `web/public/data/invest.json` and `invest_stress.json`. No existing field or route changed. |
+| KFL-M 1.5 | 2026-10-18 | **Mini-grid siting screen** (§9.6). Every site scored 0 to 100 on access gap, gas-to-power, demand, security and solar resource (`core.siting`), four screening gates, 20 km leader-clustered opportunities (`core.sitingClusters`). New API route `/api/siting`, page `siting.html`, input file `web/public/data/siting.json` (`scripts/build_siting.py`, Global Solar Atlas 2, CC BY 4.0). New thresholds: `siting_min_mw`, `siting_min_people_not_grid`, `siting_max_energy_attacks_10km`, `siting_cluster_km`. No existing field or route changed. |
 | KFL-M 1.4 | 2026-10-18 | Energy-infrastructure incident overlay: per-site 10/25/50 km counts of attacks on oil, gas and power infrastructure 2015 to now (Oxford/Inuwa et al. 2026, CC BY 4.0), served as `sec_energy`. |
 | KFL-M 1.3 | 2026-10-17 | **Enrichment — live & opportunity** (§9). Population within 5/10/25/50 km (GRID3 v3.0); power-gap estimates (`core.powerGap`); electricity-access context (WDI, NDHS 2023-24) with a derived state rural proxy; live NASA FIRMS thermal check with an under-report flag (`core.liveCheck`); ACLED LGA security context and 12-month trend (`core.secTrend`). New thresholds: `live_min_window_nights`, `live_burning_night_share_pct`, `sec_trend_band_pct`, `sec_trend_min_abs_events`. No change to verdicts, trends or penalties. |
 | KFL-M 1.2 | 2026-10-17 | **Penalty basis corrected.** The governing instrument is the Flare Gas (Prevention of Waste and Pollution) Regulations, **2018** (S.I. No. 9 of 2018), not "NUPRC 2022 Regulations". Every penalty is now shown at **both** Reg. 13 tiers ($2.00 / $0.50) and no midpoint is used; the exemptions are stated. GFMR vintage labelled (June 2026 release, three-satellite method). Emissions ratios updated to the June 2026 tracker, and unburned methane is now reported as CH₄ mass (1.1 labelled a CO₂e quantity "t CH₄"). Niger Delta now by the nine-state boundary, with offshore sites labelled. Thresholds named and explicit: significance rules, rising floor, peer-set rules, top-decile cut-off, scenario rounding. |
@@ -388,6 +389,111 @@ study: gas rights, offtake, tariff, licensing, land and community consent are no
   Potential file on energydata.info, named in the build brief, is behind a browser challenge and cannot be
   fetched by a script, so the Atlas is used instead.
 - **Scopes**: `national` = all 476 GFMR sites; `delta` = sites inside the nine Niger Delta states.
+
+### 9.7 Investable score (KFL-M 1.6; `invest()` / `firmsWindow()` in `ledger-core.js`; `/api/invest`)
+
+A **screening score for triage**: which flare sites deserve a first look from an investor in gas-to-power. It
+answers three questions (is the flare consistent, is it close to people without power, is it secure enough) and
+asks whether the 1.5 siting screen would keep it. It is not a feasibility study or an investment recommendation:
+gas rights, offtake, tariff, licensing, land, community consent, capex and returns are not assessed.
+
+**Inputs.** The `/api/sites` record (GFMR record, trend, power gap, population, access, `sec_energy`, ACLED area
+counts), the 1.5 siting result for the same site (gates, solar and main-centre terms), and the NASA FIRMS night
+window in `web/public/data/live/firms_history.json`, bundled at deploy time so the score is reproducible. Raw
+instrument units are inputs, not score terms: FRP (MW) is normalised on a log scale; bright_ti4 (K) is published
+but not scored, because it saturates near 367 K and is warmed by daytime sun.
+
+**FIRMS window** (`firmsWindow()`): the history stores, per night and site, the detection count `n`, night-pass
+count `nd`, and the *sums* of bright_ti4 and FRP. A night counts toward the window only if some site had a
+night-pass detection on it. On the 2026-10-18 snapshot, 2026-10-13 has no detection at any site (a missing file),
+so the window is 8 nights, not 9. Persistence counts night passes only (as the 1.3 live check does); intensity
+uses every detection, day and night, because the history does not separate their FRP.
+
+| Component | Weight | Term (weight inside the component) | Scale (0 to 100) |
+|---|---|---|---|
+| Consistency | 28% | record (30%): GFMR years with a detection, last 5 | detected years / 5 |
+| | | volume (25%): latest-year million m³ | log, 0.25 to 100 (0.25 is about the 0.1 MW gate) |
+| | | trend (15%): `trend_label`, `trend_pct` | rising or stable 100; falling 100 at 0% to 0 at −80%; not significant 50; new 60; inactive 0 |
+| | | persistence (20%): FIRMS nights detected / nights in window | linear (a lower bound: cloud counts as a miss) |
+| | | intensity (10%): mean FRP per detection | log, 0.5 to 20 MW; null if not detected |
+| Demand | 34% | unserved (45%): `people_within_10km_not_grid` | log, 1,000 to 200,000 |
+| | | access (10%): state rural access proxy | linear, 50% = 0 to 15% = 100 |
+| | | proximity (20%): nearest GRID3 settlement | 100 within 2 km, 0 beyond 20 km |
+| | | centre (25%): the 1.5 siting demand term | as §9.6 |
+| Security | 26% | attacks: recorded energy-infrastructure attacks since 2015 | weighted 1 (within 10 km), 0.15 (10 to 25), 0.03 (25 to 50), × age factor (1 if the last attack nearby was this year, falling linearly to 0.5 at 8 years); log, 10 weighted = 0 |
+| | | context: lethality (40%), deaths within 25 km | log, 20 = 0 |
+| | | context: conflict (35%), ACLED political-violence events, LGAs touching 25 km, 12 months | log, 300 = 0 (area counts overstate) |
+| | | context: trend (25%), ACLED area trend | declining or none 100, flat 70, rising 30 |
+| Viability | 12% | demand gate (30%), security gate (30%) of §9.6 | pass 100, fail 0 |
+| | | solar (40%): the 1.5 solar term | as §9.6 |
+
+- **Security combines multiplicatively**: security = attacks × (0.6 + 0.4 × context). The attack record is a
+  ceiling; context moves the score under it. If the context terms are all missing, security = attacks
+  (`weights_used` 0.6).
+- **Component score** = weighted mean of its terms that have an input; **investable score** = weighted mean of the
+  components that have a score. Missing inputs are dropped and weights renormalised (`weights_used` < 1); a null
+  is never replaced by a guess. Every number in the payload is checked for finiteness before it is served
+  (`checks.non_finite_numbers`).
+- **Hard gates**: offshore, or gas for less than 0.1 MW (`siting_min_mw`), sets the score to 0 and the band to
+  `gated`; `score_ungated` keeps the value before the gate.
+- **Bands** (fixed, not re-fitted): A ≥ 75, B 65 to 74, C 55 to 64, D < 55. `band_margin` is the distance to the
+  nearest cut-off.
+- **Flags** (do not change the score): `live_no_record`, FIRMS saw heat on ≥ 2 nights but GFMR records no gas in
+  the latest year; `record_live_quiet`, GFMR records ≥ 50 million m³ but FIRMS saw the site on ≤ 1 night (FIRMS saw
+  33 of the 38 sites that size on at least one pass).
+- **Not scored, shown**: households servable (it restates volume, which consistency already scores; scoring it
+  again would double the weight on gas volume), the dominant state of nearby attacks (a state-wide penalty would
+  mark down quiet sites in a busy state), bright_ti4.
+- **Reproduce**: `node scripts/build_invest.mjs` bundles `worker/src/index.js` with esbuild, replaces D1 with the
+  committed seed, calls the Worker's own fetch handler and writes `web/public/data/invest.json` (the
+  `/api/invest?scope=national` payload) and `invest_stress.json`. `--compare <origin>` diffs the live route against
+  it. The same harness reproduces the live `/api/siting` for all 476 sites with no difference, which is the check
+  that D1 matches the seed.
+
+#### Stress tests (seed run, 2026-10-18; `invest_stress.json`)
+
+1. **A warm pixel is not a flare.** One FIRMS night is worth at most 0.28 × 0.20 / 8 = 0.7 points of the total.
+   Oguta (one detection, 312.5 K, 0.91 MW FRP, no GFMR gas in 2025): consistency 24, gated. Belema (heat on 6 of 8
+   nights, no GFMR gas for 5 years): consistency 19, gated and flagged `live_no_record`; FIRMS alone cannot make a
+   site investable.
+2. **Consistent flares rank high.** The 1.5 siting top five all land in band A (79 to 81, and Sapele 75). Sapele
+   has 62 million m³ on the GFMR record but one weak FIRMS pixel (301 K, 0.45 MW) in 8 nights: it keeps its
+   score (its low persistence costs it about 5 points against a site seen every night) and carries the `record_live_quiet` flag. 10 sites carry that
+   flag; 1 carries `live_no_record`.
+3. **Tense is not hostile.** Mean security score, 1.6 (1.5 siting term in brackets): no attack within 50 km 97
+   (100); none within 10 km but ≥ 15 within 50 km 69 (89); exactly one within 10 km 65 (77); ≥ 3 within 10 km 26
+   (15). The 1.5 linear term scored 8 of the 22 hostile sites 0 and every tense site at least 74; an arithmetic
+   mean of the 1.6 terms (tried first) left hostile sites at 48, only 12 points under tense ones, because full
+   marks on deaths and trend diluted the attack record. The multiplicative form fixes that.
+4. **Spread.** Scored sites (158) run 45 to 81, middle half 61 to 71, standard deviation 7; ungated scores over all
+   476 run 33 to 81. Components spread more (middle halves: consistency 47 to 72, demand 52 to 77, security 62 to
+   85). The total is tighter than its parts because demand and security pull against each other (correlation
+   −0.42: the populated places see more conflict). A geometric mean was tested and spread the total no further.
+   Bands: A 20, B 75, C 56, D 7, gated 318 (70 offshore, 271 under 0.1 MW of gas, of which 227 had no gas at all in
+   2025).
+5. **Weights.** Each weight multiplied by a uniform 0.7 to 1.3 and renormalised, 2,000 draws: median 9% of sites
+   change band (16% in the worst tenth of draws), 9 of the top 10 stay, Spearman rank correlation 0.99, no site
+   moves more than 5 points in 90% of draws. Dropping a component outright is not small: without demand or
+   without consistency only 3 of the top 10 stay; without viability, 9.
+
+#### Where a judgement call could mislead an investor
+
+- **The weights are not fitted.** There is no outcome record of built flare-to-power projects in Nigeria to fit
+  them to. They are stable under moderate change (test 5) but encode a view that demand matters most.
+- **Bands are brittle at the edges.** 51% of scored sites are within 2 points of a cut-off. Treat scores within
+  about 3 points as tied; read `band_margin`.
+- **The most reliable flares are gated.** The sites FIRMS saw most often (Erha, Agbami-Ekoli) are offshore. An
+  investor in a gas-to-shore line should read `score_ungated`, not the gated 0.
+- **Eight nights is short, and October is cloudy.** Persistence is a lower bound and carries 5.6% of the total. A
+  week of cloud cannot sink a site, which also means a recent shutdown would show only as a flag, not a low score.
+- **Security looks backwards.** Recorded attacks since 2015 and ACLED events over 12 months; it does not see
+  community agreements or a change in local politics. Age weighting uses the most recent attack nearby for the
+  whole count, because the overlay stores only that year.
+- **The access proxy is state-wide** (one figure per state), so it separates states, not villages; it is already
+  inside the unserved count, which is why its own weight is small.
+- **Volume is not capturable gas.** Composition, pressure, the operator's plans and gas rights decide that.
+- **Viability carries little information among scored sites** (middle half 70 to 76): it mostly repeats the 1.5
+  screen's verdict. Its 12% weight lifts every scored site by a similar amount.
 
 ## 10. Honesty constraints
 

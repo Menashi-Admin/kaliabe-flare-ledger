@@ -20,6 +20,7 @@
       <a href="./index.html#map" class="nav__link">Map</a>
       <a href="./index.html#operators" class="nav__link">Operators</a>
       <a href="siting.html" class="nav__link">Siting</a>
+      <a href="invest.html" class="nav__link">Invest</a>
       <a href="methodology.html" class="nav__link" aria-current="page">Methodology</a>
       <a href="data.html" class="nav__link">Data</a>
       <a href="blog/" class="nav__link">Writing</a>
@@ -235,6 +236,41 @@
       sites within 20 km of it (overlapping catchments) join it. Lead sites are more than 20 km apart, so adding up their unserved
       population gives a lower bound that never counts anyone twice. MW and households are supply-side: at most sites the gas could
       power more households than lack access nearby, and the surplus would need a grid connection or an industrial buyer.</p>
+
+    <h2 id="invest">7c. Investable score <span style="font-weight:400;font-size:.9rem;color:var(--ink-soft)">method KFL-M 1.6 · 2026-10-18</span></h2>
+    <p>The <a class="link" href="invest.html">investable score</a> rates every site 0 to 100 on the three questions an investor in
+      gas-to-power asks first. <strong>It is a screening score for triage</strong>, not a feasibility study or an investment
+      recommendation: gas rights, offtake, tariff, licensing, land, community consent, capex and returns are not assessed. It is built
+      by <code>invest()</code> in <code>ledger-core.js</code> from the same site record as every other page, the 1.5 siting result and
+      the NASA FIRMS night window bundled at deploy time.</p>
+    <ul>
+      <li><strong>Consistency (28%)</strong>: is the fuel reliable? Years GFMR detected the flare out of the last 5 (30%); latest-year
+        volume, log scale 0.25 to 100 million m³ (25%); trend, where falling scores 0 at &minus;80% and rising scores the same as stable (15%);
+        share of FIRMS night passes that detected the site (20%); mean fire radiative power, log scale 0.5 to 20 MW (10%). bright_ti4
+        (kelvin) is shown but not scored: it saturates near 367 K and daytime sun warms it.</li>
+      <li><strong>Demand (34%)</strong>: people within 10 km without access, log scale 1,000 to 200,000 (45%); the state rural access
+        proxy, 50% scores 0 and 15% scores 100 (10%); nearest settlement, full credit to 2 km and none past 20 km (20%); the main centre
+        within 25 km, the 1.5 siting term (25%). Households servable is shown, not scored, because it restates the volume.</li>
+      <li><strong>Security (26%)</strong>: recorded attacks on energy infrastructure since 2015, weighted 1 within 10 km, 0.15 at 10 to
+        25 km and 0.03 at 25 to 50 km, and by age (full weight if the last attack was this year, half after 8 years), on a log scale where
+        10 weighted attacks scores 0. This attack term <em>multiplies</em> the rest: security = attacks &times; (0.6 + 0.4 &times; context),
+        where context is deaths within 25 km (40%), ACLED political-violence events in the LGAs touching 25 km (35%) and the ACLED trend
+        (25%). Many attacks close by therefore cannot be offset by a quiet trend, and a tense area with no attack nearby keeps most of its
+        credit. The dominant state of nearby attacks is shown, not scored.</li>
+      <li><strong>Viability (12%)</strong>: the two soft gates of the 1.5 screen, 1,000 or more people without access within 10 km
+        (30%) and 2 or fewer attacks within 10 km (30%), and the solar resource (40%).</li>
+    </ul>
+    <p>A missing input drops its term and the remaining weights are rescaled (<code>weights_used</code> below 1 marks it); nothing is
+      guessed. Two hard gates come first: an offshore site, or one whose gas could not fuel 0.1 MW, scores 0, and its ungated score is
+      published beside it. Bands: A 75 and up, B 65 to 74, C 55 to 64, D under 55, fixed rather than re-fitted. Two flags mark sites
+      where the sources disagree without changing the score: FIRMS sees heat on 2 or more nights but GFMR records no gas; or GFMR records
+      50 million m³ or more but FIRMS saw the site on at most one night. A FIRMS night counts only if some site was detected on it; a
+      night with no detection anywhere is a missing file.</p>
+    <p><strong>Stress tests.</strong> One night of FIRMS detection moves the score by at most 0.7 points, so a single warm pixel cannot
+      lift a site. With every weight moved by up to 30%, ranks barely change (rank correlation 0.99, 9 of the top 10 kept). About half of
+      scored sites lie within 2 points of a band cut-off, so read the score and its band margin, not the letter alone. The full results,
+      and the cases where a judgement call could mislead, are on the <a class="link" href="invest.html#stress">investable score page</a>
+      and in <code>docs/METHODOLOGY.md</code> §9.7.</p>
 
     <h2 id="niger-delta">8. Niger Delta classification</h2>
     <p>

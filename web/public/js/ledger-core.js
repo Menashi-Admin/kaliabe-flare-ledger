@@ -293,6 +293,236 @@
     return out;
   }
 
+  // ------------------------------------------- live thermal window (1.6)
+  // history: web/public/data/live/firms_history.json ({ nights: { date: { sites:
+  // { id: { n, nd, bt4, frp, last } } } } }); bt4 and frp are per-night SUMS over
+  // n detections, nd of them night-time passes. A night counts toward the window
+  // only if some site had a night-time detection on it: a night with no
+  // detection anywhere is a missing file, not 476 sites going dark.
+  function firmsWindow(history) {
+    const all = Object.keys((history && history.nights) || {}).sort();
+    const counted = all.filter((n) => Object.values(history.nights[n].sites || {}).some((v) => v.nd > 0));
+    const sites = {};
+    for (const n of counted) {
+      for (const [id, v] of Object.entries(history.nights[n].sites)) {
+        const p = sites[id] || (sites[id] = { nights_detected: 0, detections: 0, night_detections: 0, bt4_sum: 0, frp_sum: 0, last_seen: '' });
+        p.nights_detected += v.nd > 0 ? 1 : 0;
+        p.detections += v.n; p.night_detections += v.nd;
+        p.bt4_sum += v.bt4; p.frp_sum += v.frp;
+        if (v.last > p.last_seen) p.last_seen = v.last;
+      }
+    }
+    for (const p of Object.values(sites)) {
+      p.mean_bright_ti4_K = p.detections ? Math.round((p.bt4_sum / p.detections) * 10) / 10 : null;
+      p.mean_frp_MW = p.detections ? Math.round((p.frp_sum / p.detections) * 100) / 100 : null;
+      delete p.bt4_sum; delete p.frp_sum;
+    }
+    return {
+      nights: counted.length, first: counted[0] || null, last: counted[counted.length - 1] || null,
+      excluded_nights: all.filter((n) => !counted.includes(n)), sites,
+    };
+  }
+
+  // ------------------------------------------------ investable score (1.6)
+  // A screening score, 0 to 100, for the question an investor asks first: is
+  // the gas there, is the demand there, and is it safe enough to build. Four
+  // components, each built from normalised terms (0 to 100). Raw instrument
+  // units (bright_ti4 K, FRP MW) are shown as inputs and normalised before
+  // they reach the score. A null input gives a null term, never a guess;
+  // weights of missing terms are renormalised (weights_used < 1 marks it). The
+  // two hard gates of the 1.5 siting screen (onshore, >= siting_min_mw) set the
+  // score to 0; the ungated score is still published.
+  const INVEST = {
+    weights: { consistency: 0.28, demand: 0.34, security: 0.26, viability: 0.12 },
+    terms: {
+      consistency: { record: 0.30, volume: 0.25, trend: 0.15, persistence: 0.20, intensity: 0.10 },
+      demand: { unserved: 0.45, access: 0.10, proximity: 0.20, centre: 0.25 },
+      // security = attacks x (context_floor + (1 - context_floor) x context), context weighted as below
+      security: { lethality: 0.40, conflict: 0.35, trend: 0.25 },
+      viability: { demand_gate: 0.30, security_gate: 0.30, solar: 0.40 },
+    },
+    scales: {
+      record_years: 5,                 // GFMR years with a detection, out of the last 5
+      volume: [0.25, 100],             // latest-year million m3, log; 0.25 is about the 0.1 MW gate
+      trend_falling_zero_pct: -80,     // a falling trend scores 0 at -80% and 1 at 0%
+      trend_neutral: { not_significant: 0.5, new: 0.6, inactive: 0 },
+      intensity_frp: [0.5, 20],        // mean FRP per detection, MW, log
+      unserved: [1e3, 2e5],            // people within 10 km without access, log (as siting)
+      access: [50, 15],                // state rural access proxy %, linear: 50% scores 0, 15% scores 1
+      proximity_km: [2, 20],           // nearest settlement: full credit to 2 km, none past 20 km
+      attacks_band_weight: { km10: 1, km10_25: 0.15, km25_50: 0.03 },
+      attacks_saturate: 10,            // distance- and age-weighted attacks, log; 10 or more scores 0
+      recency_years: 8,                // attacks count in full if the last one was this year, at the floor after 8 years
+      recency_floor: 0.5,
+      recency_ref_year: 2026,          // years-since is counted from here (incident record runs to 2025)
+      context_floor: 0.6,              // the best attack record keeps 60% of its credit however tense the area
+      lethality_saturate: 20,          // deaths within 25 km, log
+      conflict_saturate: 300,          // ACLED political-violence events, LGAs in 25 km, 12 months, log (area counts overstate)
+      sec_trend: { declining: 1, 'none recorded': 1, flat: 0.7, rising: 0.3 },
+      flag_quiet_min_million_m3: 50,   // record says a large flare (FIRMS saw 33 of the 38 this size), FIRMS saw it on at most 1 night
+      flag_live_min_nights: 2,         // FIRMS sees heat on this many nights, record says no gas
+    },
+    bands: [['A', 75], ['B', 65], ['C', 55], ['D', 0]],
+    band_labels: {
+      A: 'strong screening case: gas, demand and security all hold up',
+      B: 'workable: one component needs a closer look',
+      C: 'marginal: weak on at least one of the three questions',
+      D: 'weak: the screen finds little to build on',
+      gated: 'screened out by a hard gate (offshore, or gas under the minimum generator size)',
+    },
+  };
+
+  // Plain-language one-liners for every derived figure. The page renders these
+  // as hover explainers and /api/invest publishes them, so they cannot drift.
+  const GLOSSARY = {
+    invest_score: 'Investable score, 0 to 100: a weighted mean of consistency (28%), demand (34%), security (26%) and viability (12%). A triage score for deciding which sites to look at first, not an investment recommendation.',
+    band: 'Grade band from the investable score: A 75 and up, B 65 to 74, C 55 to 64, D under 55. Gated means a hard gate failed and the score is set to 0. Bands are fixed cut-offs, not re-fitted when the data refreshes.',
+    score_ungated: 'The score before the hard gates are applied, published so a gated site (for example an offshore flare) can still be compared.',
+    weights_used: 'Share of the weights that had an input. Below 1 means a term had no data and the remaining weights were scaled up.',
+    consistency: 'Is the fuel reliable? Years the World Bank satellite record saw this flare, how much gas it burned in the latest year, the direction of the trend, and how often NASA satellites saw it burning in the last nights.',
+    demand: 'Is there someone to sell power to? People nearby without grid access, how far the nearest settlement is, and the size of the main town within 25 km.',
+    security: 'Is it safe enough to build and operate? The record of attacks on oil, gas and power infrastructure nearby, weighted by distance and age, sets the ceiling; deaths, local political violence and its trend move the score within it. Many attacks close by cannot be offset by a quiet trend.',
+    viability: 'Would the 1.5 siting screen keep it? Its two soft gates (enough unserved people, few attacks within 10 km) and the solar resource for a hybrid plant.',
+    record: 'Share of the last 5 years (2021 to 2025) in which the World Bank GFMR satellite record detected this flare. Five of five means the gas has been there every year.',
+    volume: 'Gas flared in the latest year, million cubic metres (World Bank GFMR). Scored on a log scale, so a site ten times larger gains a fixed step rather than ten times the points.',
+    trend: 'Direction of the flare: mean of the last 3 years against the up to 5 years before. Falling gas is a shrinking fuel supply; rising is scored the same as stable, not higher.',
+    persistence: 'Share of recent nights NASA FIRMS (VIIRS on Suomi NPP, NOAA-20 and NOAA-21) detected heat at this site on a night pass. Cloud counts as a miss, so this is a lower bound; a single warm pixel moves the total score by under one point.',
+    intensity: 'Mean fire radiative power per detection, from NASA FIRMS, normalised on a log scale (0.5 to 20 MW). Day and night detections both count. Blank when the site was not detected in the window.',
+    bright_ti4: 'bright_ti4: brightness temperature of the hottest pixel in the VIIRS I4 band (3.7 micrometres), in kelvin. Shown as an input only: it saturates near 367 K and daytime sun warms it, so it is not used in the score.',
+    frp: 'FRP, fire radiative power: the heat the fire radiates, in megawatts, estimated by NASA from the satellite pixel. A bigger, steadier flare has a higher FRP.',
+    nights_window: 'Nights in the FIRMS window that had data. A night with no detection at any site is treated as a missing file and left out.',
+    unserved: 'People within 10 km estimated to have no grid electricity: GRID3 population times (1 minus the state rural access proxy). Log scale, 1,000 to 200,000.',
+    access: 'State rural access proxy: the share of rural people with electricity, from the 2024 Nigeria DHS state rate times the national rural to total ratio. Lower access scores higher. It is a state-wide figure, the same for every site in a state.',
+    proximity: 'Distance to the nearest GRID3 settlement. Full credit within 2 km, none beyond 20 km: every kilometre is distribution line to build.',
+    centre: 'The largest named settlement within 25 km (GRID3), scored on its size and discounted with distance; the same term as the 1.5 siting screen.',
+    households_servable: 'Households the gas could power at 100 kWh a month if all of it were captured. Shown, not scored: it is the latest-year volume restated, and volume is already scored under consistency.',
+    attacks: 'Recorded attacks on oil, gas and power infrastructure since 2015 (Oxford / Inuwa et al. 2026), weighted by distance (within 10 km counts 1, 10 to 25 km 0.15, 25 to 50 km 0.03) and by age (see recency). Log scale; 10 or more weighted attacks scores 0. This term multiplies the security score, so it acts as a ceiling.',
+    recency: 'Years since the most recent recorded attack within 25 km (else 50 km). The attack count is weighted in full if that attack was this year, falling to half if it was 8 or more years ago. Folded into the attacks term, not scored on its own.',
+    lethality: 'Deaths in recorded energy-infrastructure attacks within 25 km since 2015. Log scale; 20 or more scores 0.',
+    conflict: 'Political-violence events (ACLED) in the last 12 months in the local government areas touching the 25 km circle. Area counts overstate what lies strictly within 25 km, so the scale is gentle: log, 300 or more scores 0.',
+    sec_trend: 'ACLED political-violence trend in the same area: last 12 months against the 12 before. Rising lowers the score; declining or none recorded scores full marks.',
+    dominant_state: 'State where most nearby recorded attacks happened. Shown, not scored: a state-wide penalty would mark down quiet sites in a busy state.',
+    demand_gate: '1.5 siting gate: at least 1,000 people without access within 10 km.',
+    security_gate: '1.5 siting gate: 2 or fewer energy-infrastructure attacks within 10 km.',
+    solar: 'Global horizontal irradiation at the site (Global Solar Atlas 2), so a hybrid solar and gas plant ranks higher.',
+    hard_gates: 'Hard gates: the site must be onshore (offshore gas needs a line to shore) and its gas must fuel at least a 0.1 MW generator. Failing either sets the score to 0.',
+    flags: 'Flags mark sites where the two satellite sources disagree. They do not change the score; they say what to check first.',
+    band_margin: 'Points between the score and the nearest band cut-off. Under 3 means a small change in the weights could move the site into the next band; read such sites as on the line.',
+  };
+
+  // site: a /api/sites record plus electric_potential_MW_exact.
+  // live: firmsWindow(...).sites[id] or null; nights: firmsWindow(...).nights.
+  // sit: core.siting(...) for the same site (gates and the solar / demand terms).
+  function invest(site, live, nights, sit, T = THRESHOLDS) {
+    const S = INVEST.scales, TW = INVEST.terms;
+    const term = (score, value, basis) => ({ score: score == null || !isFinite(score) ? null : Math.round(clamp01(score) * 100), value: value == null ? null : value, basis, label: 'estimate' });
+    const combine = (terms, w) => {
+      let ws = 0, acc = 0;
+      for (const [k, t] of Object.entries(terms)) if (t.score != null) { ws += w[k]; acc += w[k] * t.score; }
+      return { score: ws ? Math.round(acc / ws) : null, weights_used: Number(ws.toFixed(2)), terms };
+    };
+    const inv = (v, sat) => 1 - logScale(1 + v, 1, 1 + sat);
+
+    // Consistency: is the fuel there, and will it stay?
+    const ys = (site.year_series || []).slice(-S.record_years);
+    const det = ys.filter((d) => d.million_m3 > 0).length;
+    const vol = fin(site.latest_year_vol_million_m3) ? site.latest_year_vol_million_m3 : null;
+    const tl = site.trend_label;
+    let trendScore;
+    if (tl === 'rising' || tl === 'stable') trendScore = 1;
+    else if (tl === 'falling') trendScore = fin(site.trend_pct) ? 1 - site.trend_pct / S.trend_falling_zero_pct : 0.5;
+    else trendScore = S.trend_neutral[tl] != null ? S.trend_neutral[tl] : null;
+    const seen = live ? live.nights_detected : 0;
+    const dayOnly = live ? live.detections - live.night_detections : 0;
+    const consistency = combine({
+      record: ys.length ? term(det / S.record_years, det, `GFMR detected the flare in ${det} of the last ${S.record_years} years (${ys[0].year} to ${ys[ys.length - 1].year})`) : term(null, null, 'no GFMR record'),
+      volume: vol == null ? term(null, null, 'no latest-year volume')
+        : term(logScale(vol, ...S.volume), vol, `${num(vol, 2)} million m3 flared in ${site.latest_year}; log scale ${S.volume[0]} to ${S.volume[1]}`),
+      trend: term(trendScore, fin(site.trend_pct) ? site.trend_pct : null, `trend ${String(tl || 'n/a').replace('_', ' ')}${fin(site.trend_pct) ? ' (' + pct(site.trend_pct) + ')' : ''}; ${tl === 'falling' ? `scores 0 at ${S.trend_falling_zero_pct}%` : tl === 'rising' || tl === 'stable' ? 'rising scores the same as stable' : 'no significant direction, partial credit'}`),
+      persistence: !(nights > 0) ? term(null, null, 'no FIRMS window')
+        : term(seen / nights, seen, `detected on ${seen} of ${nights} nights by NASA FIRMS VIIRS night passes${dayOnly > 0 ? ` (${dayOnly} daytime detections not counted here)` : ''}; cloud counts as a miss, so a lower bound`),
+      intensity: !live || !fin(live.mean_frp_MW) ? term(null, null, 'not detected in the FIRMS window, so no intensity reading')
+        : term(logScale(live.mean_frp_MW, ...S.intensity_frp), live.mean_frp_MW, `mean FRP ${num(live.mean_frp_MW, 2)} MW over ${live.detections} detections; log scale ${S.intensity_frp[0]} to ${S.intensity_frp[1]} MW`),
+    }, TW.consistency);
+
+    // Demand: people without power, close enough to reach.
+    const dark = fin(site.people_within_10km_not_grid) ? site.people_within_10km_not_grid : null;
+    const acc = fin(site.rural_access_proxy_pct) ? site.rural_access_proxy_pct : null;
+    const dist = fin(site.dist_km) ? site.dist_km : null;
+    const cen = sit && sit.components && sit.components.demand;
+    const demand = combine({
+      unserved: dark == null ? term(null, null, 'no population or access figure') : term(logScale(dark, ...S.unserved), dark, `${num(dark, 0)} people within 10 km without grid access; log scale ${num(S.unserved[0], 0)} to ${num(S.unserved[1], 0)}`),
+      access: acc == null ? term(null, null, 'no access figure') : term((S.access[0] - acc) / (S.access[0] - S.access[1]), acc, `state rural access proxy ${num(acc, 1)}%; linear, ${S.access[0]}% scores 0 and ${S.access[1]}% scores 100`),
+      proximity: dist == null ? term(null, null, 'no settlement distance') : term(1 - (dist - S.proximity_km[0]) / (S.proximity_km[1] - S.proximity_km[0]), dist, `nearest settlement ${site.nearest_settlement || 'n/a'} at ${num(dist, 1)} km; full credit to ${S.proximity_km[0]} km, none past ${S.proximity_km[1]} km`),
+      centre: cen && cen.score != null ? { ...cen } : term(null, null, 'no main centre term'),
+    }, TW.demand);
+
+    // Security: the attack record is a ceiling; context moves the score under it.
+    const se = site.sec_energy || null;
+    let security;
+    if (!se) security = { score: null, weights_used: 0, terms: { attacks: term(null, null, 'no incident overlay') } };
+    else {
+      const B = S.attacks_band_weight;
+      const a10 = se.attacks_10km || 0, a25 = Math.max(0, (se.attacks_25km || 0) - a10), a50 = Math.max(0, (se.attacks_50km || 0) - (se.attacks_25km || 0));
+      const yr = se.most_recent_attack_year;
+      const ago = yr ? S.recency_ref_year - yr : null;
+      const decay = yr ? 1 - (1 - S.recency_floor) * Math.min(1, ago / S.recency_years) : 1;
+      const wtd = (B.km10 * a10 + B.km10_25 * a25 + B.km25_50 * a50) * decay;
+      const pv = site.sec_area25_12m && fin(site.sec_area25_12m.pv) ? site.sec_area25_12m.pv : null;
+      const st = site.sec_trend;
+      const attacks = term(inv(wtd, S.attacks_saturate), Math.round(wtd * 10) / 10, `${a10} attacks within 10 km, ${a25} at 10 to 25 km, ${a50} at 25 to 50 km since 2015; distance-weighted x${B.km10}, x${B.km10_25}, x${B.km25_50} and age factor ${num(decay, 2)}: ${num(wtd, 1)} weighted; log scale, ${S.attacks_saturate} scores 0`);
+      const ctx = combine({
+        lethality: term(inv(se.deaths_25km || 0, S.lethality_saturate), se.deaths_25km || 0, `${se.deaths_25km || 0} deaths in recorded attacks within 25 km; log scale, ${S.lethality_saturate} scores 0`),
+        conflict: pv == null ? term(null, null, 'no ACLED area count') : term(inv(pv, S.conflict_saturate), pv, `${pv} political-violence events in 12 months in the LGAs touching 25 km (ACLED); log scale, ${S.conflict_saturate} scores 0`),
+        trend: S.sec_trend[st] == null ? term(null, null, `ACLED trend ${st || 'n/a'}`) : term(S.sec_trend[st], st, `ACLED area trend ${st}`),
+      }, TW.security);
+      const recency = { score: Math.round(decay * 100), value: yr || null, basis: yr ? `most recent attack nearby in ${yr}, ${ago} years before ${S.recency_ref_year}: attacks weighted x${num(decay, 2)} (x1 this year, x${S.recency_floor} at ${S.recency_years} years or more)` : 'no recorded attack within 50 km', folded_into: 'attacks', label: 'estimate' };
+      const cf = S.context_floor;
+      security = {
+        score: ctx.score == null ? attacks.score : Math.round(attacks.score * (cf + (1 - cf) * ctx.score / 100)),
+        weights_used: ctx.score == null ? cf : 1,
+        formula: `attacks x (${cf} + ${Number((1 - cf).toFixed(2))} x context); context = weighted mean of lethality, conflict and trend`,
+        context_score: ctx.score,
+        terms: { attacks, recency, ...ctx.terms },
+      };
+    }
+
+    // Viability: the 1.5 screen's soft gates and the solar resource.
+    const g = {};
+    for (const x of (sit && sit.gates) || []) g[x.id] = x.pass;
+    const sol = sit && sit.components && sit.components.solar;
+    const viability = combine({
+      demand_gate: g.demand == null ? term(null, null, 'no siting gate') : term(g.demand ? 1 : 0, g.demand, `1.5 demand gate ${g.demand ? 'passed' : 'failed'}: ${num(T.siting_min_people_not_grid, 0)} or more people without access within 10 km`),
+      security_gate: g.security == null ? term(null, null, 'no siting gate') : term(g.security ? 1 : 0, g.security, `1.5 security gate ${g.security ? 'passed' : 'failed'}: ${T.siting_max_energy_attacks_10km} or fewer attacks within 10 km`),
+      solar: sol && sol.score != null ? { ...sol } : term(null, null, 'no solar value'),
+    }, TW.viability);
+
+    const components = { consistency, demand, security, viability };
+    let ws = 0, sum = 0;
+    for (const [k, c] of Object.entries(components)) if (c.score != null) { ws += INVEST.weights[k]; sum += INVEST.weights[k] * c.score; }
+    const ungated = ws ? Math.round(sum / ws) : null;
+    const hard = [
+      { id: 'onshore', pass: site.niger_delta_class !== 'offshore' },
+      { id: 'power', pass: g.power === true },
+    ];
+    const gated = hard.some((x) => !x.pass);
+    const score = gated ? 0 : ungated;
+    const band = gated ? 'gated' : score == null ? null : INVEST.bands.find((b) => score >= b[1])[0];
+    // Points to the nearest band cut-off: under 3 means the letter could flip on a small weight change.
+    const band_margin = gated || score == null ? null : Math.min(...INVEST.bands.filter((b) => b[1] > 0).map((b) => Math.abs(score - b[1])));
+
+    // Where the long record and the live window disagree, say so; the score is unchanged.
+    const flags = [];
+    if (nights > 0 && seen >= S.flag_live_min_nights && !(vol > 0)) flags.push({ id: 'live_no_record', text: `NASA FIRMS saw heat here on ${seen} of ${nights} nights, but GFMR records no gas in ${site.latest_year}: a restarted flare, or another heat source within 1 km. Check before relying on either.` });
+    if (nights > 0 && vol >= S.flag_quiet_min_million_m3 && seen <= 1) flags.push({ id: 'record_live_quiet', text: `GFMR records ${num(vol, 1)} million m3 in ${site.latest_year}, but FIRMS saw the site on ${seen} of ${nights} nights: cloud, a cut in flaring, or a shutdown. Confirm the gas is still there.` });
+    return {
+      invest_score: score, band, band_margin, score_ungated: ungated, gated,
+      failed_hard_gates: hard.filter((x) => !x.pass).map((x) => x.id),
+      weights_used: Number(ws.toFixed(2)),
+      flags, components, label: 'estimate',
+    };
+  }
+
   // ---------------------------------------------------------------- formatting
   const nf = (d) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d, minimumFractionDigits: 0 });
   const num = (v, d = 1) => (v == null || !isFinite(v) ? '—' : nf(d).format(v));
@@ -370,5 +600,5 @@
     </svg>`;
   }
 
-  return { THRESHOLDS, THRESHOLD_DOCS, SITING, convert, scenario, changeSignificant, rising, powerGap, liveCheck, secTrend, siting, sitingClusters, haversineKm, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
+  return { THRESHOLDS, THRESHOLD_DOCS, SITING, INVEST, GLOSSARY, convert, scenario, changeSignificant, rising, powerGap, liveCheck, secTrend, siting, sitingClusters, firmsWindow, invest, haversineKm, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
 });

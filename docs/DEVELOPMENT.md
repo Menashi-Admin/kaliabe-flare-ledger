@@ -64,6 +64,7 @@ python3 scripts/build_seed.py
 python3 scripts/fetch_layers.py && python3 scripts/fetch_layers2.py && python3 scripts/compact_layers.py
 python3 scripts/gen_sql.py
 python3 scripts/build_siting.py        # solar inputs for /api/siting (KFL-M 1.5)
+node scripts/build_invest.mjs          # offline /api/invest run + stress tests -> data/invest*.json (KFL-M 1.6)
 python3 scripts/build_digest_csv.py
 python3 scripts/build_blog.py
 python3 scripts/validate_sources.py
