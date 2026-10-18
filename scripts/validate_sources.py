@@ -133,6 +133,10 @@ SOURCES = [
     dict(id='cod-ab-nga', name='OCHA COD-AB Nigeria administrative boundaries — HDX package',
          url='https://data.humdata.org/api/3/action/package_show?id=cod-ab-nga',
          used_for='LGA polygons with P-codes for the ACLED join and the security layer', licence=None, pinned=None, check='hdx'),
+    dict(id='gsa-solar', name='Global Solar Atlas 2 point service (World Bank / ESMAP, Solargis data), long-term averages',
+         url='https://api.globalsolaratlas.info/data/lta?loc=4.81560,7.04980',
+         used_for='solar term of the mini-grid siting score: GHI and PV output per site (scripts/build_siting.py)',
+         licence='CC BY 4.0 (World Bank; declared)', pinned=None, check='gsa'),
 ]
 
 LOCAL = [
@@ -145,6 +149,7 @@ LOCAL = [
     ('web/public/data/access_rates.json', 'electricity access, national + state (scripts/fetch_access_rates.py)'),
     ('web/public/data/security.json', 'ACLED LGA security context per site (scripts/ingest_acled.py)'),
     ('web/public/layers/security-lga.geojson', 'security layer: LGAs within 50 km of a site'),
+    ('web/public/data/siting.json', 'solar resource per site for the siting score (scripts/build_siting.py)'),
     ('web/public/data/live/live_thermal.json', 'live FIRMS summary (changes daily; checksum is a snapshot)'),
 ]
 
@@ -299,6 +304,12 @@ def check(src, data, ctype):
     if kind == 'acled_api':
         notes.append('PENDING CREDENTIALS: needs a myACLED account (OAuth). The sample in data/samples/ is SYNTHETIC and only exercises the code path.')
         return 'endpoint reachable; not pulled — no myACLED account on this box', None, notes
+    if kind == 'gsa':
+        try:
+            lay = json.loads(data)['annual']['metadata']['layers']['GHI']
+            return f"GHI layer {lay.get('version')}, updated {lay.get('updated')}, period to {lay.get('period', {}).get('to')}", None, notes
+        except Exception as e:  # noqa: BLE001
+            return f'unverified: not the Atlas JSON ({e})', None, notes
     if kind == 'pdf':
         return ('PDF' if data[:4] == b'%PDF' else 'unverified: response is not a PDF') + ' (no version field to read)', None, notes
     if kind == 'html':

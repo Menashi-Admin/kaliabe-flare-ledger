@@ -63,6 +63,7 @@ See README "Reproduce it" and `ARCHITECTURE.md`. In short:
 python3 scripts/build_seed.py
 python3 scripts/fetch_layers.py && python3 scripts/fetch_layers2.py && python3 scripts/compact_layers.py
 python3 scripts/gen_sql.py
+python3 scripts/build_siting.py        # solar inputs for /api/siting (KFL-M 1.5)
 python3 scripts/build_digest_csv.py
 python3 scripts/build_blog.py
 python3 scripts/validate_sources.py

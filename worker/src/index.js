@@ -23,6 +23,7 @@ import POP from '../../web/public/data/pop_demand.json';
 import ACCESS from '../../web/public/data/access_rates.json';
 import SEC from '../../web/public/data/security.json';
 import LIVE_BUNDLED from '../../web/public/data/live/live_thermal.json';
+import SITING_INPUTS from '../../web/public/data/siting.json';
 
 const T = core.THRESHOLDS;
 
@@ -86,8 +87,8 @@ const PENALTY = {
 const PENALTY_BASIS = 'Flare Gas Regulations 2018 (S.I. No. 9 of 2018) Reg. 13: US$2.00 (≥10,000 bbl/d) or US$0.50 (<10,000 bbl/d) per 1,000 scf (28.317 m³)';
 
 // Method version + data vintage: stamped on every API response and brief.
-const METHOD_VERSION = 'KFL-M 1.4 (2026-10-18)';
-const METHOD_CHANGES = 'KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
+const METHOD_VERSION = 'KFL-M 1.5 (2026-10-18)';
+const METHOD_CHANGES = 'KFL-M 1.5: mini-grid siting screen (/api/siting, siting.html) - every site scored 0 to 100 on grid access gap, gas-to-power potential, population demand, security posture and solar resource (Global Solar Atlas 2, CC BY 4.0), with four screening gates and 20 km opportunity clusters; all terms are labelled estimates; no existing field changed. KFL-M 1.4: energy-infrastructure incident overlay — per-site radius counts (10/25/50 km) of oil-gas and power attack incidents 2015-now, from Oxford/Inuwa et al. 2026 (CC BY 4.0, zenodo.org/records/15974757), filling the point-radius security fields previously pending an ACLED account. KFL-M 1.3: enrichment — GRID3 population within 5/10/25/50 km, power-gap estimates (gas wasted, generator MW, households, people without access), live NASA FIRMS thermal check with an under-report flag, ACLED LGA security context. KFL-M 1.2: penalty basis corrected to the 2018 Regulations (S.I. No. 9 of 2018) with both Reg. 13 tiers; GFMR vintage labelled; emissions ratios updated to the June 2026 tracker; Niger Delta by state boundary; thresholds made explicit.';
 const VINTAGE = {
   dataset: 'World Bank GFMR, Flare Volume Estimates by Individual Flare Location 2012–2025 (xlsx)',
   release: 'Global Gas Flaring Tracker, 23 June 2026',
@@ -814,6 +815,120 @@ ${topSites.map((x) => `<tr><td>${esc(x.field_name || x.site_id)} <span class="s"
   return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300', ...corsHeaders } });
 }
 
+// ---- KFL-M 1.5: mini-grid siting screen: /api/siting?scope=national|delta&screened=1&limit=N
+// Scored by core.siting from the same site record /api/sites serves, plus the
+// bundled solar inputs (scripts/build_siting.py → web/public/data/siting.json).
+const SITING_FOOTNOTE = 'A screening estimate, not a feasibility study or a bankability finding. Every term is derived from public data on stated assumptions: the generator size is what the latest-year flared gas could fuel continuously if all of it were captured; people without access use a state rural access proxy; security counts recorded attacks, not current risk. Gas rights, offtake, tariff, licensing, land and community consent are not assessed. Households servable are supply-side (what the gas could power), not a count of households who would connect.';
+const SITING_SCOPES = {
+  national: { label: 'Nigeria (every GFMR flare site)', test: () => true },
+  delta: { label: 'Niger Delta (onshore, inside the nine-state boundary)', test: (s) => s.in_niger_delta },
+};
+let sitingCache = null;
+function sitingAll(ledger) {
+  if (sitingCache && sitingCache.ledger === ledger) return sitingCache.data;
+  const rows = ledger.sites.map((s) => {
+    const exact = core.powerGap(s.latest_year_vol_million_m3, null, K).electric_potential_MW_exact;
+    const r = core.siting({ ...s, electric_potential_MW_exact: exact }, SITING_INPUTS.sites[s.site_id] || null, T);
+    const sol = SITING_INPUTS.sites[s.site_id] || {};
+    return {
+      site_id: s.site_id, field_name: s.field_name, operator: s.operator, lat: s.lat, lon: s.lon,
+      state: s.state, niger_delta_class: s.niger_delta_class, in_niger_delta: s.in_niger_delta, niger_delta_label: s.niger_delta_label,
+      ...r,
+      latest_year: s.latest_year, latest_year_vol_million_m3: s.latest_year_vol_million_m3,
+      gas_available_GWh: s.gas_available_GWh, electric_potential_MW: s.electric_potential_MW, electric_potential_MW_exact: exact,
+      households_servable: s.households_servable, people_within_10km_not_grid: s.people_within_10km_not_grid,
+      rural_access_proxy_pct: s.rural_access_proxy_pct, pop10km: s.pop10km,
+      nearest_settlement: s.nearest_settlement, nearest_settlement_lga: s.nearest_settlement_lga, nearest_settlement_dist_km: s.dist_km,
+      main_centre_25km: s.main_centre_25km, main_centre_25km_pop: s.main_centre_25km_pop, main_centre_25km_dist_km: s.main_centre_25km_dist_km,
+      ghi_kwh_m2_day: sol.ghi_kwh_m2_day ?? null, pvout_kwh_kwp_yr: sol.pvout_kwh_kwp_yr ?? null,
+      sec_trend: s.sec_trend, energy_attacks_10km: s.sec_energy ? s.sec_energy.attacks_10km : null, energy_attacks_25km: s.sec_energy ? s.sec_energy.attacks_25km : null,
+      live_status: s.live_status,
+    };
+  });
+  // Screened-in first, then by score; ties by MW. The rank is national.
+  rows.sort((a, b) => (b.screened_in - a.screened_in) || ((b.siting_score ?? -1) - (a.siting_score ?? -1)) || (b.electric_potential_MW_exact - a.electric_potential_MW_exact));
+  rows.forEach((r, i) => { r.rank_national = i + 1; });
+  const clusters = core.sitingClusters(rows.filter((r) => r.screened_in), T);
+  const clusterOf = new Map();
+  clusters.forEach((c, i) => { c.cluster_id = `c${i + 1}`; for (const id of c.site_ids) clusterOf.set(id, c.cluster_id); });
+  for (const r of rows) r.cluster_id = clusterOf.get(r.site_id) || null;
+  sitingCache = { ledger, data: { rows, clusters } };
+  return sitingCache.data;
+}
+function sitingAggregate(rows, clusters, scope) {
+  const inScope = rows.filter(SITING_SCOPES[scope].test);
+  const ids = new Set(inScope.map((r) => r.site_id));
+  const ins = inScope.filter((r) => r.screened_in);
+  // A cluster belongs to the scope of its lead site. Only onshore sites are screened in, so every lead is in the Niger Delta or the one site outside it.
+  const cl = clusters.filter((c) => ids.has(c.lead_site_id));
+  const mw = ins.reduce((a, r) => a + r.electric_potential_MW_exact, 0);
+  const fails = {};
+  for (const r of inScope) for (const g of r.failed_gates) fails[g] = (fails[g] || 0) + 1;
+  return {
+    scope, scope_label: SITING_SCOPES[scope].label,
+    sites: inScope.length,
+    sites_screened_in: ins.length,
+    opportunities: cl.length,
+    electric_potential_MW: round(mw, 0),
+    households_servable: core.util.sig(ins.reduce((a, r) => a + (r.households_servable || 0), 0), 2),
+    people_not_grid_lower_bound: core.util.sig(cl.reduce((a, c) => a + c.people_not_grid_lead, 0), 2),
+    median_score_screened_in: ins.length ? ins.map((r) => r.siting_score).sort((a, b) => a - b)[Math.floor((ins.length - 1) / 2)] : null,
+    screened_out_by_gate: fails,
+    notes: {
+      opportunities: `screened-in sites grouped by leader clustering: the best-scoring site leads, sites within ${T.siting_cluster_km} km of it (overlapping 10 km catchments) join; one mini-grid opportunity each`,
+      electric_potential_MW: 'sum over screened-in sites of the generator size the latest-year flared gas could fuel continuously; supply-side',
+      households_servable: 'supply-side: households the gas could power at 1.2 MWh/yr each, not households who would connect',
+      people_not_grid_lower_bound: `sum of the lead sites' people within 10 km without access; leads are more than ${T.siting_cluster_km} km apart so their 10 km circles do not overlap, which makes this a lower bound`,
+      supply_vs_demand: 'the households servable figure is what the gas could power; at most sites it is larger than the unserved population nearby, so the surplus would need a grid connection or an industrial buyer',
+    },
+    label: 'estimate',
+  };
+}
+function sitingResponse(url, ledger) {
+  const q = url.searchParams;
+  const scope = Object.keys(SITING_SCOPES).includes(q.get('scope')) ? q.get('scope') : 'national';
+  const { rows, clusters } = sitingAll(ledger);
+  let list = rows.filter(SITING_SCOPES[scope].test);
+  if (q.get('screened') === '1') list = list.filter((r) => r.screened_in);
+  list = list.map((r, i) => ({ rank: i + 1, ...r }));
+  const lim = parseInt(q.get('limit'), 10);
+  if (lim > 0) list = list.slice(0, lim);
+  return json({
+    method_version: METHOD_VERSION,
+    label: 'estimate',
+    footnote: SITING_FOOTNOTE,
+    scope, scope_label: SITING_SCOPES[scope].label,
+    aggregate: { national: sitingAggregate(rows, clusters, 'national'), delta: sitingAggregate(rows, clusters, 'delta') },
+    method: {
+      score: 'weighted mean of the component scores (0 to 100) that have an input; weights of missing terms are renormalised (weights_used < 1 marks it)',
+      weights: core.SITING.weights,
+      scales: core.SITING.scales,
+      gates: { onshore: 'not offshore', power_min_MW: T.siting_min_mw, people_not_grid_min: T.siting_min_people_not_grid, energy_attacks_10km_max: T.siting_max_energy_attacks_10km },
+      cluster_km: T.siting_cluster_km,
+      clustering: 'leader clustering, no chaining: best-scoring unassigned screened-in site leads, unassigned screened-in sites within cluster_km of it join, repeat',
+      ranking: 'screened-in sites first, then by score, then by MW; rank_national is the rank over every site',
+      components: {
+        access_gap: 'people within 10 km without grid access: GRID3 population x (1 - state rural access proxy, NDHS 2024)',
+        power: 'generator MW the latest-year flared gas could fuel continuously (core.powerGap)',
+        demand: 'largest named centre within 25 km (GRID3), discounted with distance',
+        security: 'recorded attacks on oil, gas and power infrastructure within 10 and 25 km since 2015 (Oxford/Inuwa 2026, CC BY 4.0) and the ACLED LGA political-violence trend',
+        solar: 'global horizontal irradiation at the site (Global Solar Atlas 2, World Bank / Solargis, CC BY 4.0); ranks hybrid solar + gas sites higher',
+      },
+      gap_assumptions: GAP_ASSUMPTIONS,
+    },
+    sources: {
+      volume: 'World Bank GFMR flare-location estimates 2012-2025, June 2026 release',
+      population: 'GRID3 NGA Population v3.0 and Settlement Points (CC BY 4.0)',
+      access: 'World Bank WDI 2024; Nigeria DHS 2023-24 (NPC & ICF)',
+      security: 'Oxford / Inuwa, Leonard, Hirmer 2026 (CC BY 4.0), zenodo.org/records/15974757; ACLED via HDX (LGA aggregates)',
+      solar: SITING_INPUTS.meta.solar,
+    },
+    count: list.length,
+    clusters: q.get('clusters') === '1' ? clusters.filter((c) => list.some((r) => r.cluster_id === c.cluster_id)) : undefined,
+    sites: list,
+  });
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
@@ -854,6 +969,8 @@ export default {
       }
 
       if (path === '/api/brief') return brief(url, await loadLedger(env));
+
+      if (path === '/api/siting') return sitingResponse(url, await loadLedger(env));
 
       if (path === '/api/sites/trend') {
         // lightweight aggregate for map — latest year markers

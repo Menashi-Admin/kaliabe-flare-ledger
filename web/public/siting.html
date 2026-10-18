@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mini-grid siting | Kaliabe Flare Tracker</title>
+<meta name="description" content="Where Nigeria's flared gas could fuel a mini-grid: every flare site screened on grid access gap, gas-to-power potential, population demand, security and solar resource. Screening estimates from open data." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23b5761e%22/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="./css/base.css" />
+<style>
+  .sit-stats{max-width:none;margin:22px 0 0}
+  .sit-cmp td.num,.sit-cmp th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .sit-terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:18px 0 0}
+  .sit-terms .card{gap:6px}
+  .sit-terms .card p{margin:0;font-size:.84rem;color:var(--ink-soft)}
+  .sit-w{font-family:var(--serif);font-size:1.5rem}
+  .sit-bar{display:inline-block;width:46px;height:6px;background:var(--paper-2);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+  .sit-bar i{display:block;height:100%;background:var(--accent)}
+  .sit-bar--score i{background:var(--on)}
+  .sit-c{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:.8rem}
+  .sit-score{font-family:var(--serif);font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .sit-out{color:var(--off)}
+  .sit-btn{all:unset;cursor:pointer;color:var(--accent);font-size:.8rem;white-space:nowrap}
+  .sit-btn:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+  .table tbody tr.sit-detail:hover{background:transparent}
+  .sit-why{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 28px;margin:0;font-size:.8rem}
+  .sit-why div{padding:6px 0;border-top:1px solid var(--line)}
+  .sit-why dt{font-weight:600}
+  .sit-why dd{margin:2px 0 0;color:var(--ink-soft)}
+  .sit-tools{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand"><span class="brand__mark" aria-hidden="true"></span><span class="brand__name"><a href="./" style="color:inherit;text-decoration:none">Kaliabe Flare Tracker</a></span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="./index.html#map" class="nav__link">Map</a>
+      <a href="./index.html#operators" class="nav__link">Operators</a>
+      <a href="siting.html" class="nav__link" aria-current="page">Siting</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+      <a href="blog/" class="nav__link">Writing</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <div class="wrap">
+    <p class="hero__kicker">Mini-grid siting · <span id="mv">KFL-M 1.5</span></p>
+    <h1>Where flared gas could power a mini-grid</h1>
+    <p class="lede">
+      Every flare site in the tracker, screened as a place to build a gas or hybrid solar and gas mini-grid. Each site is scored
+      on five terms the tracker already holds: how many people nearby lack grid access, how much power the flared gas could
+      make, how large the nearest demand centre is, the security record around the site, and the solar resource.
+      <strong>Every figure is an estimate</strong>, and the screen is a starting list for site visits, not a bankability finding.
+    </p>
+
+    <dl class="hero__stats sit-stats" id="stats">
+      <div class="stat"><dt>Opportunities</dt><dd id="sOpp">…</dd><dd class="stat__sub" id="sOppSub"></dd></div>
+      <div class="stat"><dt>Gas-to-power <span class="est">estimate</span></dt><dd id="sMW">…</dd><dd class="stat__sub">generator size the flared gas could fuel</dd></div>
+      <div class="stat"><dt>Households servable <span class="est">estimate</span></dt><dd id="sHH">…</dd><dd class="stat__sub">supply-side, at 100 kWh a month; see the note below</dd></div>
+      <div class="stat"><dt>People without access <span class="est">estimate</span></dt><dd id="sPpl">…</dd><dd class="stat__sub">within 10 km, a lower bound</dd></div>
+    </dl>
+    <p class="map__cite">Figures above are for the Niger Delta scope and screened-in sites only. Each figure is derived from the site records below.</p>
+
+    <h2>Niger Delta and national</h2>
+    <p>The GFMR site set is almost all in the Niger Delta. The national figures add the offshore sites (screened out, since their
+      gas would need a line to shore) and the one site outside the nine states.</p>
+    <div class="tablewrap">
+      <table class="table sit-cmp" id="cmp">
+        <thead><tr><th>Scope</th><th class="num">Sites</th><th class="num">Screened in</th><th class="num">Opportunities</th><th class="num">MW</th><th class="num">Households servable</th><th class="num">People without access (lower bound)</th></tr></thead>
+        <tbody id="cmpBody"><tr><td colspan="7">Loading…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="ops__note" id="gateNote"></p>
+    <p class="ops__note" id="supplyNote"></p>
+
+    <h2>How a site is scored</h2>
+    <p>Each term scores 0 to 100. The siting score is their weighted mean. A site is <strong>screened in</strong> only if it also
+      passes four gates: it is onshore, its gas could fuel at least 0.1 MW, at least 1,000 people within 10 km are without
+      access, and no more than 2 attacks on energy infrastructure were recorded within 10 km since 2015. The best-scoring site leads
+      an opportunity, and screened-in sites within 20 km of it, whose 10 km circles overlap, join it.</p>
+    <div class="sit-terms" id="terms"></div>
+
+    <h2 id="ranked">Ranked sites</h2>
+    <div class="sit-tools">
+      <div class="seg" role="group" aria-label="Scope">
+        <button type="button" class="seg__opt" data-scope="delta" aria-pressed="true">Niger Delta</button>
+        <button type="button" class="seg__opt" data-scope="national" aria-pressed="false">National</button>
+      </div>
+      <label class="filter__toggle"><input type="checkbox" id="onlyIn" checked /> Screened in only</label>
+      <a class="link" id="apiLink" href="/api/siting?scope=delta">API: /api/siting</a>
+    </div>
+    <div class="tablewrap">
+      <table class="table table--tight" id="rankTable">
+        <caption class="visually-hidden">Flare sites ranked by mini-grid siting score</caption>
+        <thead><tr>
+          <th class="num">#</th><th>Site / operator</th><th>State</th><th class="num">Score</th>
+          <th>Access gap</th><th>Power</th><th>Demand</th><th>Security</th><th>Solar</th>
+          <th class="num">MW</th><th class="num">Households</th><th>Basis</th>
+        </tr></thead>
+        <tbody id="rankBody"><tr><td colspan="12">Loading…</td></tr></tbody>
+      </table>
+    </div>
+
+    <h2>What this is not</h2>
+    <div class="notice" id="footnote">
+      A screening estimate, not a feasibility study or a bankability finding.
+    </div>
+    <ul class="sources" id="sources"></ul>
+
+    <p style="margin-top:36px"><a href="./" class="link">Back to the tracker</a> · <a href="methodology.html#siting" class="link">Siting method</a></p>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap foot__inner">
+  <p>Built by Kaliabe · open data · honest uncertainty. Siting scores are screening estimates, not investment advice.</p>
+  <p class="foot__links"><a href="methodology.html">Methodology</a> · <a href="data.html">Data &amp; licences</a> · <a href="blog/">Writing</a></p>
+</div></footer>
+
+<script src="./js/ledger-core.js"></script>
+<script>
+(function () {
+  'use strict';
+  var API = new URLSearchParams(location.search).get('api') || '';
+  var U = KaliabeCore.util, num = U.num, esc = U.esc;
+  var TERMS = [
+    ['access_gap', 'Access gap', 'People within 10 km estimated to be without grid access.'],
+    ['power', 'Power', 'Generator size the latest-year flared gas could fuel.'],
+    ['demand', 'Demand', 'Largest named centre within 25 km, discounted with distance.'],
+    ['security', 'Security', 'Recorded attacks on energy infrastructure nearby, and the conflict trend.'],
+    ['solar', 'Solar', 'Global horizontal irradiation, so hybrid solar and gas sites rank higher.'],
+  ];
+  var GATE = { onshore: 'offshore', power: 'gas under 0.1 MW', demand: 'under 1,000 people unserved', security: 'security record' };
+  var state = { scope: 'delta', onlyIn: true, cache: {} };
+
+  function get(scope) {
+    if (state.cache[scope]) return Promise.resolve(state.cache[scope]);
+    return fetch(API + '/api/siting?scope=' + scope).then(function (r) {
+      if (!r.ok) throw new Error('API ' + r.status);
+      return r.json();
+    }).then(function (d) { state.cache[scope] = d; return d; });
+  }
+  function mw(v) { return v == null ? 'n/a' : num(v, v < 10 ? 1 : 0); }
+  function bar(c, cls) {
+    if (!c || c.score == null) return '<span class="sit-c site-sub">n/a</span>';
+    return '<span class="sit-c"><span class="sit-bar' + (cls || '') + '"><i style="width:' + c.score + '%"></i></span>' + c.score + '</span>';
+  }
+
+  function header(d) {
+    var n = d.aggregate.national, nd = d.aggregate.delta;
+    document.getElementById('mv').textContent = d.method_version;
+    document.getElementById('sOpp').textContent = num(nd.opportunities, 0);
+    document.getElementById('sOppSub').textContent = num(nd.sites_screened_in, 0) + ' screened-in sites in the Niger Delta';
+    document.getElementById('sMW').innerHTML = num(nd.electric_potential_MW, 0) + ' <span class="kv__sub">MW</span>';
+    document.getElementById('sHH').textContent = num(nd.households_servable, 0);
+    document.getElementById('sPpl').textContent = num(nd.people_not_grid_lower_bound, 0);
+    document.getElementById('cmpBody').innerHTML = [nd, n].map(function (a) {
+      return '<tr><th scope="row" style="text-align:left;font-weight:600">' + esc(a.scope_label) + '</th>' +
+        '<td class="num">' + num(a.sites, 0) + '</td><td class="num">' + num(a.sites_screened_in, 0) + '</td>' +
+        '<td class="num">' + num(a.opportunities, 0) + '</td><td class="num">' + num(a.electric_potential_MW, 0) + '</td>' +
+        '<td class="num">' + num(a.households_servable, 0) + '</td><td class="num">' + num(a.people_not_grid_lower_bound, 0) + '</td></tr>';
+    }).join('');
+    var g = n.screened_out_by_gate || {};
+    document.getElementById('gateNote').innerHTML = 'Nationally, sites failing each gate (a site can fail several): ' +
+      Object.keys(GATE).map(function (k) { return esc(GATE[k]) + ' <strong>' + num(g[k] || 0, 0) + '</strong>'; }).join(' · ') +
+      '. People without access: ' + esc(n.notes.people_not_grid_lower_bound) + '.';
+    document.getElementById('supplyNote').innerHTML = '<strong>Supply exceeds local need.</strong> In the Niger Delta the gas could power about ' +
+      num(nd.households_servable, 0) + ' households, while at least ' + num(nd.people_not_grid_lower_bound, 0) +
+      ' people lack access in the lead catchments. ' + esc(nd.notes.supply_vs_demand.charAt(0).toUpperCase() + nd.notes.supply_vs_demand.slice(1)) + '.';
+    var w = d.method.weights;
+    document.getElementById('terms').innerHTML = TERMS.map(function (t) {
+      return '<div class="card"><p class="fig__label">' + esc(t[1]) + ' <span class="est">estimate</span></p>' +
+        '<span class="sit-w">' + Math.round(w[t[0]] * 100) + '%</span><p>' + esc(t[2]) + '</p>' +
+        '<p class="site-sub">' + esc(d.method.components[t[0]]) + '</p></div>';
+    }).join('');
+    document.getElementById('footnote').textContent = d.footnote;
+    var s = d.sources, sol = s.solar || {};
+    document.getElementById('sources').innerHTML = [
+      'Flare volume: ' + s.volume,
+      'Population and settlements: ' + s.population,
+      'Electricity access: ' + s.access,
+      'Security: ' + s.security,
+      'Solar: ' + (sol.dataset || '') + ', ' + (sol.publisher || '') + ', ' + (sol.licence || '') + ' (layer ' + (sol.layer_version || 'n/a') + ', retrieved ' + (sol.retrieved || 'n/a') + '). ' + (sol.attribution || ''),
+      'Method ' + d.method_version + '. Gas to power assumptions: ' + d.method.gap_assumptions.join('; ') + '.',
+    ].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
+  }
+
+  function table(d) {
+    var rows = d.sites.filter(function (r) { return !state.onlyIn || r.screened_in; });
+    document.getElementById('apiLink').href = API + '/api/siting?scope=' + state.scope + (state.onlyIn ? '&screened=1' : '');
+    if (!rows.length) { document.getElementById('rankBody').innerHTML = '<tr><td colspan="12">No sites in this view.</td></tr>'; return; }
+    document.getElementById('rankBody').innerHTML = rows.map(function (r, i) {
+      var c = r.components, out = !r.screened_in;
+      var item = function (k, v) { return '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; };
+      var why = TERMS.map(function (t) { return item(t[1] + (c[t[0]].score == null ? ', no input' : ', ' + c[t[0]].score), c[t[0]].basis); }).join('');
+      var gates = out ? item('Screened out', r.failed_gates.map(function (k) { return GATE[k] || k; }).join(', ')) : '';
+      var place = r.main_centre_25km ? 'Main centre ' + r.main_centre_25km + ', ' + num(r.main_centre_25km_dist_km, 1) + ' km' : '';
+      return '<tr' + (out ? ' class="sit-out"' : '') + '>' +
+        '<td class="num">' + (i + 1) + '</td>' +
+        '<td><strong>' + esc(r.field_name || r.site_id) + '</strong><br><span class="site-sub">' + esc(r.operator) + (r.cluster_id ? ' · opportunity ' + esc(r.cluster_id) : '') + '</span></td>' +
+        '<td>' + esc(r.state || 'n/a') + (r.niger_delta_class === 'offshore' ? '<br><span class="site-sub">offshore</span>' : '') + '</td>' +
+        '<td class="num"><span class="sit-score">' + (r.siting_score == null ? 'n/a' : r.siting_score) + '</span></td>' +
+        '<td>' + bar(c.access_gap) + '</td><td>' + bar(c.power) + '</td><td>' + bar(c.demand) + '</td><td>' + bar(c.security, ' sit-bar--score') + '</td><td>' + bar(c.solar) + '</td>' +
+        '<td class="num">' + mw(r.electric_potential_MW) + '</td>' +
+        '<td class="num">' + num(r.households_servable, 0) + '</td>' +
+        '<td><button type="button" class="sit-btn" aria-expanded="false" aria-controls="why' + i + '">Why</button></td>' +
+        '</tr><tr class="sit-detail" id="why' + i + '" hidden><td colspan="12"><dl class="sit-why">' + gates + why +
+        item('Place', place || 'no named centre within 25 km') + item('Weights used', r.weights_used === 1 ? 'all five terms' : String(r.weights_used)) + '</dl></td></tr>';
+    }).join('');
+  }
+
+  function render() {
+    return get(state.scope).then(table).catch(fail);
+  }
+  function fail(e) {
+    document.getElementById('rankBody').innerHTML = '<tr><td colspan="12">Could not load the siting API (' + esc(e.message) + ').</td></tr>';
+  }
+
+  document.querySelectorAll('[data-scope]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.scope = b.dataset.scope;
+      document.querySelectorAll('[data-scope]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      render();
+    });
+  });
+  document.getElementById('rankBody').addEventListener('click', function (e) {
+    var b = e.target.closest('.sit-btn');
+    if (!b) return;
+    var open = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(open));
+    document.getElementById(b.getAttribute('aria-controls')).hidden = !open;
+  });
+  document.getElementById('onlyIn').addEventListener('change', function (e) { state.onlyIn = e.target.checked; render(); });
+
+  get('delta').then(function (d) { header(d); table(d); }).catch(fail);
+})();
+</script>
+</body>
+</html>

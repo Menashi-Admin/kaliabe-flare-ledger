@@ -16,6 +16,7 @@
     <nav class="nav" aria-label="Primary">
       <a href="./index.html#map" class="nav__link">Map</a>
       <a href="./index.html#operators" class="nav__link">Operators</a>
+      <a href="siting.html" class="nav__link">Siting</a>
       <a href="methodology.html" class="nav__link" aria-current="page">Methodology</a>
       <a href="data.html" class="nav__link">Data</a>
       <a href="blog/" class="nav__link">Writing</a>
@@ -213,6 +214,24 @@
         before (rising or declining beyond ±25% and at least 3 events, otherwise flat). These are LGA aggregates, not point counts.
         They are reported events, not a risk judgement. Point counts are pending a myACLED account.</li>
     </ul>
+
+    <h2 id="siting">7b. Mini-grid siting screen <span style="font-weight:400;font-size:.9rem;color:var(--ink-soft)">method KFL-M 1.5 · 2026-10-18</span></h2>
+    <p>The <a class="link" href="siting.html">siting page</a> scores every site 0 to 100 as a place for a gas, or hybrid solar and gas,
+      mini-grid. <strong>It is a screening estimate</strong>, not a feasibility study: gas rights, offtake, tariff, licensing, land and
+      community consent are not assessed. The terms reuse the figures above (<code>siting()</code> in <code>ledger-core.js</code>).</p>
+    <ul>
+      <li><strong>Access gap (27%)</strong>: people within 10 km without access, log scale from 1,000 to 200,000.</li>
+      <li><strong>Power (23%)</strong>: the generator size the gas could fuel, log scale from 0.1 to 10 MW. Above 10 MW the gas is more than one mini-grid needs.</li>
+      <li><strong>Demand (18%)</strong>: the main centre within 25 km, log scale from 1,000 to 100,000 people, reduced with distance (full credit within 5 km, half at 25 km).</li>
+      <li><strong>Security (22%)</strong>: 100, less 20 for each recorded attack on energy infrastructure within 10 km, 2 for each between 10 and 25 km (Oxford/Inuwa 2026), and 15 if the ACLED trend is rising. Recorded attacks, not a risk rating.</li>
+      <li><strong>Solar (10%)</strong>: global horizontal irradiation at the site, 4.0 to 5.5 kWh/m²/day (Global Solar Atlas 2, World Bank / Solargis, CC BY 4.0).</li>
+    </ul>
+    <p>A missing input drops its term and the other weights are rescaled; nothing is guessed. A site is <strong>screened in</strong> only if
+      it is onshore, its gas could fuel at least 0.1 MW, at least 1,000 people within 10 km lack access, and no more than 2 energy-infrastructure
+      attacks were recorded within 10 km. Opportunities are formed by leader clustering: the best-scoring site leads, and screened-in
+      sites within 20 km of it (overlapping catchments) join it. Lead sites are more than 20 km apart, so adding up their unserved
+      population gives a lower bound that never counts anyone twice. MW and households are supply-side: at most sites the gas could
+      power more households than lack access nearby, and the surplus would need a grid connection or an industrial buyer.</p>
 
     <h2 id="niger-delta">8. Niger Delta classification</h2>
     <p>

@@ -18,6 +18,7 @@ contents, licence, and access method are listed below.
 | **Nigeria DHS 2023-24** (NPC & ICF) | State population-with-electricity → derived state rural proxy | DHS Program terms: public aggregate indicators, cite NPC & ICF | https://api.dhsprogram.com |
 | **NASA FIRMS (LANCE) VIIRS 375 m NRT** | Live hot-pixel detections (bright_ti4, FRP) for the live check and the last-24h layer | NASA Earth Science open data policy (acknowledgement requested) | https://firms.modaps.eosdis.nasa.gov/ |
 | **ACLED — Nigeria, monthly events by LGA** (via HDX) | Political-violence / civilian-targeting / demonstration events and fatalities by LGA | ACLED Terms of Use & Attribution Policy — attribution required; used for non-commercial monitoring; **confirm before commercial reuse** | https://data.humdata.org/dataset/nigeria-acled-conflict-data |
+| **Global Solar Atlas 2** (KFL-M 1.5) | Long-term annual GHI (kWh/m²) and PV output (kWh/kWp) at each site, for the siting score's solar term; point service, cached offline, only a 476-row JSON ships | CC BY 4.0 (World Bank / ESMAP; data by Solargis) | https://globalsolaratlas.info |
 | **OCHA COD-AB Nigeria admin-2** | LGA polygons with P-codes for the ACLED join and the security layer | CC BY-IGO | https://data.humdata.org/dataset/cod-ab-nga |
 
 Reachability, vintage, checksums and licences are re-checked by `scripts/validate_sources.py`,

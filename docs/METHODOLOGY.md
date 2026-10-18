@@ -1,6 +1,6 @@
 # Methodology & Confidence
 
-**Kaliabe Flare Ledger · method version KFL-M 1.3 (2026-10-17)**
+**Kaliabe Flare Ledger · method version KFL-M 1.5 (2026-10-18)**
 Mirrors the site's [methodology page](https://kaliabe-flare-web.pages.dev/methodology.html). The
 code that implements each rule is named next to it.
 
@@ -12,7 +12,9 @@ code that implements each rule is named next to it.
 
 | Version | Date | Change |
 |---|---|---|
-| **KFL-M 1.3** | 2026-10-17 | **Enrichment — live & opportunity** (§9). Population within 5/10/25/50 km (GRID3 v3.0); power-gap estimates (`core.powerGap`); electricity-access context (WDI, NDHS 2023-24) with a derived state rural proxy; live NASA FIRMS thermal check with an under-report flag (`core.liveCheck`); ACLED LGA security context and 12-month trend (`core.secTrend`). New thresholds: `live_min_window_nights`, `live_burning_night_share_pct`, `sec_trend_band_pct`, `sec_trend_min_abs_events`. No change to verdicts, trends or penalties. |
+| **KFL-M 1.5** | 2026-10-18 | **Mini-grid siting screen** (§9.6). Every site scored 0 to 100 on access gap, gas-to-power, demand, security and solar resource (`core.siting`), four screening gates, 20 km leader-clustered opportunities (`core.sitingClusters`). New API route `/api/siting`, page `siting.html`, input file `web/public/data/siting.json` (`scripts/build_siting.py`, Global Solar Atlas 2, CC BY 4.0). New thresholds: `siting_min_mw`, `siting_min_people_not_grid`, `siting_max_energy_attacks_10km`, `siting_cluster_km`. No existing field or route changed. |
+| KFL-M 1.4 | 2026-10-18 | Energy-infrastructure incident overlay: per-site 10/25/50 km counts of attacks on oil, gas and power infrastructure 2015 to now (Oxford/Inuwa et al. 2026, CC BY 4.0), served as `sec_energy`. |
+| KFL-M 1.3 | 2026-10-17 | **Enrichment — live & opportunity** (§9). Population within 5/10/25/50 km (GRID3 v3.0); power-gap estimates (`core.powerGap`); electricity-access context (WDI, NDHS 2023-24) with a derived state rural proxy; live NASA FIRMS thermal check with an under-report flag (`core.liveCheck`); ACLED LGA security context and 12-month trend (`core.secTrend`). New thresholds: `live_min_window_nights`, `live_burning_night_share_pct`, `sec_trend_band_pct`, `sec_trend_min_abs_events`. No change to verdicts, trends or penalties. |
 | KFL-M 1.2 | 2026-10-17 | **Penalty basis corrected.** The governing instrument is the Flare Gas (Prevention of Waste and Pollution) Regulations, **2018** (S.I. No. 9 of 2018), not "NUPRC 2022 Regulations". Every penalty is now shown at **both** Reg. 13 tiers ($2.00 / $0.50) and no midpoint is used; the exemptions are stated. GFMR vintage labelled (June 2026 release, three-satellite method). Emissions ratios updated to the June 2026 tracker, and unburned methane is now reported as CH₄ mass (1.1 labelled a CO₂e quantity "t CH₄"). Niger Delta now by the nine-state boundary, with offshore sites labelled. Thresholds named and explicit: significance rules, rising floor, peer-set rules, top-decile cut-off, scenario rounding. |
 | KFL-M 1.1 | 2026-10-16 | Decision layer Wave 1. |
 
@@ -353,6 +355,39 @@ estimate** on the stated assumption, labelled `estimate` in the API (`gap_label`
   `data/samples/acled_point_sample_SYNTHETIC.csv` is invented test data for `--self-test` only.
 - **Not a judgement.** These are reported conflict events, evidence for monitoring. They are not a risk
   rating of a site or an operator.
+
+### 9.6 Mini-grid siting screen (KFL-M 1.5; `siting()` / `sitingClusters()` in `ledger-core.js`; `/api/siting`)
+
+A **screening estimate** of where the flared gas could fuel a gas, or hybrid solar and gas, mini-grid. It is
+built only from fields the site record already carries, plus one new input (solar). It is not a feasibility
+study: gas rights, offtake, tariff, licensing, land and community consent are not assessed.
+
+| Term | Weight | Input | Scale (0 to 100) |
+|---|---|---|---|
+| Access gap | 27% | `people_within_10km_not_grid` | log, 1,000 to 200,000 people |
+| Power | 23% | generator MW from `core.powerGap` (unrounded) | log, 0.1 to 10 MW (10 MW and above = 100) |
+| Demand | 18% | `main_centre_25km_pop`, `main_centre_25km_dist_km` | log, 1,000 to 100,000 people, × a distance factor (1 within 5 km, falling linearly to 0.5 at 25 km) |
+| Security | 22% | `sec_energy.attacks_10km`, `attacks_25km`, `sec_trend` | 100 − 20 per attack within 10 km − 2 per attack 10 to 25 km − 15 if the ACLED trend is rising |
+| Solar | 10% | GHI kWh/m²/day (`siting.json`) | linear, 4.0 to 5.5 |
+
+- **Score** = weighted mean of the terms that have an input; missing terms are dropped and the remaining weights
+  renormalised (`weights_used` < 1 shows it). A null input is never replaced by a guess.
+- **Gates** (all must pass to be *screened in*): onshore (`niger_delta_class` ≠ offshore; an offshore flare needs a
+  gas line to shore first); gas-to-power ≥ 0.1 MW; ≥ 1,000 people within 10 km without access; ≤ 2 recorded
+  energy-infrastructure attacks within 10 km.
+- **Opportunities** (leader clustering, no chaining): the best-scoring unassigned screened-in site leads; every
+  unassigned screened-in site within 20 km of it (overlapping 10 km catchments) joins; repeat. Lead sites are all
+  more than 20 km apart, so their 10 km circles do not overlap and the sum of the leads' unserved figures is a
+  **lower bound** on people without access. The people figure is never summed across overlapping sites.
+- **Supply exceeds local need** at most screened-in sites: households servable is what the gas could power, and
+  it is usually larger than the unserved population nearby. The surplus would need a grid connection or an
+  industrial buyer; the screen does not size that.
+- **MW and households** are supply-side: what the gas could power, not who would connect.
+- **Solar input** (`scripts/build_siting.py`): Global Solar Atlas 2 (World Bank / ESMAP, Solargis data, CC BY 4.0),
+  long-term annual GHI and PV output at the site coordinate, from the Atlas point service. The KTH Solar
+  Potential file on energydata.info, named in the build brief, is behind a browser challenge and cannot be
+  fetched by a script, so the Atlas is used instead.
+- **Scopes**: `national` = all 476 GFMR sites; `delta` = sites inside the nine Niger Delta states.
 
 ## 10. Honesty constraints
 

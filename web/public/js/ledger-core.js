@@ -36,6 +36,11 @@
     live_burning_night_share_pct: 50,
     sec_trend_band_pct: 25,
     sec_trend_min_abs_events: 3,
+    // KFL-M 1.5 mini-grid siting screen (core.siting). Gates, not weights.
+    siting_min_mw: 0.1,
+    siting_min_people_not_grid: 1000,
+    siting_max_energy_attacks_10km: 2,
+    siting_cluster_km: 20,
   };
   const THRESHOLD_DOCS = [
     ['trend_stable_band_pct', 'Trend: stable band', '±5%', 'A recent-vs-baseline change inside ±5% is labelled stable.'],
@@ -50,6 +55,10 @@
     ['scenario_sig_figs', 'Scenario rounding', '3 significant figures', 'Scenario outputs are rounded to 3 significant figures (step 5%) so they are not read as precise; always labelled “scenario” with the assumption.'],
     ['live_burning_night_share_pct', 'Live thermal: “burning now”', '≥50% of nights in the window, window ≥3 nights', 'A site is live-burning when VIIRS (NASA FIRMS) detected it on at least half the nights in the rolling window. Cloudy nights count as misses, so the share is a lower bound.'],
     ['live_min_window_nights', 'Live thermal: minimum window', '3 nights', 'No live verdict until the window covers this many nights.'],
+    ['siting_min_mw', 'Siting gate: gas-to-power', '0.1 MW', 'A site is screened in only if its latest-year flared gas could fuel at least a 100 kW generator continuously.'],
+    ['siting_min_people_not_grid', 'Siting gate: unserved demand', '1,000 people', 'At least this many people within 10 km estimated to be without grid access.'],
+    ['siting_max_energy_attacks_10km', 'Siting gate: security', '2 or fewer attacks within 10 km', 'Three or more recorded attacks on oil, gas or power infrastructure within 10 km since 2015 screens a site out.'],
+    ['siting_cluster_km', 'Siting: opportunity cluster', 'within 20 km of the lead site', 'The best-scoring screened-in site leads an opportunity; screened-in sites within 20 km of it (overlapping 10 km catchments) join it, because one mini-grid would serve the shared catchment.'],
     ['sec_trend_band_pct', 'Security trend band', '±25% and ±3 events', 'Political-violence events in the LGAs touching the 25 km circle, last 12 months vs the 12 before: rising / declining only if the change is beyond ±25% and at least 3 events; otherwise flat.'],
   ];
 
@@ -167,6 +176,123 @@
     return out('flat');
   }
 
+  // ------------------------------------------------- mini-grid siting (1.5)
+  // A screening score, 0 to 100, for a gas (or hybrid solar + gas) mini-grid
+  // at a flare site. Built only from fields the site record already carries.
+  // Every term is an ESTIMATE; a null input gives a null term, never a guess,
+  // and the weights of the remaining terms are renormalised.
+  const SITING = {
+    weights: { access_gap: 0.27, power: 0.23, demand: 0.18, security: 0.22, solar: 0.10 },
+    scales: {
+      access_gap: [1e3, 2e5],     // people without access within 10 km, log scale
+      power: [0.1, 10],           // MW the gas could fuel, log scale; 10 MW and up scores 100
+      demand: [1e3, 1e5],         // population of the main centre within 25 km, log scale
+      demand_near_km: 5,          // full credit when the centre is this close
+      demand_far_factor: 0.5,     // credit at 25 km (a longer distribution line)
+      security_per_attack_10km: 20,
+      security_per_attack_10_25km: 2,
+      security_rising_trend: 15,
+      solar: [4.0, 5.5],          // GHI kWh/m2/day, linear
+    },
+  };
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
+  const logScale = (v, lo, hi) => (v > 0 ? clamp01((Math.log10(v) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo))) : 0);
+  const fin = (v) => typeof v === 'number' && isFinite(v);
+
+  // site: one /api/sites record. solar: { ghi_kwh_m2_day, pvout_kwh_kwp_yr } or null.
+  function siting(site, solar, T = THRESHOLDS) {
+    const S = SITING.scales, W = SITING.weights;
+    const mw = fin(site.electric_potential_MW_exact) ? site.electric_potential_MW_exact : fin(site.electric_potential_MW) ? site.electric_potential_MW : null;
+    const dark = fin(site.people_within_10km_not_grid) ? site.people_within_10km_not_grid : null;
+    const se = site.sec_energy || null;
+    const term = (score, value, basis) => ({ score: score == null ? null : Math.round(score * 100), value, basis, label: 'estimate' });
+
+    const access = dark == null ? term(null, null, 'no population or access figure for this site')
+      : term(logScale(dark, ...S.access_gap), dark, `${num(dark, 0)} people within 10 km without grid access (GRID3 pop10km x (1 - state rural access proxy ${site.rural_access_proxy_pct}%)); log scale ${num(S.access_gap[0], 0)} to ${num(S.access_gap[1], 0)}`);
+    const power = mw == null ? term(null, null, 'no latest-year volume')
+      : term(logScale(mw, ...S.power), mw, `${num(mw, mw < 10 ? 1 : 0)} MW the latest-year flared gas could fuel continuously (${num(site.gas_available_GWh, 1)} GWh/yr of gas at 40% efficiency); log scale ${S.power[0]} to ${S.power[1]} MW${mw > S.power[1] ? '; more gas than one mini-grid needs, an embedded-generation case' : ''}`);
+    let demand;
+    if (!fin(site.main_centre_25km_pop) || !site.main_centre_25km) demand = term(dark == null ? null : 0, 0, 'no named settlement within 25 km');
+    else {
+      const d = fin(site.main_centre_25km_dist_km) ? site.main_centre_25km_dist_km : 25;
+      const f = d <= S.demand_near_km ? 1 : 1 - (1 - S.demand_far_factor) * Math.min(1, (d - S.demand_near_km) / (25 - S.demand_near_km));
+      demand = term(logScale(site.main_centre_25km_pop, ...S.demand) * f, site.main_centre_25km_pop,
+        `${site.main_centre_25km} (${num(site.main_centre_25km_pop, 0)} people within 2 km of the point), ${num(d, 1)} km away; log scale ${num(S.demand[0], 0)} to ${num(S.demand[1], 0)}, distance factor ${num(f, 2)}`);
+    }
+    let security;
+    if (!se) security = term(null, null, 'no incident overlay for this site');
+    else {
+      const a10 = se.attacks_10km || 0, a25 = Math.max(0, (se.attacks_25km || 0) - a10);
+      const rising = site.sec_trend === 'rising';
+      const v = 100 - S.security_per_attack_10km * a10 - S.security_per_attack_10_25km * a25 - (rising ? S.security_rising_trend : 0);
+      security = term(clamp01(v / 100), a10, `${a10} energy-infrastructure attacks within 10 km and ${a25} more within 25 km since 2015 (Oxford/Inuwa 2026); ACLED area trend ${site.sec_trend}; 100 - ${S.security_per_attack_10km} per 10 km attack - ${S.security_per_attack_10_25km} per 10 to 25 km attack${rising ? ` - ${S.security_rising_trend} for a rising trend` : ''}`);
+    }
+    const ghi = solar && fin(solar.ghi_kwh_m2_day) ? solar.ghi_kwh_m2_day : null;
+    const sol = ghi == null ? term(null, null, 'no solar resource value for this site')
+      : term(clamp01((ghi - S.solar[0]) / (S.solar[1] - S.solar[0])), ghi, `GHI ${num(ghi, 2)} kWh/m2/day${fin(solar.pvout_kwh_kwp_yr) ? `, PV output ${num(solar.pvout_kwh_kwp_yr, 0)} kWh/kWp/yr` : ''} (Global Solar Atlas 2); linear ${S.solar[0]} to ${S.solar[1]}`);
+
+    const components = { access_gap: access, power, demand, security, solar: sol };
+    let wsum = 0, acc = 0;
+    for (const [k, c] of Object.entries(components)) if (c.score != null) { wsum += W[k]; acc += W[k] * c.score; }
+    const score = wsum ? Math.round(acc / wsum) : null;
+
+    const a10 = se ? se.attacks_10km || 0 : null;
+    const gates = [
+      { id: 'onshore', pass: site.niger_delta_class !== 'offshore', rule: 'onshore (an offshore flare needs a gas line to shore before it can feed a mini-grid)' },
+      { id: 'power', pass: mw != null && mw >= T.siting_min_mw, rule: `gas could fuel at least ${T.siting_min_mw} MW` },
+      { id: 'demand', pass: dark != null && dark >= T.siting_min_people_not_grid, rule: `at least ${num(T.siting_min_people_not_grid, 0)} people without access within 10 km` },
+      { id: 'security', pass: a10 != null && a10 <= T.siting_max_energy_attacks_10km, rule: `${T.siting_max_energy_attacks_10km} or fewer energy-infrastructure attacks within 10 km` },
+    ];
+    return {
+      siting_score: score,
+      screened_in: gates.every((g) => g.pass),
+      failed_gates: gates.filter((g) => !g.pass).map((g) => g.id),
+      gates, components,
+      weights_used: wsum ? Number(wsum.toFixed(2)) : 0,
+      label: 'estimate',
+    };
+  }
+
+  // Great-circle distance, km.
+  function haversineKm(a, b) {
+    const R = 6371.0088, r = Math.PI / 180;
+    const dl = (b.lat - a.lat) * r, dn = (b.lon - a.lon) * r;
+    const h = Math.sin(dl / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dn / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  // Opportunities: leader clustering. The best-scoring unassigned site leads;
+  // every unassigned site within siting_cluster_km of it (its 10 km circle
+  // overlaps the lead's) joins. Repeat. No chaining, so a cluster never spans
+  // more than 2 x siting_cluster_km. Leads are all more than siting_cluster_km
+  // apart, so their 10 km circles are disjoint: summing the leads' unserved
+  // figures is a lower bound on the people without access, never a double count.
+  // rows: [{ site_id, lat, lon, siting_score, electric_potential_MW_exact,
+  //          households_servable, people_within_10km_not_grid }]
+  function sitingClusters(rows, T = THRESHOLDS) {
+    const left = rows.slice().sort((a, b) => (b.siting_score || 0) - (a.siting_score || 0) || (b.electric_potential_MW_exact || 0) - (a.electric_potential_MW_exact || 0));
+    const out = [];
+    while (left.length) {
+      const lead = left.shift();
+      const g = [lead];
+      for (let i = left.length - 1; i >= 0; i--) if (haversineKm(lead, left[i]) <= T.siting_cluster_km) g.push(left.splice(i, 1)[0]);
+      g.sort((a, b) => (b.siting_score || 0) - (a.siting_score || 0));
+      const mw = g.reduce((a, r) => a + (r.electric_potential_MW_exact || 0), 0);
+      out.push({
+        lead_site_id: lead.site_id,
+        site_ids: g.map((r) => r.site_id),
+        sites: g.length,
+        lead_score: lead.siting_score,
+        radius_km: Math.round(Math.max(0, ...g.map((r) => haversineKm(lead, r))) * 10) / 10,
+        electric_potential_MW: roundMW(mw),
+        electric_potential_MW_exact: mw,
+        households_servable: sig(g.reduce((a, r) => a + (r.households_servable || 0), 0), 2),
+        people_not_grid_lead: lead.people_within_10km_not_grid || 0,
+      });
+    }
+    return out;
+  }
+
   // ---------------------------------------------------------------- formatting
   const nf = (d) => new Intl.NumberFormat('en-US', { maximumFractionDigits: d, minimumFractionDigits: 0 });
   const num = (v, d = 1) => (v == null || !isFinite(v) ? '—' : nf(d).format(v));
@@ -244,5 +370,5 @@
     </svg>`;
   }
 
-  return { THRESHOLDS, THRESHOLD_DOCS, convert, scenario, changeSignificant, rising, powerGap, liveCheck, secTrend, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
+  return { THRESHOLDS, THRESHOLD_DOCS, SITING, convert, scenario, changeSignificant, rising, powerGap, liveCheck, secTrend, siting, sitingClusters, haversineKm, trendChart, util: { num, money, pct, esc, ordinal, sig, penaltyPair } };
 });
