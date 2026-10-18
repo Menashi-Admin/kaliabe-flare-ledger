@@ -1020,6 +1020,10 @@ function investResponse(url, ledger) {
     label: 'estimate',
     footnote: INVEST_FOOTNOTE,
     scope, scope_label: SITING_SCOPES[scope].label,
+    tiers: {
+      public: ['screening score, per-site components, methodology, underlying open inputs (GFMR volume, FIRMS persistence and FRP, population, access, incident overlay, solar)', 'everything on this public surface is reproducible from open sources on stated assumptions'],
+      partner: ['verified operator and facility registry, measured flow and gas-composition validation, offtake and PPA price scenarios, tariff and grid stress tests, project-level investment memos, full data-pack export and API, ongoing monitoring', 'requires a partnership engagement and our official-capacity data licence: contact@kaliabe.ng'],
+    },
     aggregate: { national: investAggregate(rows), delta: investAggregate(rows.filter(SITING_SCOPES.delta.test)) },
     spread: { scored: agg.scored, gated: agg.gated, score: agg.score, ungated: agg.ungated },
     method: {
