@@ -1,0 +1,26 @@
+{
+  "schema": "kcc-place-cache/1",
+  "query": {
+    "name": "Ibadan",
+    "state": "Oyo",
+    "postcode": null
+  },
+  "resolved_at": "2026-10-18",
+  "nipost": {
+    "status": "not_attempted_no_postcode"
+  },
+  "coords": {
+    "lat": 7.3784,
+    "lon": 3.8972,
+    "osm_ref": "node/27565066",
+    "display_name": "Ìbàdàn, Ibadan South West, Oyo, 234102, Nigeria",
+    "licence": "OpenStreetMap contributors, ODbL 1.0",
+    "resolver": "osm-nominatim",
+    "method": "place-name fallback (NIPOST L5 coordinates not available)"
+  },
+  "zone": {
+    "value": "South West",
+    "resolver": "derived from state by KCC (six geopolitical zones), not from NIPOST",
+    "assumed": false
+  }
+}

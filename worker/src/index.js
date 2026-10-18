@@ -26,6 +26,7 @@ import LIVE_BUNDLED from '../../web/public/data/live/live_thermal.json';
 import SITING_INPUTS from '../../web/public/data/siting.json';
 import FIRMS_HISTORY from '../../web/public/data/live/firms_history.json';
 import NEWS_BUNDLED from '../../web/public/data/news/feed.json';
+import { quote as kccQuote, listMeta as kccMeta } from './kcc.js';
 
 const T = core.THRESHOLDS;
 
@@ -1200,6 +1201,13 @@ export default {
       if (path === '/api/siting') return sitingResponse(url, await loadLedger(env));
 
       if (path === '/api/invest') return investResponse(url, await loadLedger(env));
+
+      // KCC 1.0 (Commodity Cost Tracker): separate surface, not part of KFL-M
+      if (path === '/api/kcc/quote' || path === '/kcc/quote') {
+        const q = kccQuote({ from: url.searchParams.get('from'), to: url.searchParams.get('to'), commodity: url.searchParams.get('commodity'), fx: parseFloat(url.searchParams.get('fx')) });
+        return json(q.body, q.status);
+      }
+      if (path === '/api/kcc/meta' || path === '/kcc/meta') return json(kccMeta());
 
       if (path === '/api/sites/trend') {
         // lightweight aggregate for map — latest year markers

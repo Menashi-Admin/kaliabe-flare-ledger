@@ -1,0 +1,26 @@
+{
+  "schema": "kcc-place-cache/1",
+  "query": {
+    "name": "Abuja",
+    "state": "Federal Capital Territory",
+    "postcode": null
+  },
+  "resolved_at": "2026-10-18",
+  "nipost": {
+    "status": "not_attempted_no_postcode"
+  },
+  "coords": {
+    "lat": 9.0643,
+    "lon": 7.4893,
+    "osm_ref": "node/31203257",
+    "display_name": "Abuja, Municipal Area Council, Federal Capital Territory, 223140, Nigeria",
+    "licence": "OpenStreetMap contributors, ODbL 1.0",
+    "resolver": "osm-nominatim",
+    "method": "place-name fallback (NIPOST L5 coordinates not available)"
+  },
+  "zone": {
+    "value": "North Central",
+    "resolver": "derived from state by KCC (six geopolitical zones), not from NIPOST",
+    "assumed": false
+  }
+}

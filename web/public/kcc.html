@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Commodity cost tracker | Kaliabe</title>
+<meta name="description" content="A rough, sourced range for what it costs to move a commodity between two places in Nigeria. Low, central and high estimates on an open, owned rate model. Negotiation-planning ranges, not quotes." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23B08A43%22/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/base.css" />
+<style>
+  /* KCC house tokens: ivory / forest / brass. Scoped to this page; base.css layout is reused. */
+  :root{--paper:#F3F0E8;--paper-2:#EAE5D6;--ink:#17231F;--ink-soft:#4F5B55;--line:#D5CEBB;--accent:#0E4B3C;--accent-soft:#DCE6DF;--brass:#B08A43;
+    --serif:'Cormorant Garamond',Georgia,serif;--sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .brand__mark{background:var(--brass);box-shadow:0 0 0 4px #E9DDBF}
+  .page h1,.page h2{color:var(--accent)}
+  .kcc-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:26px 0 8px;max-width:900px}
+  .kcc-form label{display:block;font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:6px}
+  .kcc-form input,.kcc-form select{width:100%;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:10px 12px;font:inherit}
+  .kcc-btn{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}
+  .kcc-btn:hover{background:#0A3A2F}
+  .kcc-hint{font-size:.84rem;color:var(--ink-soft);max-width:70ch}
+  .qcard{border:1px solid var(--line);border-top:3px solid var(--brass);background:#fff;border-radius:0 0 8px 8px;padding:24px 26px;margin:28px 0;max-width:900px}
+  .qcard h2{margin:0 0 4px!important}
+  .qband{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+  .qband div{background:var(--paper-2);border-radius:8px;padding:14px 16px}
+  .qband dt{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft)}
+  .qband dd{margin:4px 0 0;font-family:var(--serif);font-size:2rem;font-weight:600;color:var(--accent)}
+  .qband .central{background:var(--accent-soft)}
+  .qsmall{font-size:.84rem;color:var(--ink-soft);margin:4px 0}
+  .qtable{width:100%;border-collapse:collapse;font-size:.88rem;margin:10px 0}
+  .qtable th,.qtable td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .qtable th{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft)}
+  .tag{display:inline-block;font-size:.72rem;border:1px solid var(--brass);color:#7A5E27;border-radius:10px;padding:0 8px;margin-left:6px}
+  .err{border-left:3px solid #8a2b1f;background:#f3dfdb;padding:12px 16px;border-radius:0 6px 6px 0;max-width:900px}
+  @media(max-width:560px){.qband{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <div class="brand"><span class="brand__mark" aria-hidden="true"></span><span class="brand__name"><a href="./" style="color:inherit;text-decoration:none">Kaliabe</a></span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="nav__link">Flare tracker</a>
+      <a href="kcc.html" class="nav__link" aria-current="page">Commodity costs</a>
+      <a href="methodology.html" class="nav__link">Methodology</a>
+      <a href="data.html" class="nav__link">Data</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <div class="wrap">
+    <p class="hero__kicker" style="color:var(--brass)">Commodity cost tracker <span id="ver">KCC 1.0</span></p>
+    <h1>What does it roughly cost to move it?</h1>
+    <p class="lede">Pick where it starts, where it goes and what it is. You get a low, central and high range per tonne, built on an open rate model. Every figure shows its source, its vintage and whether we assumed it.</p>
+
+    <div class="notice"><strong>Read this first.</strong> These are negotiation-planning ranges, not quotes. A haulier's price depends on season, diesel, security, queues and who you are. The band is wide on purpose: low stacks every favourable input, high stacks every unfavourable one.</div>
+
+    <form class="kcc-form" id="f">
+      <div><label for="from">From</label><input id="from" list="places" placeholder="Port Harcourt" autocomplete="off" required /></div>
+      <div><label for="to">To</label><input id="to" list="places" placeholder="Apapa" autocomplete="off" required /></div>
+      <div><label for="com">Commodity</label><select id="com" required></select></div>
+      <div style="align-self:end"><button class="kcc-btn" type="submit">Estimate</button></div>
+    </form>
+    <datalist id="places"></datalist>
+    <p class="kcc-hint">Type a place from the list (add the state after a comma if two share a name), or a point as <code>6.52,3.37</code>. NIPOST postcodes are not accepted live yet: the NIPOST layer is built but no API key was available, so the place grid is resolved from place names. <a href="https://github.com/Menashi-Admin/kaliabe-flare-ledger/blob/main/docs/METHODOLOGY-KCC.md" class="link">Why</a>.</p>
+
+    <div id="out" aria-live="polite"></div>
+  </div>
+</main>
+
+<footer class="foot"><div class="wrap foot__inner">
+  <p>Built by Kaliabe. Open data, owned method, honest uncertainty. Estimates only, not quotes. Rate model and sources: <a href="https://github.com/Menashi-Admin/kaliabe-flare-ledger/blob/main/docs/METHODOLOGY-KCC.md">docs/METHODOLOGY-KCC.md</a>.</p>
+  <p class="foot__links"><a href="mailto:contact@kaliabe.ng">contact@kaliabe.ng</a></p>
+</div></footer>
+
+<script>
+(function () {
+  var API = '';
+  var out = document.getElementById('out');
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function n(v) { return Number(v).toLocaleString('en-NG'); }
+  function prov(o) { return esc(o.source) + ' | vintage: ' + esc(o.vintage) + ' | ' + (o.assumed ? '<strong>assumed</strong>' : 'cited'); }
+
+  fetch(API + '/api/kcc/meta').then(function (r) { return r.json(); }).then(function (m) {
+    document.getElementById('ver').textContent = m.version;
+    document.getElementById('places').innerHTML = m.places.map(function (p) { return '<option value="' + esc(p.name + ', ' + p.state) + '">'; }).join('');
+    document.getElementById('com').innerHTML = m.commodities.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>'; }).join('');
+  }).catch(function () { out.innerHTML = '<p class="err">The quote service could not be reached. Try again shortly.</p>'; });
+
+  function band(label, o, pre) {
+    return '<dl class="qband" style="margin:12px 0"><div><dt>Low</dt><dd>' + pre + n(o.low) + '</dd></div><div class="central"><dt>Central</dt><dd>' + pre + n(o.central) + '</dd></div><div><dt>High</dt><dd>' + pre + n(o.high) + '</dd></div></dl>';
+  }
+  function render(q) {
+    var e = q.estimate, d = q.distance;
+    var rows = q.components.map(function (c) {
+      return '<tr><td>' + esc(c.name) + '</td><td>' + n(c.low) + ' / ' + n(c.central) + ' / ' + n(c.high) + '<br><span class="qsmall">' + esc(c.unit) + '</span></td><td class="qsmall">' + prov(c) + (c.note ? '<br>' + esc(c.note) : '') + (c.anchor_verified === false ? '<br><span class="tag">anchor not re-verified in this build</span>' : '') + '</td></tr>';
+    }).join('');
+    out.innerHTML =
+      '<section class="qcard"><h2>' + esc(q.request.from) + ' to ' + esc(q.request.to) + '</h2>' +
+      '<p class="qsmall">' + esc(q.request.commodity.replace(/_/g, ' ')) + ' | ' + esc(q.commodity_note) + '</p>' +
+      '<p class="qsmall"><strong>Estimated cost per tonne (USD)</strong></p>' + band('usd', e.per_tonne_usd, '$') +
+      '<p class="qsmall">Source: ' + prov(e.per_tonne_usd) + '</p>' +
+      '<p class="qsmall"><strong>In naira at a placeholder rate of ' + n(q.fx.value) + ' per USD</strong> (' + esc(q.fx.source) + '): ' + n(e.per_tonne_ngn.low) + ' to ' + n(e.per_tonne_ngn.high) + ' per tonne, central ' + n(e.per_tonne_ngn.central) + '.</p>' +
+      '<p class="qsmall"><strong>Per truckload</strong> (central payload): $' + n(e.per_truckload_usd.low) + ' to $' + n(e.per_truckload_usd.high) + ', central $' + n(e.per_truckload_usd.central) + '. <strong>Per ' + esc(e.per_typical_unit_usd.unit.replace('USD per ', '')) + ':</strong> $' + e.per_typical_unit_usd.low + ' to $' + e.per_typical_unit_usd.high + '.</p>' +
+      '<h3>Distance</h3><p class="qsmall">' + n(d.km.low) + ' / ' + n(d.km.central) + ' / ' + n(d.km.high) + ' km (low / central / high). Method: <strong>' + esc(d.method === 'osrm_road' ? 'routed road distance' : 'straight line times winding factor') + '</strong>. ' + esc(d.method_label) + '. Straight line ' + n(d.straight_line_km) + ' km. ' + prov(d) + '</p>' +
+      '<h3>How the range was built</h3><table class="qtable"><thead><tr><th>Input</th><th>Low / central / high</th><th>Source, vintage, status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p class="qsmall">Formula: haul = truck-km rate x km x corridor x road condition / payload; total = haul + handling. Low uses every low input and the highest payload; high uses every high input and the lowest payload.</p>' +
+      '<h3>Table reference</h3><p class="qsmall">Route key <code>' + esc(q.table_reference.route_key || 'point-to-point (no routed pair)') + '</code> in <a class="link" href="data/kcc/routes.json">routes.json</a>; parameters in <a class="link" href="data/kcc/model.json">model.json</a>; commodity <code>' + esc(q.request.commodity) + '</code> in <code>data/commodities.json</code>. Anyone can reproduce this quote from those files.</p>' +
+      '<div class="notice" style="margin-bottom:0">' + esc(q.note) + ' Where the quote says assumed, nobody measured it; where it says cited, the source is named and some citations are still unverified (flagged above).</div></section>';
+  }
+  document.getElementById('f').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var qs = new URLSearchParams({ from: document.getElementById('from').value, to: document.getElementById('to').value, commodity: document.getElementById('com').value });
+    out.innerHTML = '<p class="qsmall">Working...</p>';
+    fetch(API + '/api/kcc/quote?' + qs).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); }).then(function (x) {
+      if (!x.ok) { out.innerHTML = '<p class="err"><strong>No estimate.</strong> ' + esc(x.j.error) + (x.j.which ? ' (' + esc(x.j.which) + ')' : '') + '. ' + esc(x.j.detail || '') + '</p>'; return; }
+      render(x.j);
+    }).catch(function () { out.innerHTML = '<p class="err">The quote service could not be reached.</p>'; });
+  });
+})();
+</script>
+</body>
+</html>
